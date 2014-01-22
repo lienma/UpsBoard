@@ -13,3 +13,10 @@ results
 
 npm-debug.log
 node_modules
+
+cache
+cache
+public/javascripts/.cache
+config.js
+plex.js
+
