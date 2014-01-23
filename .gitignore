@@ -1,6 +1,7 @@
-cache/plex/*
-cache/sickbeard/*
+cache
 node_modules
 public/javascripts/.cache
+
 config.js
 plex.js
+

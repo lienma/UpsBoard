@@ -14,17 +14,15 @@ var express 		= require('express')
 var passport 		= require('passport')
   , LocalStrategy 	= require('passport-local').Strategy;
 
-var api 			= require('./routes/api')
-  , routes 			= require('./routes')
-  , stats 			= require('./routes/stats')
-  , config 			= require('./libs/Config')
-  , Logger 			= require('./libs/Logger');
+var appRoot 		= path.resolve(__dirname)
+  , paths 			= require(appRoot + '/core/paths');
 
-var publicPath 		= path.join(__dirname, 'public')
-  , app 			= express();
+var routes 			= require(paths.core + '/routes')
+  , config 			= require(paths.core + '/config')
+  , logger 			= require(paths.logger)('MAIN_APP');
 
-var server 			= http.createServer(app)
-  , logger 			= Logger('MAIN_APP');
+var app 			= express()
+  , server 			= http.createServer(app);
 
 if(os.type() == 'Windows_NT') {
 	console.log('UpsBoard only works on Linux operating system, and also Mac with limited features.');
@@ -32,6 +30,7 @@ if(os.type() == 'Windows_NT') {
 }
 
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
+
 config().then(function(conf) {
 
 	app.isMacOs = (os.type() == 'Linux') ? false : true;
@@ -39,10 +38,10 @@ config().then(function(conf) {
 	app.config = conf;
 
 	// all environments
-	app.set('host', app.config.host);
-	app.set('port', app.config.port);
-	app.set('views', path.join(__dirname, 'views'));
-	app.set('view engine', 'jade');
+	app.set('host', 		app.config.host);
+	app.set('port', 		app.config.port);
+	app.set('views', 		path.join(paths.core, 'views'));
+	app.set('view engine', 	'jade');
 
 	passport.use(new LocalStrategy(function(username, password, done) {
 		if(username == conf.user.username) {
@@ -80,7 +79,7 @@ config().then(function(conf) {
 
 	app.use(express.csrf());
 
-	app.use(app.config.webRoot, stylus.middleware({src: publicPath, compile: function(str, path) {
+	app.use(app.config.webRoot, stylus.middleware({src: paths.public, compile: function(str, path) {
 		return stylus(str).set('filename', path) .use(nib())
 	}}));
 
@@ -99,7 +98,7 @@ config().then(function(conf) {
 				};
 			}
 
-			app.use(app.config.webRoot, expressUglify.middleware({ src: publicPath, logger: new blankLog() }));
+			app.use(app.config.webRoot, expressUglify.middleware({ src: paths.public, logger: new blankLog() }));
 	
 			var oneYear = 31557600000;
 			app.use(app.config.webRoot, express.static(publicPath, { maxAge: oneYear }));
@@ -112,7 +111,7 @@ config().then(function(conf) {
 				app.use(express.logger('dev'));
 			}
 
-			app.use(app.config.webRoot, express.static(publicPath));
+			app.use(app.config.webRoot, express.static(paths.public));
 			app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 		}
 	});
@@ -125,27 +124,27 @@ config().then(function(conf) {
 
 	var webRoot = app.config.webRoot;
 
-	app.get(webRoot + '/', routes.index);
-	app.post(webRoot + '/', routes.login);
+	app.get(webRoot + '/', routes.frontend.index);
+	app.post(webRoot + '/', routes.frontend.login);
 
-	app.get(webRoot + '/install', routes.install);
+	app.get(webRoot + '/install', routes.frontend.install);
 
-	app.get(webRoot + '/api/plex/currentlyWatching', api.plex.currentlyWatching);
-	app.get(webRoot + '/api/plex/poster', api.plex.poster);
-	app.get(webRoot + '/api/plex/recentlyAddedMovies', api.plex.recentlyAddedMovies);
-	app.get(webRoot + '/api/plex/recentlyAired', api.plex.recentlyAired);
+	app.get(webRoot + '/api/plex/currentlyWatching', routes.api.plex.currentlyWatching);
+	app.get(webRoot + '/api/plex/poster', routes.api.plex.poster);
+	app.get(webRoot + '/api/plex/recentlyAddedMovies', routes.api.plex.recentlyAddedMovies);
+	app.get(webRoot + '/api/plex/recentlyAired', routes.api.plex.recentlyAired);
 
-	app.get(webRoot + '/api/sickbeard/poster', api.sickbeard.poster);
-	app.get(webRoot + '/api/sickbeard/showsStats', api.sickbeard.showsStats);
-	app.get(webRoot + '/api/sickbeard/upcoming', api.sickbeard.upcoming);
+	app.get(webRoot + '/api/sickbeard/poster', routes.api.sickbeard.poster);
+	app.get(webRoot + '/api/sickbeard/showsStats', routes.api.sickbeard.showsStats);
+	app.get(webRoot + '/api/sickbeard/upcoming', routes.api.sickbeard.upcoming);
 
-	app.get(webRoot + '/stats/all', stats.all);
-	app.get(webRoot + '/stats/bandwidth', stats.bandwidth);
-	app.get(webRoot + '/stats/cpu', stats.cpu);
-	app.get(webRoot + '/stats/disks', stats.disks);
-	app.get(webRoot + '/stats/memory', stats.memory);
-	app.get(webRoot + '/stats/services', stats.services);
-	app.get(webRoot + '/stats/weather', stats.weather);
+	app.get(webRoot + '/stats/all', routes.stats.all);
+	app.get(webRoot + '/stats/bandwidth', routes.stats.bandwidth);
+	app.get(webRoot + '/stats/cpu', routes.stats.cpu);
+	app.get(webRoot + '/stats/disks', routes.stats.disks);
+	app.get(webRoot + '/stats/memory', routes.stats.memory);
+	app.get(webRoot + '/stats/services', routes.stats.services);
+	app.get(webRoot + '/stats/weather', routes.stats.weather);
 
 }).then(function() {
 	server.listen(app.get('port'), app.get('host'), function() {

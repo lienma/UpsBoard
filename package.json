@@ -13,6 +13,7 @@
     "nib": 				"*",
 	"passport":			"*",
 	"passport-local": 	"*",
+	"bcrypt":			"*",
 
 	"ssh2": 			"*",
 	"moment": 			"*",
