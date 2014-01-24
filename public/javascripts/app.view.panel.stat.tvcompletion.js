@@ -22,12 +22,13 @@
 				width: percent + '%'
 			});
 
-if(App.Config.IsLoggedIn) {
-	var title = 'Download: ' + model.get('epDownloaded').toLocaleString() + '<br /> Total: ' + model.get('epTotal').toLocaleString();
-console.log(title);
-	$(this.$('.progress')).attr('title', title).tooltip({html: true, placement: 'bottom'});
+			if(App.Config.IsLoggedIn) {
+				var title = 'Download: ' + model.get('epDownloaded').toLocaleString() + '<br /> Total: ' + model.get('epTotal').toLocaleString();
 
-}
+				var progress = this.$('.progress');
+				progress.attr((progress.attr('data-original-title')) ? 'title' : 'data-original-title', title)
+				progress.tooltip({html: true, placement: 'bottom'});
+			}
 		},
 
 		render: function() {
