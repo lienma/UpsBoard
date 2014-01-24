@@ -1,4 +1,4 @@
-# [UpStats Board](https://github.com/lienma/UpStatsBoard)
+# [UpsBoard](https://github.com/lienma/UpsBoard) - Development. Use at your own risk.
 
 **U**senet + **p**lex + **Stats** Board, allows you to monitor your usenet services (**SABnzbd+**, **Sick Beard**, & **CouchPotato**), **Plex**, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage). I want to give a special thanks to [ryanc](https://github.com/d4rk22) for his inspirational work, [Network-Status-Page](https://github.com/d4rk22/Network-Status-Page).
 
