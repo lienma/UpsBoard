@@ -7,20 +7,27 @@
 		el: '.panel.tvCompletion',
 
 		initialize: function() {
-			var base = this;
+			var self = this;
 			this.listenTo(this.model, 'change', this.update);
 			this.model.fetch();
 			App.Funcs.IntervalTimeout(function() {
-				base.model.fetch();
+				self.model.fetch();
 			}, App.Config.UpdateDelayLong);
 		},
 
 		update: function(model) {
-			var percent = this.model.get('percentComplete');
+			var percent = model.get('percentComplete');
 			this.$('.percent').text(percent + '%');
 			this.$('.progress-bar').css({
 				width: percent + '%'
 			});
+
+if(App.Config.IsLoggedIn) {
+	var title = 'Download: ' + model.get('epDownloaded').toLocaleString() + '<br /> Total: ' + model.get('epTotal').toLocaleString();
+console.log(title);
+	$(this.$('.progress')).attr('title', title).tooltip({html: true, placement: 'bottom'});
+
+}
 		},
 
 		render: function() {

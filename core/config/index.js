@@ -49,6 +49,13 @@ function Config() {
 }
 
 function getConfigData() {
+	if(configData.version < 2) {
+		var err = new Error('INVALID_CONFIG');
+		err.reason = 'There is a new version of the config.js file.';
+		err.suggestion = 'Rename the config.js-sample to config.js and add your information to config.js';
+		return when.reject(err);
+	}
+
 	return when.resolve({data: configData, config: {}});
 }
 

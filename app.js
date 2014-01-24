@@ -164,7 +164,7 @@ config().then(function(conf) {
 			}
 			if(reason.suggestion) {
 				console.log('Suggestion:'.green);
-				console.log(reason.suggestion);
+				console.log('\t', reason.suggestion);
 			}
 		} else {
 			logger.error(reason.message);

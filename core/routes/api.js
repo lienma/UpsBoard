@@ -103,11 +103,18 @@ console.log(reason);
 		showsStats: function(req, res) {
 			var sb = req.app.config.sickbeard;
 			sb.getShowsStats().then(function(stats) {
-				res.json({
-					percentComplete: Math.round(stats.ep_downloaded / stats.ep_total * 10000) / 100,
-					showsActive: stats.shows_active,
-					showsTotal: stats.shows_total
-				});
+				var json = {
+					percentComplete: Math.round(stats.ep_downloaded / stats.ep_total * 10000) / 100
+				};
+
+				if(req.isAuthenticated()) {
+					json.epDownloaded 	= stats.ep_downloaded;
+					json.epTotal 		= stats.ep_total;
+					json.showsActive	= stats.shows_active;
+					json.showsTotal 	= stats.shows_total;
+				}
+
+				res.json(json);
 			}).otherwise(function(reason) {
 // Show some error?
 			});

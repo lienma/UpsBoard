@@ -63,32 +63,28 @@ Logger.prototype.setModule = function(module) {
 	return this;
 };
 
-function getMessage(messages) {
+function getMessage(messages, color) {
 	for(var i = 0; i < messages.length; i++) {
 		if(!(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/.test(messages[i]))) {
-			messages[i] = messages[i].grey;
+			messages[i] = messages[i][(color) ? color : 'grey'];
 		}
 	}
 	return Array.prototype.join.call(messages, ' ');
 }
  
 Logger.prototype.debug = function() {
-	var msg = getMessage(arguments);
 	this.log('DEBUG', getMessage(arguments));
 };
 
 Logger.prototype.error = function() {
-	var msg = Array.prototype.join.call(arguments, ' ');
 	this.log('ERROR', getMessage(arguments));
 };
 
 Logger.prototype.fatal = function() {
-	var msg = Array.prototype.join.call(arguments, ' ');
-	this.log('FATAL', getMessage(arguments));
+	this.log('FATAL', getMessage(arguments, 'red'));
 };
 
 Logger.prototype.info = function() {
-	var msg = Array.prototype.join.call(arguments, ' ');
 	this.log('INFO', getMessage(arguments));
 };
 
@@ -109,7 +105,7 @@ Logger.prototype.log = function(type, message) {
 		type[(type == 'DEBUG') ? 'grey' : (type == 'ERROR' || type == 'FATAL') ? 'red' : (type == 'INFO') ? 'green' :'white'] + spaces,
 		this.module.blue,
 		'::'.cyan,
-		message
+		(type == 'FATAL') ? message.red : message
 	].join(' ');
 
 	if(config.runningMode == 'debug') {
