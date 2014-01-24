@@ -353,9 +353,9 @@
 				this.$el.html(this.template(this.model.attributes));
 				this.detailDiv = this.$('.detail');
 
-				this.progressBar = $('<div/>', {class: 'progress-bar'}).tooltip();
-				var progressDiv = $('<div/>', {class: 'progress'}).append(this.progressBar);
-				this.$('.progressDiv').append(progressDiv);
+				this.progressBar = $('<div/>', {class: 'progress-bar'});
+				this.progressDiv = $('<div/>', {class: 'progress'}).append(this.progressBar).tooltip();
+				this.$('.progressDiv').append(this.progressDiv);
 
 				App.Disks.on('change', this.update, this);
 				App.Disks.on('add', this.addDisk, this);
@@ -386,7 +386,9 @@
 				} else if(percent>= 90) {
 					loadColor = 'progress-bar-danger';
 				}
-				this.progressBar.css({width: percent + '%'}).attr('data-original-title', percent + '% Full');
+
+				this.progressDiv.attr('data-original-title', percent + '% Full')
+				this.progressBar.css({width: percent + '%'});
 				this.progressBar.removeClass('progress-bar-warning progress-bar-danger').addClass(loadColor);
 			},
 
