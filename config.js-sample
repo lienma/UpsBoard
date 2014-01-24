@@ -1,0 +1,133 @@
+var config = module.exports = {
+
+	// What mode do you want to run?
+	//  - normal:
+	//      Nothing is outputted to the console.
+	//      Logs are stored in logs/debug.log
+	//      NO debugging code is logged.
+	//  - debug:
+	//      Logs are displayed in the console as well as logged to file logs/debug.log
+	//        Debug logs are store and displayed as well.
+	"runningMode": 			"normal",
+
+	// Server Settings.
+	"host": 				"0.0.0.0",
+	"port": 				8024,
+	"webRoot": 				"",
+
+	// Optional, If you want to stop the page requesting updates
+	"debugStopUpdating": 	false,
+
+	// Optional, If you want to log the http requests.
+	"logHttpRequests": 		true,
+
+	// Required, Pick a username and password, On first run the password will get encrypted.
+	"username": 			"admin",
+	"userPassword": 		"password",
+
+	// Optional, If you want to include Google Analytics
+	"googleAnalyticsId": 	"",
+	"googleAnalyticsUrl": 	"",
+
+
+	"drives": {
+		"Label":{
+			"remote": 		false,
+			"location": 	"/",
+
+			// Required, if this is a remote drive.
+			"host": 		"",
+			"port": 		22,
+			"username": 	"",
+			"password": 	"",
+
+			// Optional, Allow you to specify a total drive space.
+			// Format:
+			//  (Size)(Unit)
+			//    Size: Any whole number.
+			//    Unit: Can be any of the following:
+            //      B, KB, MB, GB, TB, PB, EB
+			// Example:
+            //   total: "5TB",
+			total: "",
+
+			// Optional, If you want to give the drive a different icon.
+			icon: ""
+		}
+	},
+
+	"bandwidthServers": {
+		"Label": {
+			// This allows you to display on bottom bar, when you have multiple bandwidth monitors.
+			"default": 	true,
+
+			//          [Download, Upload]
+			"maxSpeed": [100, 100],
+			"remote": 	false,
+
+			// Optional, Allow you specify if you have a bandwidth cap/limit.
+			//  Format: Download,Upload:10TB = If you bandwidth includes both upload and download, 10 terabytes is the cap.
+			//  Example: Upload:20TB = Only have a cap on your upload of 20 terabytes.
+			//           Download:20TB = Only have a cap on your download of 20 terabytes.
+			//           Download,Upload:250GB = Your whole connection is capped at 250 gigabytes.
+			"cap": "",
+
+			// Optional, Select the interface to to watch
+			"interface": "eth0",
+
+			// Optional, Select the path of vnStat, if not at the default location.
+			"vnstatPath": "/path/to/vnstat",
+
+			// Optional, Allows you specify the directory of the vnstat, if it is not at the default location.
+			"vnstatDBDirectory": "/path/to/database/directory",
+
+			// Required, if this is a remote server.
+			"host": 	"",
+			"port": 	22,
+			"username": "",
+			"password": "",
+
+		}
+	},
+
+	"services": {
+		"PolarBear": {
+			"host": "",
+			"port": 80,
+
+			// Optional, This allows you to put a link on the button.
+			"url": "",
+
+			// Optional, Require the user to be logged in before they can see the link
+			"loginRequired": false
+		}
+	},
+
+	"sickbeard": {
+		"protocol": "http://",
+		"host": 	"",
+		"port": 	8081,
+		"webRoot": 	"",
+		"apiKey": 	""
+	},
+
+	"plex": {
+		"protocol": 			"http://",
+		"host": 				"",
+		"port": 				32400,
+		"username": 			"",
+		"password": 			"",
+		"recentTVSection": 		2,
+		"recentMovieSection": 	1
+	},
+
+	// Optional, Forecast.io Api
+	"weather": {
+		"apiKey": 			"",
+		"lat": 				"",
+		"long": 			"",
+		"useFahrenheit": 	true
+	}
+};
+
+config.version = 2;

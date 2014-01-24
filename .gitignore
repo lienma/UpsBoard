@@ -1,0 +1,8 @@
+cache
+logs
+node_modules
+public/javascripts/.cache
+
+config.js
+plex.js
+
