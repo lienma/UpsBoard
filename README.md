@@ -1,4 +1,4 @@
-# [UpsBoard](https://github.com/lienma/UpsBoard) [![Gittip](http://badgr.co/gittip/lienma.png)](https://www.gittip.com/lienma/)
+# [UpsBoard](https://github.com/lienma/UpsBoard) [![Gittip](http://img.shields.io/gittip/lienma.png)](https://www.gittip.com/lienma/)
 ***
 Development. Use at your own risk.
 
