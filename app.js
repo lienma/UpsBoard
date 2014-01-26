@@ -25,8 +25,12 @@ var routes			= require(paths.core + '/routes')
 
 var app				= express();
 
+if(process.env.NODE_ENV == 'development') {
+	require('when/monitor/console');
+}
+
 if(os.type() == 'Windows_NT') {
-	console.log('UpsBoard only works on Linux operating system, and also Mac with limited features.');
+	console.fatal('UpsBoard only works on Linux operating system, and also Mac with limited features.');
 	process.exit(0);
 }
 

@@ -1,5 +1,6 @@
 var _ 			= require('underscore')
-  , path 		= require('path');
+  , path 		= require('path')
+  , moment		= require('moment');
 
 var appRoot 	= path.resolve(__dirname, '../../')
   , paths 		= require(appRoot + '/core/paths')
@@ -37,6 +38,16 @@ log.error
 			});
 		},
 		poster: function(req, res) {
+
+			if(req.get('If-None-Match')) {
+				var isCache = !(moment(req.get('If-None-Match')).isBefore(moment().subtract('days', 7)));
+				log.debug('Is', 'Plex'.cyan, 'image cache in user\'s browser?', (isCache) ? 'Yes'.green : 'No'.red);
+
+				if(isCache) {
+					return res.send(304, '');
+				}
+			}
+
 			var plex = req.app.config.plex;
 			plex.getImage({
 				location: req.param('location'),
@@ -44,6 +55,10 @@ log.error
 				height: req.param('height')
 			}).then(function(image) {
 				res.type('jpeg');
+
+				res.set('Last-Modified', (new Date()).toUTCString());
+				res.set('ETag', Date.now());
+
 				res.send(image);
 			}).otherwise(function(reason) {
 // Show some error?
@@ -84,9 +99,25 @@ console.log(reason);
 
 	sickbeard: {
 		poster: function(req, res) {
+			if(req.get('If-None-Match')) {
+				var isCache = !(moment(req.get('If-None-Match')).isBefore(moment().subtract('days', 7)));
+				log.debug('Is', 'Sick Beard'.cyan, 'image cache in user\'s browser?', (isCache) ? 'Yes'.green : 'No'.red);
+
+				if(isCache) {
+					return res.send(304, '');
+				}
+			}
+
 			var sb = req.app.config.sickbeard;
-			sb.getPoster(req.param('showId')).then(function(image) {
+			sb.getPoster(req.param('showId'), {
+				width: req.param('width'),
+				height: req.param('height')
+			}).then(function(image) {
 				res.type('jpeg');
+
+				res.set('Last-Modified', (new Date()).toUTCString());
+				res.set('ETag', Date.now());
+
 				res.send(image);
 			}).otherwise(function(reason) {
 // Error image..

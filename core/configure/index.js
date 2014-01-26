@@ -11,10 +11,6 @@ var validation 	= require(paths.core + '/configure/validation')
   , log 		= require(paths.logger)('CONFIG')
   , configData 	= require(paths.app + '/config.js');
 
-if(configData.runningMode == 'debug' && process.env.NODE_ENV == 'development') {
-	require('when/monitor/console');
-}
-
 function Config() {
 	var promise = when.defer();
 

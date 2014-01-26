@@ -1,4 +1,5 @@
 var request = require('request')
+  , gm		= require('gm')
   , when   	= require('when')
   , _ 		= require('underscore')
   , path 	= require('path');
@@ -6,7 +7,8 @@ var request = require('request')
 var appRoot = path.resolve(__dirname, '../../')
   , paths 	= require(appRoot + '/core/paths');
 
-var log 	= require(paths.logger)('SICKBEARD');
+var log 	= require(paths.logger)('SICKBEARD')
+  , Cache	= require('./../cache')('sickbeard');
 
 function formatShow(show) {
 	return {
@@ -81,51 +83,45 @@ SickBeard.prototype.getShowsStats = function(callback) {
 	return promise.promise;
 };
 
-SickBeard.prototype.getPoster = function(showId) {
-	var promise = when.defer()
-	  , fs = require('fs')
-	  , moment = require('moment');
-	var self = this
+SickBeard.prototype.getPoster = function(showId, options) {
+	var promise = when.defer();
+	var self = this;
+
+	var width = (options.width) ? options.width : false
+	  , height = (options.height) ? options.height : false;
 	
 	var url = this.url + '/api/' + this.apiKey + '/?cmd=show.getposter&tvdbid=' + showId;
-	var file = path.join(paths.cache, 'sickbeard', 'poster-' + showId);
 
 	function getImage(dontWriteImage) {
+		var defer = when.defer();
+
 		request({uri: url, timeout: 10000, encoding: null}, function(err, res, body) {
 			if (!err && res.statusCode == 200) {
-				if(!dontWriteImage) {
-					fs.writeFile(file, body, function(err) {
-
-					});
-				}
-
-				promise.resolve(body);
+				defer.resolve(body);
 			} else {
 				promise.reject(err);
 			}
 		});
+
+		return defer.promise;
 	}
 
-	fs.exists(file, function(exists) {
-		if(exists) {
-			fs.stat(file, function(err, stats) {
-				if(err)	return getImage(true);
-
-				var imgCreated = moment(stats.mtime);
-				if(imgCreated.isBefore(imgCreated.subtract('days', 7))) {
-					getImage();
-				} else {
-					fs.readFile(file, function(err, image) {
-						if(err) return getImage(true);
-
-						promise.resolve(image);
-					});
-				}
-			});
+	Cache.getItem('poster-' + showId, getImage).then(function(image) {
+		if(height || width) {
+			resizeImage(image);
 		} else {
-			getImage();
+			promise.resolve(image);
 		}
 	});
+
+	function resizeImage(image) {
+		gm(image).resize(width, height).toBuffer(function(err, buffer) {
+			if(err) {
+				return promise.reject(err);
+			}
+			promise.resolve(buffer);
+		});
+	}
 
 	return promise.promise;
 };

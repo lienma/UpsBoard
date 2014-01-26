@@ -57,7 +57,7 @@
 			  , airs = this.model.get('airs')
 			  , network = this.model.get('network');
 
-			var showPoster = App.Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.id;
+			var showPoster = App.Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.id + '&width=200';
 
 			var epTime = airs.match(/(\d+):(\d+) (\w+)/);
 			var epDateMoment = moment(epDate +  epTime, "YYYY-MM-DD h:mm A");
