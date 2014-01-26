@@ -7,7 +7,7 @@ var bcrypt 		= require('bcrypt')
 var appRoot 	= path.resolve(__dirname, '../../')
   , paths 		= require(appRoot + '/core/paths');
 
-var validation 	= require(paths.core + '/config/validation')
+var validation 	= require(paths.core + '/configure/validation')
   , log 		= require(paths.logger)('CONFIG')
   , configData 	= require(paths.app + '/config.js');
 

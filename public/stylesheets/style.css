@@ -319,6 +319,10 @@ body {
   position: relative;
   right: 0;
 }
+.top-display-bar .weather-container .tempature.text .ampm {
+  font-size: 7px;
+  margin-left: -6px;
+}
 .top-display-bar .weather-container table {
   width: 168px;
 }

@@ -34,6 +34,15 @@ module.exports 	= function validateSickbeard(data) {
 		options.url = options.protocol + options.host + ':' + options.port + '/' + options.webRoot;
 	}
 
+	var sickbeardCacheFolder = path.join(paths.cache, 'sickbeard');
+	var cacheFolderExists = fs.existsSync(sickbeardCacheFolder);
+	log.debug('Does Sick Beard cache folder exist? ' + cacheFolderExists);
+
+	if(!cacheFolderExists) {
+		log.debug('Creating cache folder for Sick Beard.');
+		fs.mkdirSync(sickbeardCacheFolder);
+	}
+
 	var sickbeard = new SickBeard(options);
 
 	log.debug('Testing Sick Beard\'s api key');
@@ -46,18 +55,11 @@ module.exports 	= function validateSickbeard(data) {
 
 	}).otherwise(function(reason) {
 		if(reason.message == 'DENIED' || reason.message == 'WRONG_SETTINGS') {
-			promise.reject(reason.reason);
+			return promise.reject(reason.reason);
 		}
+
+		promise.reject(reason);
 	});
-
-	var sickbeardCacheFolder = path.join(paths.cache, 'sickbeard');
-	var cacheFolderExists = fs.existsSync(sickbeardCacheFolder);
-	log.debug('Does Sick Beard cache folder exist? ' + cacheFolderExists);
-
-	if(!cacheFolderExists) {
-		log.debug('Creating cache folder for Sick Beard.');
-		fs.mkdirSync(sickbeardCacheFolder);
-	}
 
 	return promise.promise;
 };

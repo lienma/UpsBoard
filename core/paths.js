@@ -1,5 +1,5 @@
-var path 		= require('path');
-var appRoot 	= path.resolve(__dirname, '../');
+var path		= require('path');
+var appRoot		= path.resolve(__dirname, '../');
 
 var paths = module.exports = {
 	app: 		appRoot,

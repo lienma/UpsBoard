@@ -2,27 +2,28 @@
  * Module dependencies.
  */
 
-var express 		= require('express')
-  , stylus 			= require('stylus')
-  , nib 			= require('nib')
-  , http 			= require('http')
-  , path 			= require('path')
-  , os 				= require('os')
-  , bcrypt 			= require('bcrypt')
-  , expressUglify 	= require('express-uglify');
+var express			= require('express')
+  , stylus			= require('stylus')
+  , nib				= require('nib')
+  , http			= require('http')
+  , path			= require('path')
+  , os				= require('os')
+  , when			= require('when')
+  , bcrypt			= require('bcrypt')
+  , expressUglify	= require('express-uglify');
 
-var passport 		= require('passport')
-  , LocalStrategy 	= require('passport-local').Strategy;
+var passport		= require('passport')
+  , LocalStrategy	= require('passport-local').Strategy;
 
-var appRoot 		= path.resolve(__dirname)
-  , paths 			= require(appRoot + '/core/paths');
+var appRoot			= path.resolve(__dirname)
+  , paths			= require(appRoot + '/core/paths');
 
-var routes 			= require(paths.core + '/routes')
-  , config 			= require(paths.core + '/config')
-  , logger 			= require(paths.logger)('MAIN_APP');
+var routes			= require(paths.core + '/routes')
+  , Configure		= require(paths.core + '/configure')
+  , Updater			= require(paths.core + '/updater')
+  , logger			= require(paths.logger)('MAIN_APP');
 
-var app 			= express()
-  , server 			= http.createServer(app);
+var app				= express();
 
 if(os.type() == 'Windows_NT') {
 	console.log('UpsBoard only works on Linux operating system, and also Mac with limited features.');
@@ -31,7 +32,8 @@ if(os.type() == 'Windows_NT') {
 
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 
-config().then(function(conf) {
+Configure().then(function(conf) {
+
 
 	app.isMacOs = (os.type() == 'Linux') ? false : true;
 
@@ -147,6 +149,8 @@ config().then(function(conf) {
 	app.get(webRoot + '/stats/weather', routes.stats.weather);
 
 }).then(function() {
+	var server = http.createServer(app);
+
 	server.listen(app.get('port'), app.get('host'), function() {
 		var uri = app.get('host') + ':' + app.get('port') + app.config.webRoot;
 

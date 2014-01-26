@@ -1,8 +1,6 @@
 var fs 		= require('fs')
   , moment 	= require('moment')
-  , os 		= require('os')
   , path 	= require('path')
-  , when   	= require('when')
   , _    	= require('underscore');
 
 var appRoot = path.resolve(__dirname, '../')
@@ -28,6 +26,8 @@ function Logger(module) {
 
 	return this;
 }
+
+Logger.maxLogFiles = 5;
 
 Logger.prototype.printObject = function(obj, baseTabs) {
 	var tabs = '', tabCount = 0;
@@ -114,6 +114,42 @@ Logger.prototype.log = function(type, message) {
 
 	logMessage = logMessage.replace(/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/g, '');
 	fs.appendFileSync(this.filePath, logMessage + '\n');
+
+	rotateLogs(this);
 };
+
+function rotateLogs(log) {
+
+	var stats = fs.statSync(log.filePath)
+	  , fiveMB = 5 * 1024 * 1024;
+
+	if(stats.size > fiveMB) {
+		lastLogFile(log);
+		for(var i = Logger.maxLogFiles - 1; i > 0; i--) {
+			renameLogFile(log, i);
+		}
+		fs.renameSync(log.filePath, log.filePath + '.01');
+	}
+}
+
+function renameLogFile(log, logNumber) {
+
+	var filename =  log.filePath + '.' + ((logNumber < 10) ? '0' + logNumber : logNumber)
+	  , newFilename = log.filePath + '.' + ((logNumber + 1 < 10) ? '0' + (logNumber + 1) : logNumber + 1);
+
+	var exists = fs.existsSync(filename);
+	if(exists) {
+		fs.renameSync(filename, newFilename);
+	}
+}
+
+function lastLogFile(log) {
+	var filename = log.filePath + '.' + ((Logger.maxLogFiles < 10) ? '0' + Logger.maxLogFiles : Logger.maxLogFiles);
+	var exists = fs.existsSync(filename);
+
+	if(exists) {
+		fs.unlinkSync(filename);
+	}
+}
 
 exports = module.exports = Logger;
