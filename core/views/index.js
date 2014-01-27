@@ -31,11 +31,15 @@
     new PanelView.Services();
     new PanelView.DiskSpace();
     new PanelView.DataCap();
-    new PanelView.UpComingShows();
+
     new PanelView.RecentlyAiredShows();
     new PanelView.RecentlyAddedMovies();
     new PanelView.CurrentlyWatching();
-    new PanelView.Stat.TVCompletion();
+
+    if(App.Config.Enabled.SickBeard) {
+      new PanelView.UpComingShows();
+      new PanelView.Stat.TVCompletion();
+    }
 
   });
 })(App, jQuery);

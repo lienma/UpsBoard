@@ -14,6 +14,16 @@ module.exports 	= function validateSickbeard(data) {
 	var promise = when.defer();
 	var sbData = data.data.sickbeard;
 
+	if(!sbData || sbData.disable) {
+		data.config.sickbeard = {
+			enabled: false
+		};
+
+		log.debug('Sick Beard is disabled, moving on!')
+		return when.resolve(data);
+	}
+
+
 	if(!_.isString(sbData.apiKey) || _.isEmpty(sbData.apiKey)) {
 		var error = new Error('INVALID_CONFIG');
 		error.reason = 'A Sick Beard api key is required to run this app.';
@@ -51,6 +61,7 @@ module.exports 	= function validateSickbeard(data) {
 
 		log.info('Validated Sick Beard configuration'.green);
 		data.config.sickbeard = sickbeard;
+		data.config.sickbeard.enabled = true;
 		promise.resolve(data);
 
 	}).otherwise(function(reason) {

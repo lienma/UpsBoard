@@ -127,7 +127,6 @@
 				base.$('.poster').show();
 			});
 
-			$('<img/>')[0].src = epPoster;
 			var pTemplate = _.template($('#tmpl-panel-recently-aired-show-popover').html());
 
 			this.$('.poster img').popover({

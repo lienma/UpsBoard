@@ -30,6 +30,8 @@ function routerIndex(req, res, status) {
 	res.render('index', {
 		debugStopUpdating: (req.app.config.debugStopUpdating) ? 'true' : 'false',
 
+		enabledSickBeard: req.app.config.sickbeard.enabled,
+
 		googleAnalytics: req.app.config.googleAnalytics,
 		googleAnalyticsId: req.app.config.googleAnalyticsId,
 		googleAnalyticsUrl: req.app.config.googleAnalyticsUrl,

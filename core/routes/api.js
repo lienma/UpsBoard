@@ -99,6 +99,12 @@ console.log(reason);
 
 	sickbeard: {
 		poster: function(req, res) {
+			var sb = req.app.config.sickbeard;
+
+			if(!sb.enabled) {
+				return res.json({disabled: true});
+			}
+
 			if(req.get('If-None-Match')) {
 				var isCache = !(moment(req.get('If-None-Match')).isBefore(moment().subtract('days', 7)));
 				log.debug('Is', 'Sick Beard'.cyan, 'image cache in user\'s browser?', (isCache) ? 'Yes'.green : 'No'.red);
@@ -108,7 +114,7 @@ console.log(reason);
 				}
 			}
 
-			var sb = req.app.config.sickbeard;
+			
 			sb.getPoster(req.param('showId'), {
 				width: req.param('width'),
 				height: req.param('height')
@@ -125,6 +131,11 @@ console.log(reason);
 		},
 		upcoming: function(req, res) {
 			var sb = req.app.config.sickbeard;
+
+			if(!sb.enabled) {
+				return res.json({disabled: true});
+			}
+
 			sb.getUpComingShows().then(function(shows) {
 				res.json(shows);
 			}).otherwise(function(reason) {
@@ -133,6 +144,11 @@ console.log(reason);
 		},
 		showsStats: function(req, res) {
 			var sb = req.app.config.sickbeard;
+
+			if(!sb.enabled) {
+				return res.json({disabled: true});
+			}
+
 			sb.getShowsStats().then(function(stats) {
 				var json = {
 					percentComplete: Math.round(stats.ep_downloaded / stats.ep_total * 10000) / 100
@@ -147,6 +163,7 @@ console.log(reason);
 
 				res.json(json);
 			}).otherwise(function(reason) {
+console.log(reason);
 // Show some error?
 			});
 		}

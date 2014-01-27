@@ -29,17 +29,28 @@ block content
         a(tabindex='-1', href=locals.webRoot + '/?logout') Logout
 
 
-  script(type='text/template')#tmpl-panel-upcoming-show-item
+  script(type='text/template')#tmpl-panel-upcoming-show-day
     td
-      img(src!='<%= showPoster %>').poster
-    td.middle
-      div
-        strong <%= showName %>
-      div.small <%= epTitle %> -  <%= epDateAirsAired %> <%= epDateFromNow %>
-        div.small <%= showTimeAndNetwork %>
-    td
-      i.glyphicon.glyphicon-info-sign.moreInfo
-      i.glyphicon.glyphicon-search.hidden
+      div.date-label
+        span <%= dateLabel %>
+      .shows
+        ul.list-episodes.list-inline
+
+  script(type='text/template')#tmpl-panel-upcoming-show-popover
+    p.small
+      strong Title: 
+      | <%= epTitle %>
+      br
+      strong Episode: 
+      | <%= epCode %> 
+      strong Airs 
+      | <%= epDateFromNow %>
+      br
+      span.small
+        | <%= showTimeAndNetwork %>
+        br
+        strong Plot: 
+        | <%= epPlot %>
 
   script(type='text/template')#tmpl-panel-recently-aired-show-item
     .poster
@@ -104,24 +115,6 @@ block content
           span.totalSpace
 
   script(type='text/template')#tmpl-bottom-display-item
-    div.hide
-      .loader.itemTooltip
-        .loader-bg
-          .text
-            i.glyphicon.glyphicon-refresh.rotate-icon
-        .spiner-holder-1.animate-0-25-a
-          .spiner-holder-2.animate-0-25-b
-            .loader-spiner
-        .spiner-holder-1.animate-25-50-a
-          .spiner-holder-2.animate-25-50-b
-            .loader-spiner
-        .spiner-holder-1.animate-50-75-a
-          .spiner-holder-2.animate-50-75-b
-            .loader-spiner
-        .spiner-holder-1.animate-75-100-a
-          .spiner-holder-2.animate-75-100-b
-            .loader-spiner
-
     div
       .itemTooltip
         .detail Loading
@@ -310,23 +303,28 @@ block content
 
     .row
       .col-md-4
+        - if(enabledSickBeard) {
+          .row
+            .col-md-12
+              .panel.panel-default.upComingShows
+                .panel-heading
+                  h4.panel-title TV Shows Airing Soon
+                div(style='height:350px;overflow-y:auto;overflow-x:hidden;')
+                  div
+                    table.table.table-hover.list-days
+        - }
+
         .row
-          .col-md-12
-            .panel.panel-default.upComingShows
-              .panel-heading
-                h4.panel-title TV Shows Airing Soon
-              div(style='height:350px;overflow-y:auto;overflow-x:hidden;position:relative;').ucs-body
-                div
-                  table.table.table-hover.showList
-        .row
-          .col-xs-6.col-md-6
-            .panel.panel-default.panelStat.tvCompletion
-              .panel-body.stat
-                .itemTooltip.small
-                  .pull-right.percent
-                  strong TV Completion:
-                .progress
-                 .progress-bar
+          - if(enabledSickBeard) {
+            .col-xs-6.col-md-6
+              .panel.panel-default.panelStat.tvCompletion
+                .panel-body.stat
+                  .itemTooltip.small
+                    .pull-right.percent
+                    strong TV Completion:
+                  .progress
+                   .progress-bar
+          - }
           .col-xs-6.col-md-6
             .panel.panel-default.panelStat
               .panel-body.stat
