@@ -357,29 +357,17 @@
 				this.progressDiv = $('<div/>', {class: 'progress'}).append(this.progressBar).tooltip();
 				this.$('.progressDiv').append(this.progressDiv);
 
-				App.Disks.on('change', this.update, this);
-				App.Disks.on('add', this.addDisk, this);
-			},
-
-			totalDisks: 0,
-			addDisk: function(model, collection) {
-				this.totalDisks += 1;
-
-				if(collection.size() == this.totalDisks) {
-					this.update();
-				}
+				App.BaseDisk.on('change:total', this.update, this);
+				App.BaseDisk.on('change:used', this.update, this);
 			},
 
 			update: function() {
-				var total = 0, used = 0;
-				App.Disks.each(function(disk, i) {
-					total += parseFloat(disk.get('total'));
-					used += parseFloat(disk.get('used'));
-				});
+				var total = App.BaseDisk.get('total'), used = App.BaseDisk.get('used');
 
 				var percent = Math.floor(used / total * 100);
+				var detail = (App.Config.IsLoggedIn) ? formatBytes(used) + ' / ' + formatBytes(total) : percent + '% Used';
 
-				this.detailDiv.html(formatBytes(used) + ' / ' + formatBytes(total));
+				this.detailDiv.html(detail);
 				var loadColor = '';
 				if(percent >= 75 && 90 > percent) {
 					loadColor = 'progress-bar-warning';

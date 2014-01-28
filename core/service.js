@@ -112,7 +112,7 @@ Service.prototype.isOnline = function(returnSocket) {
 	  , self = this, isOnline = false
 	  , Socket = new require('net').Socket();
 
-	Socket.setTimeout(500);
+	Socket.setTimeout(5000);
 	Socket.connect(this.port, this.host);
 
 	Socket.on('connect', function() {
@@ -121,16 +121,17 @@ Service.prototype.isOnline = function(returnSocket) {
 		Socket.destroy();
 	});
 
+	Socket.on('error', failed);
+	Socket.on('timeout', failed);
+
+	return promise.promise;
+
 	function failed() {
 		if(!isOnline) {
 			promise.resolve(false);
 		}
 		Socket.destroy()
 	}
-	Socket.on('error', failed);
-	Socket.on('timeout', failed);
-
-	return promise.promise;
 }
 
 exports = module.exports = Service;

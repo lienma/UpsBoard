@@ -24,12 +24,12 @@ function Drive(label, location, options) {
 
 	this.remote = (this.options.remote) ? true : false;
 
-	var service = false;
+	this.service = false;
 	if(this.remote) {
-		service = new Service(this.options.host, this.options.port, {username: this.options.username, password: this.options.password});
+		this.service = new Service(this.options.host, this.options.port, {username: this.options.username, password: this.options.password});
 	}
 
-	this.command = Command(service);
+	this.command = Command(this.service);
 }
 
 Drive.defaultOptions = {
@@ -50,15 +50,33 @@ Drive.prototype.getDriveSpace = function() {
 
 	log.debug('Getting drive space for', this.label.yellow, 'using', 'df'.red, 'command');
 
-	
-	df(this).then(function(data) {
-		if(_.isNaN(data.used)) {
-			log.debug('Falling back to', 'du'.red, 'for', self.label.yellow);
-			du(self).then(finish).otherwise(promise.reject);
-		} else {
-			finish(data);
-		}
-	}).otherwise(promise.reject)
+	if(this.remote) {
+		this.service.isOnline().then(function(isOnline) {
+			if(isOnline) {
+				cmd();
+			} else {
+				promise.resolve({
+					_id:		self._id,
+					label:		self.label,
+					icon:		self.getIcon(),
+					offline:	true
+				});
+			}
+		}).otherwise(promise.reject);
+	} else {
+		cmd();
+	}
+
+	function cmd() {
+		df(self).then(function(data) {
+			if(_.isNaN(data.used)) {
+				log.debug('Falling back to', 'du'.red, 'for', self.label.yellow);
+				du(self).then(finish).otherwise(promise.reject);
+			} else {
+				finish(data);
+			}
+		}).otherwise(promise.reject);
+	}
 
 	function finish(data) {
 		var since = new Date().getTime() - start;

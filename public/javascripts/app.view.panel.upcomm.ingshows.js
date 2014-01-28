@@ -167,6 +167,8 @@
 			  , airs = this.model.get('airs')
 			  , network = this.model.get('network');
 
+			epPlot = (epPlot == '') ? 'No episode plot given' : epPlot;
+
 			var epTime = airs.match(/(\d+):(\d+)(\s*)(\w*)/);
 
 			var time = parseInt(epTime[1] + '' + epTime[2]);
@@ -174,10 +176,21 @@
 
 			this.$el.data('time', time);
 
-			var epDateMoment = moment(epDate + ' ' + epTime[0], 'YYYY-MM-DD h:mm A');
+			time = String((time.length == 3) ? '0' + time : time);
+
+			var hours = parseInt(time.substr(0, 2))
+			  , minutes = time.substr(2, 4);
+
+			var ampm = 'AM';
+			if(hours > 12) {
+				hours -= 12;
+				ampm = 'PM';
+			}
+
+			var epDateMoment = moment(epDate + ' ' + hours + ':' + minutes + ' ' + ampm, 'YYYY-MM-DD h:mm A');
 			var showPoster = App.Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.id + '&width=200';
 
-			epPlot = (epPlot == '') ? 'No episode plot given' : epPlot;
+			var isEpMissed = moment().isAfter(epDateMoment);
 
 			var templateObj = {
 				epCode: season + 'x' + epNum,
@@ -191,6 +204,10 @@
 			};
 
 			this.$el.html(this.template(templateObj));
+
+			if(isEpMissed) {
+				this.$('.poster').addClass('missing-episode');
+			}
 
 			var self = this, img = $('<img/>', {src: showPoster}).load(function() {
 				self.$('.poster').show();

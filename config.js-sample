@@ -104,6 +104,9 @@ var config = module.exports = {
 	},
 
 	"sickbeard": {
+		// Set to True if you want to disable sickbeard from upsboard.
+		"disable": false,
+
 		"protocol": "http://",
 		"host": 	"",
 		"port": 	8081,

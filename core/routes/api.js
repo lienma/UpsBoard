@@ -139,7 +139,7 @@ console.log(reason);
 			sb.getUpComingShows().then(function(shows) {
 				res.json(shows);
 			}).otherwise(function(reason) {
-// Show some error?
+console.log(reason);
 			});
 		},
 		showsStats: function(req, res) {

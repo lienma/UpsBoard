@@ -75,6 +75,12 @@ body {
   height: 12px;
   margin-bottom: 0;
 }
+.diskSpacePanel .panel-body .media-list .media .media-body .server-offline {
+  color: #f00;
+  font-weight: bold;
+  text-align: center;
+  width: 100%;
+}
 .carousel-menu {
   position: absolute;
   bottom: 0;
@@ -219,20 +225,12 @@ body {
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 .panel.upComingShows table td .shows ul li .poster img {
+  border-radius: 3px;
   width: 47px;
 }
-.panel.upComingShows table tr.missedEpisode td,
-.panel.upComingShows table tr.missedEpisode:hover td {
-  background-color: #fde4e4;
-}
-.panel.upComingShows table td img.poster {
-  width: 35px;
-}
-.panel.upComingShows table td i.glyphicon {
-  color: #666;
-}
-.panel.upComingShows table td.middle {
-  width: 100%;
+.panel.upComingShows table td .shows ul li .poster.missing-episode {
+  border: 1px solid #f9b3b3;
+  background-color: #fde3e3;
 }
 .panel.recentlyAiredShows .panel-heading .tab {
   border-radius: 5px 5px 0 0;
@@ -284,7 +282,7 @@ body {
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 .panel.recentlyAiredShows .panel-body ul .poster img {
-/*height: 81px*/
+  border-radius: 3px;
   width: 64px;
 }
 .systemModal .modal-body {

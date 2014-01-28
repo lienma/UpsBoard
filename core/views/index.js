@@ -15,16 +15,8 @@
 
 	App.Bandwidth = {};
 
-    App.Disks = new App.Collection.Disks();
-    App.Disks.fetch();
-    App.Disks.interval = setInterval(function() {
-      if(!App.Config.StopUpdating) {
-        App.Disks.fetch();
-      }
-    }, App.Config.UpdateDelayLong);
-
 	var AppView = view(App)
-	  , PanelView = panel(view(App));
+	  , PanelView = panel(AppView);
 
     new AppView.TopBar();
     new AppView.BottomBar();

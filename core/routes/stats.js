@@ -43,8 +43,31 @@ exports.disks = function(req, res) {
 		funcArray.push(drive.getDriveSpace());
 	});
 
+	var loggedIn = req.isAuthenticated();
+
 	when.all(funcArray).then(function(results) {
-		res.json(results);
+		var used = 0, total = 0;
+
+		results.forEach(function(drive) {
+			if(!drive.offline) {
+				used += drive.used;
+				total += drive.total;
+
+				if(!loggedIn) {
+					drive.used = Math.round(drive.used / drive.total * 100)
+					drive.total = 100;
+				}
+			}
+		});
+
+		var json = {
+			collection: results,
+
+			used: (loggedIn) ? used : Math.round(used / total * 100),
+			total: (loggedIn) ? total : 100
+		};
+
+		res.json(json);
 
 	}).otherwise(function(reason) {
 		res.json([]);
