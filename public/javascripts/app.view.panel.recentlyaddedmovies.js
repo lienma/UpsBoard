@@ -17,12 +17,11 @@
 			this.collection = new Collection();
 			this.collection.on('add', this.addMovie, this);
 
-			var base = this;
+			var self = this;
 			this.collection.fetch();
 			App.Funcs.IntervalTimeout(function() {
-				base.collection.fetch();
+				self.collection.fetch();
 			}, App.Config.UpdateDelayLong);
-
 		},
 
 
@@ -36,7 +35,7 @@
 
 			this.$('.carousel-inner').append(slide.render().addClass((this.slideCounter == 1) ? ' active' : ''));
 
-			//this.startSlideshow();
+			this.startSlideshow();
 		},
 
 		startSlideshow: function() {
@@ -61,10 +60,7 @@
 			var movie = this.model;
 
 			var src = App.Config.WebRoot + '/api/plex/poster?location=' + encodeURIComponent(movie.get('movieThumbnail')) + '&width=300&height=500';
-
-			this.img = $('<img />', { 'src': src, title: movie.get('movieTitle') + ' (' + movie.get('movieYear') + ')' });
-			//this.caption = $('<div />', {class: 'carousel-caption'}).html('<h3>' + movie.get('movieTitle') + ' <span>(' + movie.get('movieYear') + ')</span></h3>');
-
+			this.img = $('<img />', { 'src': src });
 			this.$el.append(this.img);
 		},
 
@@ -75,25 +71,31 @@
 
 			var coverSrc = App.Config.WebRoot + '/api/plex/poster?location=' + encodeURIComponent(movie.get('movieCover'));
 
+			var seconds = Math.floor(parseInt(movie.get('movieLength')) / 1000);
+			var numHours = Math.floor(seconds / 3600);
+			var numMinutes = Math.floor((seconds % 3600) / 60);
+
+			var strHours = ' ' + ((numHours == 1) ? 'Hour' : 'Hours') + ' '
+			  , strMinutes = ' ' + ((numMinutes == 1) ? 'Minute' : 'Minutes');
+			var length = numHours + strHours + numMinutes + strMinutes;
 
 			var tmplObj = {
 				cover: coverSrc,
+				length: length,
+				rating: movie.get('movieRating'),
+				released: moment(movie.get('movieReleased'), 'YYYY-MM-DD').format('MMMM Do YYYY'),
 				summary: movie.get('movieSummary'),
 				title: movie.get('movieTitle'),
 				year: movie.get('movieYear')
 			};
 
 			this.details = $('<div/>').html(popoverTemplate(tmplObj));
-
 			this.$el.append(this.details);
 
 			var holder = $(this.details.find('.carousel-menu-holder'));
-
 			this.$el.hover(function(event) {
-				//event.stopPropagation();
 				holder.slideDown('fast');
 			}, function(event) {
-				//event.stopPropagation();
 				holder.slideUp('fast');
 			});
 		},

@@ -61,7 +61,6 @@ log.error
 
 				res.send(image);
 			}).otherwise(function(reason) {
-// Show some error?
 console.log(reason);
 			});
 		},
@@ -75,7 +74,7 @@ console.log(reason);
 
 				res.json(json);
 			}).otherwise(function(reason) {
-// Show some error?
+console.log(reason);
 			});
 		},
 
@@ -92,7 +91,7 @@ console.log(reason);
 
 				res.json(json);
 			}).otherwise(function(reason) {
-// Show some error?
+console.log(reason);
 			});
 		}
 	},
@@ -126,7 +125,7 @@ console.log(reason);
 
 				res.send(image);
 			}).otherwise(function(reason) {
-// Error image..
+console.log(reason);
 			});
 		},
 		upcoming: function(req, res) {
@@ -164,7 +163,6 @@ console.log(reason);
 				res.json(json);
 			}).otherwise(function(reason) {
 console.log(reason);
-// Show some error?
 			});
 		}
 	}

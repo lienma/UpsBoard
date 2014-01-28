@@ -68,16 +68,16 @@ block content
 
     p.small
       strong Title: 
-      | <%= epTitle %>
+      |  <%= epTitle %>
       br
       strong Episode: 
-      | <%= epSeason %>x<%= epNumber %> 
+      |  <%= epSeason %>x<%= epNumber %> 
       strong  Added: 
-      | <%= epAddedFormated %>
+      |  <%= epAddedFormated %>
       br
       span.small
         strong Plot: 
-        | <%= epPlot %>
+        |  <%= epPlot %>
     div
       img(src!='<%= epPoster %>').epPoster.img-thumbnail
 
@@ -85,8 +85,31 @@ block content
     .carousel-menu
       .carousel-menu-holder
         h3.popover-title <%= title %> (<%= year %>)
-        .carousel-menu-content
-          | Hello
+        .carousel-menu-content.small
+          .small
+            strong Released: 
+            |  <%= released %>
+            br
+            strong Length: 
+            |  <%= length %>
+            br
+            strong Rating: 
+            |  <%= rating %>
+            br
+            strong Plot: 
+            |  <%= summary %>
+
+  script(type='text/template')#tmpl-panel-currently-watching-popover
+    .carousel-menu
+      .carousel-menu-holder
+        h3.popover-title <%= title %>
+        .carousel-menu-content.small
+          .small
+            | <% if(loggedIn) { %>
+            | Hello
+            | <% } else { %>
+            | Login to see details.
+            | <% } %>
 
   script(type='text/template')#tmpl-panel-data-cap-li
     div

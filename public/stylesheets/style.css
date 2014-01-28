@@ -99,6 +99,9 @@ body {
   background-clip: padding-box;
 }
 .carousel-menu .carousel-menu-holder .carousel-menu-content {
+  max-height: 200px;
+  overflow-x: auto;
+  overflow-y: hidden;
   padding: 5px;
 }
 .panel.recentlyAddedMoviesPanel .panel-body,
