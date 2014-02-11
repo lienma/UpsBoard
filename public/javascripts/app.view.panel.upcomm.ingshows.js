@@ -19,11 +19,10 @@
 			this.collection = new AllCollection();
 			this.collection.on('add', this.processEpisode, this);
 
-			var base = this;
 			this.collection.fetch();
 			App.Funcs.IntervalTimeout(function() {
-				base.collection.fetch();
-			}, App.Config.UpdateDelayLong);
+				this.collection.fetch();
+			}.bind(this), App.Config.UpdateDelayLong);
 		},
 
 
@@ -77,21 +76,11 @@
 					}
 				}
 			}
+
+			this.$('tr').removeClass('alt');
+			this.$('tr:odd').addClass('alt');
 		}
 	});
-
-
-	function WeekdayName(num, short) {
-		switch(num) {
-			case 1: return (short) ? 'Mon' : 'Monday';
-			case 2: return (short) ? 'Tue' : 'Tuesday';
-			case 3: return (short) ? 'Wed' : 'Wednesday';
-			case 4: return (short) ? 'Thu' : 'Thursday';
-			case 5: return (short) ? 'Fri' : 'Friday';
-			case 6: return (short) ? 'Sat' : 'Saturday';
-			case 7: return (short) ? 'Sun' : 'Sunday';
-		}
-	}
 
 	var DayView = Backbone.View.extend({
 		tagName: 'tr',
@@ -101,16 +90,9 @@
 			var dateStr = this.collection.at(0).get('airdate');
 			var date = moment(dateStr, 'YYYY-MM-DD');
 
-			var wdNumber = this.collection.at(0).get('weekday');
-			var wdName = WeekdayName(wdNumber, true);
-
-
-			var templateObj = {
-				dateLabel: date.format('dddd'),
-				evenOrOdd: 'even'
-			};
-
-			this.$el.html(this.template(templateObj));
+			this.$el.html(this.template({
+				dateLabel: date.format('dddd')
+			}));
 
 			this.$('.date-label').attr('title', date.format('dddd MMMM D, YYYY')).tooltip({placement: 'right'});
 
@@ -119,10 +101,6 @@
 		},
 
 		render: function(childern) {
-			var numChildern = childern.length;
-
-			this.$('.date-label').addClass((numChildern % 2 == 1) ? 'even' : 'odd');
-
 			return this.$el;
 		},
 
@@ -188,10 +166,9 @@
 			}
 
 			var epDateMoment = moment(epDate + ' ' + hours + ':' + minutes + ' ' + ampm, 'YYYY-MM-DD h:mm A');
-			var showPoster = App.Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.id + '&width=200';
-
 			var isEpMissed = moment().isAfter(epDateMoment);
 
+			var showPoster = App.Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.get('show_id') + '&width=200';
 			var templateObj = {
 				epCode: season + 'x' + epNum,
 				epDateFromNow: epDateMoment.fromNow(),
@@ -209,9 +186,9 @@
 				this.$('.poster').addClass('missing-episode');
 			}
 
-			var self = this, img = $('<img/>', {src: showPoster}).load(function() {
-				self.$('.poster').show();
-			});
+			var img = $('<img/>', {src: showPoster}).load(function() {
+				this.$('.poster').show();
+			}.bind(this));
 
 			var popoverTmpl = _.template($('#tmpl-panel-upcoming-show-popover').html());
 			this.$('.poster img').popover({
@@ -220,6 +197,10 @@
 				trigger: 'hover',
 				placement: 'bottom'
 			});
+		},
+
+		remove: function() {
+
 		},
 
 		render: function() {

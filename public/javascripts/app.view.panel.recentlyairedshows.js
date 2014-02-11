@@ -11,7 +11,7 @@
 		unwatched: true,
 
 		url: function() {
-			return App.Config.WebRoot + '/api/plex/recentlyAired?unwatched=' + this.unwatched;
+			return App.Config.WebRoot + '/api/plex/recentlyAired?limit=20&unwatched=' + this.unwatched;
 		}
 	});
 

@@ -35,6 +35,11 @@ var config = module.exports = {
 			"remote": 		false,
 			"location": 	"/",
 
+			// Optional, If your drive is on a machine running something other than linux.
+			//  Support Operating Systems:
+            //    mac & linux
+			"os":			"linux",
+
 			// Required, if this is a remote drive.
 			"host": 		"",
 			"port": 		22,

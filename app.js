@@ -80,7 +80,7 @@ Configure().then(function(conf) {
 	app.use(express.cookieParser());
 	app.use(express.cookieSession({
 		secret: conf.salt,
-		cookie: { maxAge: 60 * 60 * 1000 }
+		cookie: { maxAge: 24 * 60 * 60 * 1000 }
 	}));
 
 	app.use(express.csrf());
@@ -139,6 +139,12 @@ Configure().then(function(conf) {
 	app.get(webRoot + '/api/plex/poster', routes.api.plex.poster);
 	app.get(webRoot + '/api/plex/recentlyAddedMovies', routes.api.plex.recentlyAddedMovies);
 	app.get(webRoot + '/api/plex/recentlyAired', routes.api.plex.recentlyAired);
+
+	app.get(webRoot + '/api/sabnzbd/getQueue', routes.api.sabnzbd.getQueue);
+	app.get(webRoot + '/api/sabnzbd/pauseQueue', routes.api.sabnzbd.pauseQueue);
+	app.get(webRoot + '/api/sabnzbd/queue/:nzb/:func', routes.api.sabnzbd.itemOptions);
+	app.get(webRoot + '/api/sabnzbd/queue/:nzb/:func/:value', routes.api.sabnzbd.itemOptions);
+	app.get(webRoot + '/api/sabnzbd/resumeQueue', routes.api.sabnzbd.resumeQueue);
 
 	app.get(webRoot + '/api/sickbeard/poster', routes.api.sickbeard.poster);
 	app.get(webRoot + '/api/sickbeard/showsStats', routes.api.sickbeard.showsStats);

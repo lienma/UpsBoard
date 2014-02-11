@@ -33,7 +33,7 @@ var api = {
 				});
 				res.json(json);
 			}).otherwise(function(reason) {
-log.error
+console.log(reason);
 // Show some error?
 			});
 		},
@@ -79,10 +79,11 @@ console.log(reason);
 		},
 
 		recentlyAired: function(req, res) {
-			var plex 		= req.app.config.plex
-			  , unwatched 	= (req.param('unwatched') == 'true' && req.isAuthenticated()) ? true : false;
+			var plex		= req.app.config.plex
+			  , unwatched	= (req.param('unwatched') == 'true' && req.isAuthenticated()) ? true : false
+			  , limit		= parseInt((req.param('limit')) ? req.param('limit') : 10);
 
-			plex.getRecentlyAired(plex.recentTVSection, unwatched, 0, 18).then(function(videos) {
+			plex.getRecentlyAired(plex.recentTVSection, unwatched, 0, limit).then(function(videos) {
 
 				var json = [];
 				videos.forEach(function(video) {
@@ -90,6 +91,109 @@ console.log(reason);
 				});
 
 				res.json(json);
+			}).otherwise(function(reason) {
+console.log(reason);
+			});
+		}
+	},
+
+	sabnzbd: {
+		pauseQueue: function(req, res) {
+			var sab = req.app.config.sabnzbd;
+
+			if(!req.isAuthenticated()) {
+				return res.json({error: 'Permission Denied'});
+			}
+
+			if(!sab.enabled) {
+				return res.json({error: 'Module Disabled'});
+			}
+
+			sab.pauseQueue().then(function(data) {
+				res.json(data);
+			}).otherwise(function(reason) {
+console.log(reason);
+			});
+		},
+
+		getQueue: function(req, res) {
+			var sab = req.app.config.sabnzbd;
+
+			if(!req.isAuthenticated()) {
+				return res.json({error: 'Permission Denied'});
+			}
+
+			if(!sab.enabled) {
+				return res.json({error: 'Module Disabled'});
+			}
+
+			sab.getQueue().then(function(data) {
+				res.json(data.queue);
+			}).otherwise(function(reason) {
+console.log(reason);
+			});
+		},
+
+		itemOptions: function(req, res, next) {
+			var sab = req.app.config.sabnzbd;
+
+			if(!req.isAuthenticated()) {
+				return res.json({error: 'Permission Denied'});
+			}
+
+			if(!sab.enabled) {
+				return res.json({error: 'Module Disabled'});
+			}
+
+			function err(reason) {
+				console.log(reason);
+			}
+
+			function json(data) {
+				res.json(data);
+			}
+
+			switch(req.params.func) {
+				case 'pause':
+				case 'resume':
+					sab.queue(req.params.func, req.params.nzb).then(json).otherwise(err);
+					break;
+				case 'move':
+					sab.moveItem(req.params.nzb, req.params.value).then(json).otherwise(err);
+					break;
+				case 'category':
+					sab.changeCategory(req.params.nzb, req.params.value).then(json).otherwise(err);
+					break;
+				case 'priority':
+					sab.queue('priority', req.params.nzb, req.params.value.toLowerCase()).then(json).otherwise(err);
+					break;
+				case 'processing':
+					sab.changeProcessing(req.params.nzb, req.params.value).then(json).otherwise(err);
+					break;
+				case 'script':
+					sab.changeScript(req.params.nzb, req.params.value).then(json).otherwise(err);
+					break;
+				case 'delete':
+					sab.queue('delete', req.params.nzb, req.params.value).then(json).otherwise(err);
+					break;
+				default:
+					next();
+			}
+		},
+
+		resumeQueue: function(req, res) {
+			var sab = req.app.config.sabnzbd;
+
+			if(!req.isAuthenticated()) {
+				return res.json({error: 'Permission Denied'});
+			}
+
+			if(!sab.enabled) {
+				return res.json({error: 'Module Disabled'});
+			}
+
+			sab.resumeQueue().then(function(data) {
+				res.json(data);
 			}).otherwise(function(reason) {
 console.log(reason);
 			});

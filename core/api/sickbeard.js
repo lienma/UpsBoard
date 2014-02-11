@@ -12,7 +12,8 @@ var log 	= require(paths.logger)('SICKBEARD')
 
 function formatShow(show) {
 	return {
-		_id: show.tvdbid,
+		_id: show.tvdbid + '.' + show.season + '.' + show.episode,
+		show_id: show.tvdbid,
 		airdate: show.airdate,
 		airs: show.airs,
 		ep_name: show.ep_name,
@@ -47,7 +48,6 @@ SickBeard.prototype.getPage = function(cmd, filters) {
 	request({
 		uri: url,
 		json: true,
-		timeout: 10000
 	}, function(err, res, body) {
 		if(err) {
 			var errReject = new Error('REQUEST');
@@ -70,7 +70,7 @@ SickBeard.prototype.getPage = function(cmd, filters) {
 		}
 
 		var err = new Error('WRONG_SETTINGS');
-		err.reason = 'Something wrong with the Sick Beard settings.';
+		err.reason = 'Something is wrong with the Sick Beard settings.';
 		promise.reject(err);
 	});
 

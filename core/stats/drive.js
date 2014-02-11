@@ -23,6 +23,8 @@ function Drive(label, location, options) {
 	this.options = options;
 
 	this.remote = (this.options.remote) ? true : false;
+	
+	this.os = (this.remote) ? this.options.remote : os.type().toLowerCase();
 
 	this.service = false;
 	if(this.remote) {
@@ -38,6 +40,7 @@ Drive.defaultOptions = {
 	total: 0,
 	icon: '',
 
+	os: 'linux',
 	host: '',
 	port: 22,
 	username: '',
@@ -117,7 +120,7 @@ function df(drive) {
 		return formatResponse(drive, parseInt(drive_info[2]) * 1024, parseInt(drive_info[1]) * 1024);
 	}
 
-	var size = (os.type() == 'Linux') ? '--block-size=1024' : '-k';
+	var size = (drive.os == 'linux') ? '--block-size=1024' : '-k';
 	drive.command('df ' + size + ' "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 
@@ -150,7 +153,7 @@ function du(drive) {
 		return formatResponse(drive, parseInt(find[0]) * 1024);
 	}
 
-	var size = (os.type() == 'Linux') ? '--block-size=1024' : '-k';
+	var size = (drive.os == 'linux') ? '--block-size=1024' : '-k';
 	drive.command('du ' + size + ' -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
 		var json = {err: reason.message, offline: true};
 

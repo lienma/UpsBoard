@@ -26,15 +26,17 @@ function routerIndex(req, res, status) {
 			break;
 	}
 
+	var config = req.app.config;
 
 	res.render('index', {
-		debugStopUpdating: (req.app.config.debugStopUpdating) ? 'true' : 'false',
+		debugStopUpdating: (config.debugStopUpdating) ? 'true' : 'false',
 
-		enabledSickBeard: req.app.config.sickbeard.enabled,
+		enabledSabnzbd: config.sabnzbd.enabled,
+		enabledSickBeard: config.sickbeard.enabled,
 
-		googleAnalytics: req.app.config.googleAnalytics,
-		googleAnalyticsId: req.app.config.googleAnalyticsId,
-		googleAnalyticsUrl: req.app.config.googleAnalyticsUrl,
+		googleAnalytics: config.googleAnalytics,
+		googleAnalyticsId: config.googleAnalyticsId,
+		googleAnalyticsUrl: config.googleAnalyticsUrl,
 
 		isLoggedIn: req.isAuthenticated(),
 		isMacOs: req.app.isMacOs,
@@ -46,12 +48,12 @@ function routerIndex(req, res, status) {
 
 		title: 'UpStats Board',
 
-		weatherEnabled: (req.app.config.weather.enabled) ? 'true' : 'false',
-		weatherLat: req.app.config.weather.latitude,
-		weatherLocation: req.app.config.weather.latitude + ',' + req.app.config.weather.longitude,
-		weatherLong: req.app.config.weather.longitude,
+		weatherEnabled: (config.weather.enabled) ? 'true' : 'false',
+		weatherLat: config.weather.latitude,
+		weatherLocation: config.weather.latitude + ',' + config.weather.longitude,
+		weatherLong: config.weather.longitude,
 
-		webRoot: (req.app.config.webRoot == '/') ? '' : req.app.config.webRoot,
+		webRoot: (config.webRoot == '/') ? '' : config.webRoot,
 	});
 };
 

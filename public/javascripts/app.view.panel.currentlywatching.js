@@ -16,6 +16,7 @@
 		initialize: function() {
 			this.collection = new Collection();
 			this.collection.on('add', this.addPoster, this);
+			this.collection.on('remove', this.removePoster, this);
 
 			var self = this;
 			this.collection.fetch();
@@ -42,7 +43,7 @@
 			this.resetCarousel();
 		},
 
-		removeVideo: function(video) {
+		removePoster: function(video) {
 			video.removePoster();
 
 			this.slideCounter -= 1;

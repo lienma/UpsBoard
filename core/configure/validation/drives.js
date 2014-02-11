@@ -42,8 +42,16 @@ module.exports 	= function validateDrives(data) {
 					return when.reject(error);
 				}
 
+				var os = ((drive.os) ? drive.os : 'linux').toLowerCase();
+				if(!/linux|mac/.test(os)) {
+					var error = new Error('INVALID_CONFIG');
+					error.reason = 'The operating system, ' + os + ', is not supported at this time.';
+					return when.reject(error);
+				}
+
 				options = {
 					remote: true,
+					os: os,
 					host: (_.isString(drive.host)) ? drive.host : 'localhost',
 					port: (_.isNumber(drive.port)) ? drive.port : 22,
 					username: drive.username,

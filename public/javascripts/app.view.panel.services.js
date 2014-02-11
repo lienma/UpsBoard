@@ -8,7 +8,7 @@
 	});
 
 	var ServicesView =  Backbone.View.extend({
-		el: '.panel.servicesStatusPanel',
+		el: '.panel.panel-services',
 
 		initialize: function() {
 			var base = this;

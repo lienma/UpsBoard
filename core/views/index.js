@@ -33,5 +33,9 @@
       new PanelView.Stat.TVCompletion();
     }
 
+    if(App.Config.Enabled.SABnzbd) {
+      new PanelView.SABnzbd();
+    }
+
   });
 })(App, jQuery);

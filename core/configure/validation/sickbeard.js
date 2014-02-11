@@ -57,7 +57,7 @@ module.exports 	= function validateSickbeard(data) {
 
 	log.debug('Testing Sick Beard\'s api key');
 	sickbeard.ping().then(function() {
-		log.debug('Successful ping to Sick Beard.');
+		log.debug('Ping was successful to Sick Beard.');
 
 		log.info('Validated Sick Beard configuration'.green);
 		data.config.sickbeard = sickbeard;

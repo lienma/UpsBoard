@@ -5,13 +5,12 @@ var request 		= require('request')
 var appRoot 		= path.resolve(__dirname, '../../')
   , paths 			= require(appRoot + '/core/paths');
 
-var CPU				= require(paths.stats + '/cpu')
-  , Memory 			= require(paths.stats + '/memory');
+var CPU				= require(paths.stats + '/cpu');
 
 exports.all = function(req, res) {
 
 	when.all([getCpu(req), getBandwidth(req), getMemory(req)]).then(function(data) {
-		res.json({ cpu: data[0], bandwidth: data[1], memory: data[2] });
+		res.json({ Cpu: data[0], Bandwidth: data[1], Memory: data[2] });
 	});
 };
 
@@ -26,12 +25,16 @@ console.log(err);
 exports.cpu = function(req, res) {
 	getCpu(req).then(function(data) {
 		res.json(data);
+	}).otherwise(function(err) {
+console.log(err);
 	});
 };
 
 exports.memory = function(req, res) {
 	getMemory(req).then(function(data) {
 		res.json(data);
+	}).otherwise(function(err) {
+console.log(err);
 	});
 };
 
@@ -121,7 +124,7 @@ exports.weather = function(req, res) {
 	request({
 		uri: url, json: true, timeout: 10000
 	}, function(err, resp, body) {
-		if(err && !body.currently) {
+		if(err || !(body || body.currently)) {
 			res.json({});
 		}
 
@@ -208,17 +211,38 @@ function getCpu() {
 }
 
 function getMemory(req) {
-	var promise = when.defer();
-	Memory(req).then(function(data) {
-		if(!req.isAuthenticated()) {
-			data = {
-				free:	Math.round(data.free / data.total * 100),
-				buffer:	Math.round(data.buffer / data.total * 100),
-				cache:	Math.round(data.cache / data.total * 100),
-				used: 	Math.round(data.used / data.total * 100)
-			};	
-		}
-		promise.resolve(data);
+	var promise = when.defer()
+	  , memory = req.app.config.memory
+	  , isLoggedIn = req.isAuthenticated();
+
+	var funcArray = [];
+	for(var i = 0; i < memory.length; i++) {
+		funcArray.push(memory[i].getMemory());
+	}
+
+	when.all(funcArray).then(function(results) {
+		var json = [];
+		results.forEach(function(server) {
+			if(!isLoggedIn) {
+				server = {
+					_id:		server._id,
+					label:		server.label,
+					default:	server.default,
+					offline:	(server.offline) ? true : false,
+					free:		Math.round(server.free / server.total * 100),
+					buffer:		Math.round(server.buffer / server.total * 100),
+					cache:		Math.round(server.cache / server.total * 100),
+					used: 		Math.round(server.used / server.total * 100)
+				};	
+			}
+
+			json.push(server);
+		});
+
+		promise.resolve(json);
+	}).otherwise(function(reason) {
+console.log(reason);
+		promise.resolve([]);
 	});
 
 	return promise.promise;

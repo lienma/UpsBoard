@@ -41,9 +41,10 @@
 			if(this.model.get('offline')) {
 				this.updateOffline();
 			} else {
-				if(!App.Config.IsLoggedIn) {
-					this.$('.loggedIn').hide();
+				if(App.Config.IsLoggedIn) {
 					this.updateSpaceText();
+				} else {
+					this.$('.loggedIn').hide();
 				}
 			}
 
@@ -67,6 +68,7 @@
 			if(App.Config.IsLoggedIn) {
 				var usedSpace = this.model.get('used')
 				  , totalSpace = this.model.get('total');
+
 				this.$('.usedSpace').html(numeral(usedSpace).format('0.00 b'));
 				this.$('.totalSpace').html(numeral(totalSpace).format('0.00 b'));
 			}

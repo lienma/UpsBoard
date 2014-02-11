@@ -3,6 +3,7 @@ extends layout
 block javascript
   script(type='text/javascript')
     include:uglify index.js
+
 block content
   script(type='text/template')#tmpl-weather-popover
     table
@@ -52,6 +53,66 @@ block content
         strong Plot: 
         | <%= epPlot %>
 
+  script(type='text/template')#tmpl-panel-sabnzbd-queue-item
+    td(style='width:20px').ends
+      i.glyphicon.glyphicon-pause.pointer.queue-item-pause
+
+    td.middle
+      .modal.fade.bs-modal-sm.modal-delete-nzb(tabindex='-1', role='dialog', aria-labelledby='deleteNzb', aria-hidden='true')
+        .modal-dialog.modal-sm
+          .modal-content
+            .modal-body Are you sure you want to delete this nzb?
+            .modal-footer
+              button(type='button', data-dismiss='modal').btn.btn-block.btn-default Cancel
+              button(type='button', data-files='0').btn-modal-delete-nzb.btn.btn-block.btn-primary Delete NZB
+              button(type='button', data-files='1').btn-modal-delete-nzb-files.btn.btn-block.btn-danger Delete NZB & Files
+
+      .filename-wrap
+        .filename-text <%= filename %>
+      .small
+        .pull-right
+          strong.mb-left
+          span.add-spacing /
+          strong.mb-total
+          span.add-spacing -
+          strong.percentage-text
+        div
+          strong.status-text <%= status %>
+          span.add-spacing |
+          strong.pointer.cat-text <%= cat %>
+      .progress
+        .progress-bar
+      .menu(style='display:none')
+        select(rel='tooltip', title='Category', data-placement='right', data-type='category', data-field='cat').select-event.btn.btn-default.category-select
+
+        select(rel='tooltip', title='Priority', data-placement='right', data-type='priority', data-field='priority').select-event.btn.btn-default.priority-select
+          option(value='Force') Force
+          option(value='High') High
+          option(value='Normal') Normal
+          option(value='Low') Low
+          option(value='Stop') Stop
+
+        select(rel='tooltip', title='Processing', data-placement='left', data-type='processing', data-field='unpackopts').select-event.btn.btn-default.unpackopts-select
+          option(value='0') Download
+          option(value='1') + Repair
+          option(value='2') + Unpack
+          option(value='3') + Delete
+
+        select(rel='tooltip', title='Scripts', data-placement='left' data-type='script', data-field='script').select-event.btn.btn-default.scripts-select
+
+        button(type='button', rel='tooltip', title='Remove Nzb', data-placement='left').btn-delete-nzb.btn.btn-danger.btn-xs.delete-btn
+          i.glyphicon.glyphicon-trash.icon-delete-nzb
+    td(style='20px').ends
+      i.glyphicon.glyphicon-move.drag-handle
+
+
+
+  script(type='text/template')#tmpl-panel-sabnzbd-queue-item-menu
+    ul.action-menu
+      li
+        a(tabindex='-1', href='#').with-icon
+          i.glyphicon.glyphicon-trash
+          | Delete Nzb
   script(type='text/template')#tmpl-panel-recently-aired-show-item
     .poster
       img(src!='<%= showPoster %>', title!='<%= showName %>').pointer
@@ -106,7 +167,7 @@ block content
         .carousel-menu-content.small
           .small
             | <% if(loggedIn) { %>
-            | Hello
+            | Coming Soon
             | <% } else { %>
             | Login to see details.
             | <% } %>
@@ -146,10 +207,10 @@ block content
       .progressDiv
 
   script(type='text/template')#tmpl-panel-service-item
-    td(style='padding-right:5px;').text-right <%= label %>
+    td.text-right <%= label %>
     td.text-left
-      a(style='width:65px;text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6)', target='_blank').btn.btn-xs
-        i(style='padding-right:1.4em;').glyphicon
+      a(target='_blank').btn.btn-xs
+        i.glyphicon
         | <%= status %>
 
   script(type='text/template')#tmpl-modal-bandwidth
@@ -199,17 +260,17 @@ block content
           .offline Server Offline
           .online
       div(style='position: relative;')
-        .alertBackground
-          .centerAlert
+        .alert-background
+          .center-alert
             .alert.alert-danger
-              button(type='button', data-dismiss='alert', aria-hidden='true').close &times;
+              button(type='button', data-dismiss='alert', aria-hidden='true').close.close-alert &times;
               h4.text-center Server Offline
-        .chartContainer
+        .chart-container
 
       .well.well-sm
         dl.dl-horizontal
           dt Legend:
-          dd.chartLegend
+          dd.chart-legend
     div.graphModalBody
 
   .modal.fade(tabindex='-1', role='dialog', aria-labelledby='cpuModalLabel', aria-hidden='true')#cpuModal
@@ -221,7 +282,7 @@ block content
         .modal-body
           div
             .cpuModel.text-center
-            .chartContainer
+            .chart-container
             .well.well-sm
               dl.dl-horizontal
                 dt Legend:
@@ -245,30 +306,17 @@ block content
                 .progress
                   .progress-bar.progress-bar-info
 
-  .modal.fade(tabindex='-1', role='dialog', aria-labelledby='memoryModalLabel', aria-hidden='true')#memoryModal
+  .modal.fade(tabindex='-1', role='dialog', aria-labelledby='modal-lbl-memory', aria-hidden='true')#modal-multi-memory
     .modal-dialog.systemModal
       .modal-content
         .modal-header
           button(type='button', data-dismiss='modal', aria-hidden='true').close &times;
-          h4.modal-title#memoryModalLabel Memory History & Information
+          h4.modal-title#modal-lbl-memory Memory History & Information
         .modal-body
-          div
-            dl.dl-horizontal
-                dt Current Usage:
-                dd.currentSpeeds
-                  strong Buffer: 
-                  span(style='padding-right:15px').buffer
-                  strong Cache: 
-                  span(style='padding-right:15px').cache
-                  strong Used: 
-                  span(style='padding-right:15px').used
-            .chartContainer
-            .well.well-sm
-              dl.dl-horizontal
-                dt Legend:
-                dd.chartLegend
+          ul.nav.nav-tabs
+          .tab-content
 
-  .modal.fade(tabindex='-1', role='dialog', aria-labelledby='bandwidthModalLabel', aria-hidden='true')#bandwidthMultiModal
+  .modal.fade(tabindex='-1', role='dialog', aria-labelledby='modal-multi-bandwidth', aria-hidden='true')#modal-multi-bandwidth
     .modal-dialog.systemModal
       .modal-content
         .modal-header
@@ -284,7 +332,7 @@ block content
         table
           tr
             td
-              .weather-alerts.hide
+              .weather-alerts.hidden-xs.hide
                 span.label.label-danger.pointer
             td
               .weather-container
@@ -311,7 +359,6 @@ block content
           span.label.label-success Logged In
       - }
   .body.container
-
     - if(message) {
       - if(messageDegree == 1) {
         .alert.alert-success
@@ -325,6 +372,27 @@ block content
 
     - }
 
+    .row
+      .col-xs-12.visible-xs
+        .weather-alerts.hide
+          span.label.label-danger.pointer
+      - if(!isLoggedIn) {
+      .col-xs-12.visible-xs
+        .panel.panel-default
+          .panel-heading
+            h4.panel-title Login Form
+          .panel-body
+            .login
+              form(role='form', action=locals.webRoot + '/', method='post').form-inline
+                input(type='hidden', name='_csrf', value=locals.token)
+                .form-group
+                  label(for='username') Username
+                  input(type='text', name='username', placeholder='Username').form-control#username
+                .form-group
+                  label(for='password') Password
+                  input(type='password', name='password', placeholder='Password').form-control#password
+                button(type='submit').btn.btn-block.btn-success Sign In
+      - }
     .row
       .col-md-4
         - if(enabledSickBeard) {
@@ -357,23 +425,69 @@ block content
                 .progress
                  .progress-bar
         .row
+          - if(enabledSabnzbd) {
           .col-md-12
-            .panel.panel-default.sabnzbd
+            .panel.panel-default.panel-service.sabnzbd
               .panel-heading
+                - if(isLoggedIn) {
                 .pull-right
-                  i.glyphicon.glyphicon-plus-sign
-                h4.panel-title Sabnzbd+
-              .panel-body.onlyMsg
+                  ul.list-inline
+                   li
+                     i.puase-downloading.glyphicon.glyphicon-pause.pointer
+                   li
+                    .badge.time-left.pointer
+                      span.time 0:00:00
+                      span.left  left
+                   li
+                    .badge.downloading-speed.pointer
+                      span.number 0
+                      span.unit  KB/s
+                   li
+                     i.glyphicon.glyphicon-plus.pointer
+                - }
+
+                h4.panel-title
+                  img(src=locals.webRoot + '/images/sab2_32.png', alt='Sabnzbd+', title='Sabnzbd+', rel='tooltip').service-icon.visible-xs
+                  span.hidden-xs Sabnzbd+
+
+              - if(isLoggedIn) {
+              .panel-body
+                .loading Loading...
+                .list-body.list-queue.small
+                  table.table.table-hover
+                    tbody
+
+                .list-body.list-history.small(style='display:none;') History
+              .panel-footer
+                .pull-right.small.remaining-space
+                  span.left
+                  span  / 
+                  span.total
+                .btn-group.btn-group-xs
+                  button(type='button').btn.btn-default.list-btn.btn-queue.active Queue 
+                    span(title='Number of nzbs in the queue', rel='tooltip')
+                      |(
+                      span.nzbs-in-queue 0
+                      |)
+                  button(type='button').btn.btn-default.list-btn.btn-history History
+              - } else {
+              .panel-body.only-msg
                 .panel-msg.alert.alert-danger
                   strong Login Required
                   |  Login is required to use this feature.
+              - }
+          - }
+
           .col-md-12
-            .panel.panel-default.couchpotato
+            .panel.panel-default.panel-service.couchpotato
               .panel-heading
                 .pull-right
                   i.glyphicon.glyphicon-plus-sign
-                h4.panel-title CouchPotato
-              .panel-body.onlyMsg
+                h4.panel-title
+                  img(src=locals.webRoot + '/images/couchpotato_32.png', alt='CouchPotato', title='CouchPotato', rel='tooltip').service-icon.visible-xs
+                  span.hidden-xs CouchPotato
+
+              .panel-body.only-msg
                 .panel-msg.alert.alert-danger
                   strong Login Required
                   |  Login is required to use this feature.
@@ -384,11 +498,17 @@ block content
               .panel-heading
                 .pull-right.tabs
                   .tab.all.pull-left
-                    a(href='#') All Episodes
+                    a(href='#')
+                      span.hidden-xs All Episodes
+                      span.visible-xs  All
                   .tab.unwatched.pull-right.active
-                    a(href='#') Unwatched Episodes
+                    a(href='#')
+                      span.hidden-xs  Unwatched Episodes
+                      span.visible-xs  Unwatched
 
-                h4.panel-title Recently Aired TV Shows
+                h4.panel-title
+                  span.hidden-xs Recently Aired TV Shows
+                  span.visible-xs Recently Aired
               .panel-body
                 ul.list-inline
 
@@ -416,22 +536,26 @@ block content
                       .carousel-inner
             .row
               .col-md-12
-                .panel.panel-default.sickbeard
-                  .panel-heading
+                .panel.panel-default.panel-service.sickbeard
+                  .panel-heading(style='margin:0')
                     .pull-right
                       i.glyphicon.glyphicon-plus-sign
-                    h4.panel-title SickBeard
-                  .panel-body.onlyMsg
+
+                    h4.panel-title
+                      img(src=locals.webRoot + '/images/SickBeard_64.png', alt='Sick Beard', title='Sick Beard', rel='tooltip').service-icon.visible-xs
+                      span.hidden-xs Sick Beard
+
+                  .panel-body.only-msg
                     .panel-msg.alert.alert-danger
                       strong Login Required
                       |  Login is required to use this feature.
  
           .col-md-4
-            .panel.panel-default.servicesStatusPanel
+            .panel.panel-default.panel-services
               .panel-heading
                 h4.panel-title Services
-              .panel-body.stat
-                table.servicesList
+              .panel-body
+                table.table-services
 
             .panel.panel-default.diskSpacePanel
               .panel-heading

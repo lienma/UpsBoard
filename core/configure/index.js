@@ -21,10 +21,12 @@ function Config() {
 		'Salt',
 		'UserSettings',
 		'GoogleAnalytics',
+		'Memory',
 		'Drives',
 		'Bandwidth',
 		'Services',
 
+		'SABnzbd',
 		'Sickbeard',
 		'Plex',
 		'Weather',

@@ -31,35 +31,295 @@
 		}
 	};
 
+	var modalId = 0;
+
+	var PanelView = Backbone.View.extend({
+		template: template = _.template($('#tmpl-modal-graph-multi').html()),
+
+		events: {
+			'click .close-alert': 'closeAlert'
+		},
+
+		initialize: function(args) {
+			this.modalId	= args.modalId;
+			this.graphItems = args.graphItems;
+			this.regularGraph = args.regularGraph;
+			this.tooltipLabel = args.tooltipLabel;
+			this.showTooltip = args.showTooltip;
+			this.colors = args.colors;
+			this.yAxisFormatter = args.yAxisFormatter;
 
 
-	
+			var label = this.model.get('label'), id = this.model.id;
+			var paneId = 'paneId-' + this.modalId + '-' + id;
+
+			this.$el.attr('id', paneId);
+			this.$el.addClass('tab-pane fade');
+
+			if(this.model.get('default')) {
+				this.$el.addClass('in active').tab('show');
+			}
+
+			this.link = $('<a/>', {'data-toggle':'tab', href:'#' + paneId}).text(label);		
+			this.link.on('shown.bs.tab', this.show.bind(this));
+
+			var tmplBody = _.template(args.tmplTabBody);
+
+			this.$el.html(this.template()).find('.graphModalBody').append(tmplBody(this.model.attributes));
+
+			this.buildCurrent();
+			this.buildHistory();
+
+			this.$('.chart-container').bind('plothover', this.plotHoverEvent.bind(this));
+
+			this.model.on('change', this.addHistory, this);
+		},
+
+		addHistory: function(model) {
+			var runningSum = 0, time = new Date().getTime();
+
+			this.graphItems.forEach(function(item) {
+				var data = model.get(item.field);
+				runningSum += parseFloat(data);
+
+				this.history[item.field].push({
+					plot: (this.regularGraph) ? data : runningSum,
+					data: data,
+					time: time
+				});
+
+				if(this.history[item.field].length > config.historyLimit) {
+					this.history[item.field].shift();
+				}
+			}.bind(this));
+			this.updateGraph();
+		},
+
+		buildCurrent: function() {
+			var current = this.$('.current .online');
+
+			this.graphItems.forEach(function(item) {
+				current.append($('<strong />').html(item.label + ': '));
+				current.append($('<span />').addClass(item.field));
+			});
+		},
+
+		buildGraph: function() {
+			if(this.graph == null) {
+				var width = this.$el.width();
+				this.$('.chart-container').css({
+					width: width + 'px',
+					height: Math.round(width / 2.8) + 'px'
+				});
+
+				this.graph = this.$('.chart-container').plot(this.getDataPoints(), {
+					yaxis: { min: 0, tickFormatter: this.yAxisFormatter },
+					grid: { hoverable: true },
+					xaxis: { mode: 'time', timezone: 'browser' },
+					legend: {
+						container : this.$('.chart-legend'),
+						noColumns : this.graphItems.length
+					}
+				}).data('plot');
+			} else {
+				this.updateGraph();
+			}
+		},
+
+		buildHistory: function() {
+			this.history = {};
+			this.graphItems.forEach(function(item) {
+				this.history[item.field] = [];
+			}.bind(this));
+
+			this.addHistory(this.model);
+		},
+
+		closeAlert: function() {
+			this.$('.alertBackground').hide();
+		},
+
+		getDataPoints: function() {
+			var dataArray = [];
+
+			this.graphItems.forEach(function(item) {
+				dataArray.push(this.getHistory(item));
+			}.bind(this));
+			return dataArray;
+		},
+
+		getHistory: function(item) {
+			var historyArray = [];
+			var history = this.history[item.field];
+
+			var size = history.length;
+			if(size < config.graphLimit + 1) {
+				var left = config.graphLimit - size;
+				var startTime = (history[0]) ? history[0].time : new Date().getTime();
+
+				for(var i = 0; i < left; i++) {
+					var time = startTime - (1000 * (left - i) * 5);
+					historyArray.push([time, 0]);
+				}
+
+				var y = 0;
+				for(var i = left; i < config.graphLimit; i++) {
+					historyArray.push([history[y].time, history[y].plot]);
+					y += 1;
+				}
+			} else {
+				for(var i = size - config.graphLimit; i < size; i++) {
+					historyArray.push([history[i].time, history[i].plot]);
+				}	
+			}
+			return {data: historyArray, field: item.field, label: item.label, color: this.colors[item.field].border,
+				lines: {
+					fill: true
+				}
+			};
+		},
+
+		renderLink: function() {
+			var tab = $('<li />').addClass((this.model.get('default')) ? 'active' : '');
+
+			return tab.append(this.link);
+		},
+
+		render: function() {
+			return this.$el;
+		},
+
+		plotHoverEvent: function(event, pos, item) {
+			if(item) {
+				if(this.previousTooltip != item) {
+					this.previousTooltip = item;
+					$('.chartTooltip').remove();
+
+					var type = this.history[item.series.field];
+
+					var pos = -1;
+					for(var i = 0; i < type.length; i++) {
+						if(type[i].time == item.datapoint[0]) {
+							pos = i;
+						}
+					}
+
+					var data = (pos == -1) ? 'No data' : this.tooltipLabel(type[pos]);
+
+					if(pos != -1) {
+						function addZero(num) {
+							return (num < 10) ? '0' + num : num;
+						}
+						var d = new Date(type[pos].time);
+						var timeStr = d.getHours() + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds());
+						data = data.replace('%time%', timeStr);
+					}
+
+					var contents = '<strong>' + item.series.label + '</strong>: ' + data
+					  , colors = this.colors[item.series.field];
+
+
+					$('<div/>').addClass('chartTooltip').html(contents).css({
+						top: item.pageY + 5,
+						left: item.pageX + 5,
+						'border-color':  colors.border,
+						'background-color': colors.bg,
+						opacity: 0.9
+					}).appendTo('body').fadeIn(200);
+				}
+			} else {
+				$('.chartTooltip').remove();
+				this.previousTooltip = null;            
+			}
+		},
+
+		setupOfflineMsg: function() {
+			var alert = this.$('.alert-background')
+			  , divOffline = this.$('.current .offline')
+			  , divOnline = this.$('.current .online');
+
+			function offlineMsg(offline) {
+				alert[(offline) ? 'show' : 'hide']();
+				divOffline[(offline) ? 'show' : 'hide']();
+				divOnline[(!offline) ? 'show' : 'hide']();
+			}
+
+			offlineMsg(this.model.get('offline'));
+			this.model.on('change:offline', function(m) {
+				offlineMsg(m.get('offline'));
+			});
+		},
+
+		show: function(event) {
+			this.buildGraph();
+		},
+
+		updateGraph: function() {
+
+		}
+	});
 
 
 	function ModalMulti(options) {
-		var self = this;
+		this.id					= modalId++;
 
-		this.options = _.defaults(options, defaultOptions);
-		this.$el = $(this.options.el);
+		this.activeModel		= {};
+		this.graphHistory		= {};
+		this.graphItems			= [];
+		this.modalOpened		= false;
+		this.previousTooltip	= null;
 
-		this.$ = function(query) {
-			return this.$el.find(query);
-		};
+		this.panels				= {};
 
-		this.body = function(id) {
-			var paneId = '#paneId' + id;
-			var body = self.$(paneId);
+		this.options 			= _.defaults(options, defaultOptions);
+		this.$el 				= $(this.options.el);
+		this.$ 					= function(query) { return this.$el.find(query); };
 
-			return new (function() {
-				this.editField = function(field, text) {
-					body.find(field).html(text);
-				};
+		this.setupCollection();
+	}
 
-				this.find = function(jquery) {
-					return body.find(jquery);
-				};
-			})();
-		};
+	ModalMulti.prototype.addTab = function(model) {
+		var panel = new PanelView({
+			model: model,
+			modalId: this.id,
+			graphItems: this.options.graphFields,
+			regularGraph: this.options.regularGraph,
+			tooltipLabel: this.options.tooltipLabel,
+			colors: this.options.colors,
+			yAxisFormatter: this.options.yAxisFormatter,
+			tmplTabBody: this.options.tmplTabBody
+		});
+
+		this.panels[model.id] = panel;
+
+		this.$('ul.nav-tabs').append(panel.renderLink());
+		this.$('.tab-content').append(panel.render());
+
+		this.options.initializeBody.call(panel, model);
+	};
+
+	ModalMulti.prototype.buildTabs = function() {
+		if(this.collection.size() == 1) {
+			this.$('ul.nav-tabs').hide();
+		}
+		
+		this.collection.each(function(model) {
+			this.addTab(model);
+		}.bind(this));
+
+		this.options.initialize.call(this, this.collection);
+	};
+
+	ModalMulti.prototype.fetch = function() {
+		var base = this;
+		this.collection.fetch({success: function() {
+			if(!App.Config.StopUpdating) {
+				base.fetch();
+			}
+		}});
+	};
+
+	ModalMulti.prototype.setupCollection = function() {
 
 		var Model = Backbone.Model.extend({
 			idAttribute: 	'_id',
@@ -70,7 +330,6 @@
 		});
 
 		var collectionUrl = this.options.url ? this.options.url : false;
-
 		var Collection = Backbone.Collection.extend({
 			model: Model,
 			url: collectionUrl,
@@ -86,232 +345,39 @@
 
 		if(collectionUrl) {
 			this.collection.fetch({success: function() {
-				if(self.collection.size() == 1) {
-					self.$('ul.nav-tabs').hide();
+				if(this.collection.size() == 1) {
+					this.$('ul.nav-tabs').hide();
 				}
 	
-				self.collection.each(function(model) {
-					self.addTab(model);
-				});
-				self.options.initialize.call(this, self.collection);
+				this.collection.each(function(model) {
+					this.addTab(model);
+				}.bind(this));
+				this.options.initialize.call(this, this.collection);
 	
 				if(!App.Config.StopUpdating) {
-					self.fetch();
+					this.fetch();
 				}
-			}});
+			}.bind(this)});
 		} else {
-			options.collectionModel.on('change:collection', function(model) {
-				self.collection.set(model.get('collection'));
+			this.options.collectionModel.on('change:collection', function(model) {
+				this.collection.set(model.get('collection'));
 			}, this);
 
-			options.collectionModel.once('change:collection', function(model) {
-				self.buildTabs();
-			});
-
-
+			this.options.collectionModel.once('change:collection', function(model) {
+				this.buildTabs();
+			}, this);
 		}
-	}
-
-	ModalMulti.prototype.activeModel = {};
-	ModalMulti.prototype.graphHistory = {};
-	ModalMulti.prototype.graphItems = [];
-	ModalMulti.prototype.modalOpened = false;
-
-	ModalMulti.prototype.addHistory = function(model) {
-		var runningSum = 0, time = new Date().getTime()
-		  , base = this;
-
-		this.getGraphFields(function(field) {
-			var data = model.get(field.field);
-			runningSum += parseFloat(data);
-
-			base.graphHistory[model.id][field.field].push({
-				plot: (base.options.regularGraph) ? data : runningSum,
-				data: data,
-				time: time
-			});
-
-			if(base.graphHistory[model.id][field.field].length > config.historyLimit) {
-				base.graphHistory[model.id][field.field].shift();
-			}
-		});
-		base.updateGraph();
-	};
-
-	ModalMulti.prototype.addTab = function(model) {
-		this.buildTab(model);
-		this.buildCurrentLegend(model);
-		this.buildGraphHistory(model);
-		this.setupHistoryWatch(model);
-		this.setupPlotEvents(model);
-
-		if(model.get('default')) {
-			this.activeModel = model;
-		}
-
-		this.options.initializeBody.call(this, model);
-	};
-
-	ModalMulti.prototype.buildCurrentLegend = function(model) {
-		var graphFields = this.options.graphFields
-		  , current = model.modalPanel.find('dd.current .online');
-
-		for(var i = 0; i < graphFields.length; i++) {
-			current.append($('<strong />').html(graphFields[i].label + ': '));
-			current.append($('<span />').addClass(graphFields[i].field));
-		}
-	};
-
-	ModalMulti.prototype.buildGraph = function() {
-		var activePanel = this.getActivePanel();
-		if(this.activeModel.modalGraph == null) {
-			this.activeModel.modalGraph = activePanel.find('.chartContainer').plot(this.getDataPoints(), {
-				yaxis: { min: 0, tickFormatter: this.options.yAxisFormatter },
-				grid: { hoverable: true },
-				xaxis: { mode: 'time', timezone: 'browser' },
-				legend: {
-					container : activePanel.find('.chartLegend'),
-					noColumns : this.options.graphFields.length
-				}
-			}).data('plot');
-		} else {
-			this.updateGraph();
-		}
-	};
-
-	ModalMulti.prototype.buildGraphHistory = function(model) {
-		var base = this, id = model.id;
-		this.graphHistory[id] = {};
-		this.getGraphFields(function(field) {
-			base.graphHistory[id][field.field] = [];
-		});
-		this.addHistory(model);
-	};
-
-	ModalMulti.prototype.buildTab = function(model) {
-		var base = this
-		  , tabs = this.$('ul.nav-tabs')
-		  , bodies = this.$('.tab-content')
-		  , template = _.template($('#tmpl-modal-graph-multi').html())
-		  , tmplBody = _.template(this.options.tmplTabBody);
-
-		var dfault = model.get('default'), label = model.get('label'), id = model.id;
-		var paneId = 'paneId' + id;
-
-		model.modalTab = $('<li />').addClass((dfault) ? 'active' : '');
-		var link = $('<a/>', {'data-toggle':'tab', href:'#' + paneId}).html(label);
-		link.on('shown.bs.tab', function(e) {
-			base.activeModel = model;
-			base.buildGraph();
-		});
-		model.modalTab.append(link);
-		tabs.append(model.modalTab);
-
-		model.modalPanel = $('<div />', {id: paneId}).addClass('tab-pane fade').addClass((dfault) ? 'in active' : '');
-		model.modalPanel.html(template()).find('.graphModalBody').append(tmplBody(model.attributes));
-		bodies.append(model.modalPanel);
-
-		model.modalPanel.find('button.close').click(function() {
-			model.modalPanel.find('.alertBackground').hide();
-		});
-	};
-
-	ModalMulti.prototype.buildTabs = function() {
-		var self = this;
-
-		if(this.collection.size() == 1) {
-			this.$('ul.nav-tabs').hide();
-		}
-		
-		this.collection.each(function(model) {
-			self.addTab(model);
-		});
-		this.options.initialize.call(this, this.collection);
-	};
-
-	ModalMulti.prototype.getActivePanel = function() {
-		return this.activeModel.modalPanel;
-	};
-
-	ModalMulti.prototype.getActiveGraph = function() {
-		return this.activeModel.modalGraph;
-	};
-
-	ModalMulti.prototype.getGraphFields = function(forEach) {
-		if(typeof forEach == 'function') {
-			this.options.graphFields.forEach(function(field) {
-				forEach(field);
-			});
-			return;
-		}
-		return this.options.graphFeilds;
-	};
-
-	ModalMulti.prototype.fetch = function() {
-		var base = this;
-		this.collection.fetch({success: function() {
-			if(!App.Config.StopUpdating) {
-				base.fetch();
-			}
-		}});
-	};
-
-	ModalMulti.prototype.setupHistoryWatch = function(model) {
-		var base = this, regularGraph = this.options.regularGraph;
-		model.on('change', this.addHistory, this);
 	};
 
 	ModalMulti.prototype.setupModalEvents = function() {
-		var base = this;
+
 		this.$el.on('shown.bs.modal', function () {
-			base.modalOpened = true;
-			base.buildGraph();
-		}).on('hide.bs.modal', function () {
-			base.modalOpened = false;
-		});
+			this.modalOpened = true;
+			this.panels['1'].buildGraph();
+		}.bind(this)).on('hide.bs.modal', function () {
+			this.modalOpened = false;
+		}.bind(this));
 	};
-
-	ModalMulti.prototype.setupPlotEvents = function(model) {
-		var base = this;
-
-		model.modalPanel.find('.chartContainer').bind('plothover', function(event, pos, item) {
-			if(item) {
-				if(base.previousTooltip != item) {
-					base.previousTooltip = item;
-					$('.chartTooltip').remove();
-
-					var id = base.activeModel.id;
-					var type = base.graphHistory[id][item.series.field];
-
-					var pos = -1;
-					for(var i = 0; i < type.length; i++) {
-						if(type[i].time == item.datapoint[0]) {
-							pos = i;
-						}
-					}
-
-					var data = (pos == -1) ? 'No data' : base.options.tooltipLabel(type[pos]);
-
-					if(pos != -1) {
-						function addZero(num) {
-							return (num < 10) ? '0' + num : num;
-						}
-						var d = new Date(type[pos].time);
-						var timeStr = d.getHours() + ':' + addZero(d.getMinutes()) + ':' + addZero(d.getSeconds());
-						data = data.replace('%time%', timeStr);
-					}
-
-					var contents = '<strong>' + item.series.label + '</strong>: ' + data;
-					base.showTooltip(item.pageX, item.pageY, base.options.colors[item.series.field], contents);
-				}
-			} else {
-				$('.chartTooltip').remove();
-				base.previousTooltip = null;            
-			}
-		});
-	};
-
-	ModalMulti.prototype.previousTooltip = null;
 	
 	ModalMulti.prototype.open = function() {
 		this.$el.modal();
@@ -327,60 +393,6 @@
 			graph.draw();
 		}
 	};
-
-	ModalMulti.prototype.showTooltip = function(x, y, colors, contents) {
-		$('<div/>').addClass('chartTooltip').html(contents).css({
-			top: y + 5,
-			left: x + 5,
-			'border-color':  colors.border,
-			'background-color': colors.bg,
-			opacity: 0.9
-		}).appendTo('body').fadeIn(200);
-	};
-
-	ModalMulti.prototype.getDataPoints = function() {
-		var base = this, dataArray = [];
-
-		this.options.graphFields.forEach(function(field) {
-			var history = base.getHistoryArray(field);
-			dataArray.push(history);
-		});
-		return dataArray;
-	};
-
-	ModalMulti.prototype.getHistoryArray = function(field) {
-		var historyArray = [];
-
-		var history = this.graphHistory[this.activeModel.id][field.field];
-
-		var size = history.length;
-		if(size < config.graphLimit + 1) { //>
-			var left = config.graphLimit - size;
-			var startTime = (history[0]) ? history[0].time : new Date().getTime();
-
-			for(var i = 0; i < left; i++) {
-				var time = startTime - (1000 * (left - i) * 5);
-				historyArray.push([time, 0]);
-			}
-
-			var y = 0;
-			for(var i = left; i < config.graphLimit; i++) {
-				historyArray.push([history[y].time, history[y].plot]);
-				y += 1;
-			}
-		} else {
-			for(var i = size - config.graphLimit; i < size; i++) {
-				historyArray.push([history[i].time, history[i].plot]);
-			}	
-		}
-		return {data: historyArray, field: field.field, label: field.label, color: this.options.colors[field.field].border,
-			lines: {
-				fill: true
-			}
-		};
-	};
-
-
 
 
 	function Modal(el, graphItems, options) {
@@ -458,8 +470,7 @@
 	Modal.prototype.getDataPoints = function() {
 		var base = this, dataArray = [];
 		for(var i = 0; i < this.graphItems.length; i++) {
-			var history = base.getHistoryArray(this.graphItems[i]);
-			dataArray.push(history);
+			dataArray.push(this.getHistoryArray(this.graphItems[i]));
 		}
 		return dataArray;
 	};
@@ -498,7 +509,7 @@
 
 	Modal.prototype.setUpGraph = function() {
 		if(this.dataGraph == null) {
-			this.dataGraph = this.$('.chartContainer').plot(this.getDataPoints(), {
+			this.dataGraph = this.$('.chart-container').plot(this.getDataPoints(), {
 				yaxis: { min: 0, tickFormatter: this.options.yAxisFormatter },
 				grid: { hoverable: true },
 				xaxis: { mode: 'time', timezone: 'browser' },
@@ -532,7 +543,7 @@
 
 	Modal.prototype.setPlotEvents = function() {
 		var base = this;
-		this.$('.chartContainer').bind('plothover', function(event, pos, item) {
+		this.$('.chart-container').bind('plothover', function(event, pos, item) {
 			if(item) {
 				if(base.previousTooltip != item) {
 					base.previousTooltip = item;

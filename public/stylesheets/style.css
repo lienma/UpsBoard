@@ -6,8 +6,43 @@ body {
 .pointer {
   cursor: pointer;
 }
-.panel-body.onlyMsg {
-  padding-bottom: 0;
+.add-spacing {
+  padding: 0 5px;
+}
+ul.action-menu {
+  padding: 3px 0;
+  margin: 0 -14px;
+  font-size: 14px;
+  list-style: none;
+}
+ul.action-menu li.divider {
+  height: 1px;
+  margin: 5px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}
+ul.action-menu li {
+  margin: 0;
+}
+ul.action-menu li a {
+  display: block;
+  padding: 3px 10px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.428571429;
+  color: #333;
+  white-space: nowrap;
+  font-size: 80%;
+}
+ul.action-menu li a:hover,
+ul.action-menu li a:focus {
+  background-color: #e8e8e8;
+  background-image: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%);
+  background-repeat: repeat-x;
+  text-decoration: none;
+}
+ul.action-menu li a.with-icon {
+  pading: 0;
 }
 .panel-body.stat {
   padding: 7px;
@@ -175,6 +210,12 @@ body {
 .panel.upComingShows table {
   margin-bottom: 0;
 }
+.panel.upComingShows table tr.alt {
+  background: #f5f5f5;
+}
+.panel.upComingShows table tr.alt .date-label {
+  background-color: #3a87ad;
+}
 .panel.upComingShows table td {
   height: 86px;
   padding: 1px 1px 1px 5px;
@@ -191,6 +232,7 @@ body {
   padding: 1px 3px;
   border-radius: 4px;
   margin-top: 5px;
+  background-color: #468847;
 }
 .panel.upComingShows table td .date-label span {
   -webkit-transform: rotate(-90deg);
@@ -199,17 +241,15 @@ body {
   margin-left: -24px;
   margin-top: 26px;
 }
-.panel.upComingShows table td .date-label.even {
-  background-color: #468847;
-}
-.panel.upComingShows table td .date-label.odd {
-  background-color: #3a87ad;
-}
 .panel.upComingShows table td .shows {
   margin-left: 22px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 312px;
 }
 .panel.upComingShows table td .shows ul {
   margin-bottom: 0;
+  white-space: nowrap;
 }
 .panel.upComingShows table td .shows ul li {
   padding: 3px;
@@ -235,33 +275,17 @@ body {
   border: 1px solid #f9b3b3;
   background-color: #fde3e3;
 }
-.panel.recentlyAiredShows .panel-heading .tab {
-  border-radius: 5px 5px 0 0;
-  margin: -6px 0 0;
-  padding: 11px 11px 6px;
-}
-.panel.recentlyAiredShows .panel-heading .tab.pull-left {
-  margin-right: 2px;
-}
-.panel.recentlyAiredShows .panel-heading .tab.pull-right {
-  margin-left: 2px;
-}
-.panel.recentlyAiredShows .panel-heading .tab.active {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-width: 1px 1px 0 1px;
-  padding: 10px 10px 6px;
-}
 .panel.recentlyAiredShows .panel-body {
-  min-height: 208px;
+  height: 208px;
   padding: 5px;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 .panel.recentlyAiredShows .panel-body ul {
   margin-bottom: 0;
 }
 .panel.recentlyAiredShows .panel-body ul li {
-  padding: 5px;
-/*width: 73px*/
+  padding: 4px;
 }
 .panel.recentlyAiredShows .panel-body ul li .popover {
   margin-top: -10px;
@@ -286,7 +310,7 @@ body {
 }
 .panel.recentlyAiredShows .panel-body ul .poster img {
   border-radius: 3px;
-  width: 64px;
+  width: 56px;
 }
 .systemModal .modal-body {
   padding: 10px;
@@ -304,7 +328,7 @@ body {
 .systemModal .modal-body .cpuModel {
   padding-top: 10px;
 }
-.systemModal .modal-body .alertBackground {
+.systemModal .modal-body .alert-background {
   height: 100%;
   width: 100%;
   position: absolute;
@@ -312,7 +336,7 @@ body {
   top: 0;
   z-index: 100;
 }
-.systemModal .modal-body .alertBackground .centerAlert {
+.systemModal .modal-body .alert-background .center-alert {
   width: 75%;
   height: 75px;
   margin: auto;
@@ -322,10 +346,10 @@ body {
   bottom: 0;
   right: 0;
 }
-.systemModal .modal-body .alertBackground .centerAlert h4 {
+.systemModal .modal-body .alert-background .center-alert h4 {
   margin-bottom: 0;
 }
-.systemModal .modal-body .chartContainer {
+.systemModal .modal-body .chart-container {
   width: 558px;
   height: 200px;
 }
@@ -335,14 +359,185 @@ body {
 .systemModal .modal-body .well .dl-horizontal {
   margin-top: 0;
 }
-.systemModal .modal-body .chartLegend table .legendColorBox {
-  width: 16px;
+.systemModal .modal-body .chart-legend {
+  min-height: 17px;
 }
-.systemModal .modal-body .chartLegend table .legendLabel {
+.systemModal .modal-body .chart-legend table .legendColorBox {
+  padding: 0 2px;
+}
+.systemModal .modal-body .chart-legend table .legendLabel {
   padding-right: 15px;
 }
 .systemModal .modal-body dl {
   margin-bottom: 0;
+  margin-top: 5px;
+  font-size: 85%;
+}
+.tabs .tab {
+  border-radius: 5px 5px 0 0;
+  margin: -6px 0 0;
+  padding: 11px 11px 6px;
+}
+.tabs .tab a {
+  cursor: pointer;
+}
+.tabs .tab a:hover {
+  text-decoration: none;
+}
+.tabs .tab.pull-left {
+  margin-right: 2px;
+}
+.tabs .tab.pull-right {
+  margin-left: 2px;
+}
+.tabs .tab.active {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-width: 1px 1px 0 1px;
+  padding: 10px 10px 6px;
+}
+.panel-services .panel-body {
+  padding: 8px;
+}
+.panel-services .panel-body .table-services {
+  width: 100%;
+}
+.panel-services .panel-body .table-services td {
+  padding: 2px;
+}
+.panel-services .panel-body .table-services td a {
+  width: 70px;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.6);
+}
+.panel-services .panel-body .table-services td a i {
+  padding-right: 5px;
+}
+.sabnzbd .panel-footer {
+  padding: 5px 10px;
+}
+.sabnzbd .panel-footer .list-btn {
+  padding: 1px 15px;
+}
+.sabnzbd .time-left,
+.sabnzbd .downloading-speed {
+  width: 80px;
+}
+.sabnzbd .time-left .left,
+.sabnzbd .downloading-speed .left,
+.sabnzbd .time-left .unit,
+.sabnzbd .downloading-speed .unit {
+  color: #efefef;
+  font-size: 80%;
+}
+.sabnzbd .enabled {
+  color: #428bca;
+}
+.sabnzbd .remaining-space {
+  line-height: 23px;
+}
+.sabnzbd .remaining-space span:first-child {
+  margin-right: 5px;
+}
+.sabnzbd .remaining-space span:last-child {
+  margin-left: 5px;
+}
+.sabnzbd .list-body .table {
+  margin-bottom: 0;
+}
+.sabnzbd .list-body .table tr.alt {
+  background: #f5f5f5;
+}
+.sabnzbd .list-body .table td.middle,
+.sabnzbd .list-body .table td {
+  padding: 6px 4px;
+  vertical-align: middle;
+}
+.sabnzbd .list-body .table td.middle .drag-handle,
+.sabnzbd .list-body .table td .drag-handle {
+  cursor: move;
+}
+.sabnzbd .list-body .table td.middle .filename-wrap,
+.sabnzbd .list-body .table td .filename-wrap {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.sabnzbd .list-body .table td.middle .filename-text,
+.sabnzbd .list-body .table td .filename-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  word-wrap: break-word;
+}
+.sabnzbd .list-body .table td.middle .progress,
+.sabnzbd .list-body .table td .progress {
+  height: 8px;
+  margin: 2px 0 0;
+  width: 100%;
+}
+.sabnzbd .list-body .table td.middle .menu,
+.sabnzbd .list-body .table td .menu {
+  margin-top: 2px;
+  white-space: nowrap;
+}
+.sabnzbd .list-body .table td.middle .menu select,
+.sabnzbd .list-body .table td .menu select {
+  width: 20px;
+}
+.sabnzbd .list-body .table td.middle .menu .btn,
+.sabnzbd .list-body .table td .menu .btn {
+  font-size: 10px;
+  margin-top: -2px;
+  padding: 0 0 0 1px;
+}
+.sabnzbd .list-body .table td.middle .menu .delete-btn,
+.sabnzbd .list-body .table td .menu .delete-btn {
+  padding: 0 3px;
+}
+.sabnzbd .list-body .table td:first-child {
+  font-size: 14px;
+  padding: 12px 0 6px 5px;
+}
+.sabnzbd .list-body .table td:last-child {
+  padding: 12px 6px 6px 2px;
+}
+.panel-service .panel-heading .service-icon {
+  width: 24px;
+  margin: -5px 0 -5px -5px;
+}
+.panel-service .panel-heading ul.list-inline {
+  margin-bottom: 0;
+}
+.panel-service .panel-heading ul.list-inline li {
+  padding-right: 2px;
+  padding-left: 3px;
+}
+.panel-service .panel-heading ul.list-inline li:last-child {
+  padding-right: 0;
+}
+.panel-service .panel-heading .add {
+  margin-left: 5px;
+  margin-top: 4px;
+}
+.panel-service .panel-body {
+  padding: 0;
+  max-height: 250px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  width: 100%;
+}
+.panel-service .panel-body.only-msg {
+  padding: 15px 15px 0;
+}
+.body .weather-alerts {
+  padding: 0 15px 15px 15px;
+}
+.body .weather-alerts span.label {
+  box-shadow: 0 1px 2px rgba(0,0,0,0.52);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+  display: block;
+  width: 100%;
 }
 .top-display-bar .weather-alerts {
   margin-right: 8px;

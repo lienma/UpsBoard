@@ -4,10 +4,44 @@ body
   font-family: 'PT Sans', sans-serif
 
 .pointer
-  cursor: pointer;
+  cursor: pointer
 
-.panel-body.onlyMsg
-  padding-bottom: 0
+.add-spacing
+  padding: 0 5px
+
+ul.action-menu
+  padding: 3px 0
+  margin: 0 -14px
+  font-size: 14px
+  list-style: none
+
+  li.divider
+    height: 1px
+    margin: 5px 0
+    overflow: hidden
+    background-color: #e5e5e5
+
+  li
+    margin: 0
+
+    a
+      display: block
+      padding: 3px 10px
+      clear: both
+      font-weight: normal
+      line-height: 1.428571429
+      color: #333333
+      white-space: nowrap
+      font-size: 80%
+
+    a:hover, a:focus
+      background-color: #e8e8e8
+      background-image: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%)
+      background-repeat: repeat-x
+      text-decoration: none
+
+    a.with-icon
+      pading: 0
 
 .panel-body.stat
   padding: 7px
@@ -36,8 +70,8 @@ body
 
 .bandwidth-data-caps
   .panel-body
-    max-height: 250px;
-    overflow-y: auto;
+    max-height: 250px
+    overflow-y: auto
 
     .media-list
       padding: 0
@@ -53,8 +87,8 @@ body
 
 .diskSpacePanel
   .panel-body
-    max-height: 250px;
-    overflow-y: auto;
+    max-height: 250px
+    overflow-y: auto
 
     .media-list
       padding: 0
@@ -170,6 +204,12 @@ body
   table
     margin-bottom: 0
 
+    tr.alt
+      background: #f5f5f5
+
+      .date-label
+        background-color: rgb(58,135,173)
+
     td
       height: 86px
       padding: 1px 1px 1px 5px
@@ -186,6 +226,7 @@ body
         padding: 1px 3px
         border-radius: 4px
         margin-top: 5px
+        background-color: rgb(70,136,71)
 
         span
           -webkit-transform: rotate(-90deg)
@@ -194,17 +235,15 @@ body
           margin-left: -24px
           margin-top: 26px
 
-      .date-label.even
-        background-color: rgb(70,136,71)
-
-      .date-label.odd
-        background-color: rgb(58,135,173)
-
       .shows
         margin-left: 22px
+        overflow-x: auto
+        overflow-y: hidden
+        width: 312px
 
         ul
-          margin-bottom: 0;
+          margin-bottom: 0
+          white-space: nowrap
 
           li
             padding: 3px
@@ -231,34 +270,17 @@ body
               background-color: #fde3e3
 
 .panel.recentlyAiredShows
-  .panel-heading
-    .tab
-      border-radius: 5px 5px 0 0
-      margin: -6px 0 0
-      padding: 11px 11px 6px
-
-    .tab.pull-left
-      margin-right: 2px
-
-    .tab.pull-right
-      margin-left: 2px
-
-    .tab.active
-      background-color: #fff
-      border: 1px solid #ddd
-      border-width: 1px 1px 0 1px
-      padding: 10px 10px 6px
-
   .panel-body
-    min-height: 208px
+    height: 208px
     padding: 5px
+    overflow-x: auto
+    overflow-y: auto
 
     ul
       margin-bottom: 0
 
       li
-        padding: 5px
-        /*width: 73px*/
+        padding: 4px
 
         .popover
           margin-top: -10px
@@ -282,7 +304,7 @@ body
 
         img
           border-radius: 3px
-          width:64px
+          width: 56px
 
 .systemModal
   .modal-body
@@ -297,12 +319,12 @@ body
         padding-right: 15px
 
     .nav > li > a
-      padding: 5px 10px;
+      padding: 5px 10px
 
     .cpuModel
       padding-top: 10px
 
-    .alertBackground
+    .alert-background
       height: 100%
       width: 100%
       position: absolute
@@ -310,7 +332,7 @@ body
       top: 0
       z-index: 100
 
-      .centerAlert
+      .center-alert
         width: 75%
         height: 75px
         margin: auto
@@ -323,7 +345,7 @@ body
         h4
           margin-bottom: 0
 
-    .chartContainer
+    .chart-container
       width: 558px
       height: 200px
 
@@ -332,14 +354,181 @@ body
       .dl-horizontal
         margin-top: 0
 
-    .chartLegend
+    .chart-legend
+      min-height: 17px
+
       table
         .legendColorBox
-          width: 16px
+          padding: 0 2px
         .legendLabel
           padding-right: 15px
     dl
       margin-bottom: 0
+      margin-top: 5px
+      font-size: 85%
+
+.tabs
+  .tab
+    border-radius: 5px 5px 0 0
+    margin: -6px 0 0
+    padding: 11px 11px 6px
+
+    a
+      cursor: pointer
+
+    a:hover
+     text-decoration: none 
+
+  .tab.pull-left
+    margin-right: 2px
+
+  .tab.pull-right
+    margin-left: 2px
+
+  .tab.active
+    background-color: #fff
+    border: 1px solid #ddd
+    border-width: 1px 1px 0 1px
+    padding: 10px 10px 6px
+
+.panel-services
+  .panel-body
+    padding: 8px
+
+    .table-services
+      width: 100%
+
+      td
+        padding: 2px
+
+        a
+          width: 70px
+          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6)
+
+          i
+            padding-right: 5px
+
+.sabnzbd
+
+  .panel-footer
+    padding: 5px 10px
+
+    .list-btn
+      padding: 1px 15px
+
+  .time-left, .downloading-speed
+    width: 80px
+
+    .left, .unit
+      color: #efefef
+      font-size: 80%
+
+  .enabled
+    color: #428bca
+
+  .remaining-space
+    line-height: 23px
+
+    span:first-child
+      margin-right: 5px
+    span:last-child
+      margin-left: 5px
+
+  .list-body
+    .table
+      margin-bottom: 0
+
+      tr.alt
+        background: #f5f5f5
+
+      td.middle
+
+
+      td
+        padding: 6px 4px
+        vertical-align: middle
+
+        .drag-handle
+          cursor: move
+
+        .filename-wrap
+          display: table
+          width: 100%
+          table-layout: fixed
+
+        .filename-text
+          overflow: hidden
+          white-space: nowrap
+          text-overflow: ellipsis
+          word-break: break-all
+          word-wrap: break-word
+
+        .progress
+          height: 8px
+          margin: 2px 0 0
+          width: 100%
+
+        .menu
+          margin-top: 2px
+          white-space: nowrap
+ 
+          select
+            width: 20px
+
+          .btn
+            font-size: 10px
+            margin-top: -2px
+            padding: 0 0 0 1px
+
+          .delete-btn
+            padding: 0 3px
+
+      td:first-child
+        font-size: 14px
+        padding: 12px 0 6px 5px
+
+      td:last-child
+        padding: 12px 6px 6px 2px
+
+
+.panel-service
+  .panel-heading
+    .service-icon
+      width: 24px
+      margin: -5px 0 -5px -5px
+
+    ul.list-inline
+      margin-bottom: 0
+
+      li
+        padding-right: 2px
+        padding-left: 3px
+      li:last-child
+        padding-right: 0
+
+    .add
+      margin-left: 5px
+      margin-top: 4px
+
+  .panel-body
+    padding: 0
+    max-height: 250px
+    overflow-x: hidden
+    overflow-y: auto
+    width: 100%
+
+  .panel-body.only-msg
+    padding: 15px 15px 0
+
+.body
+  .weather-alerts
+    padding: 0 15px 15px 15px
+
+    span.label
+      box-shadow: 0 1px 2px rgba(0,0,0,0.52)
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6)
+      display: block
+      width: 100%
 
 .top-display-bar
   .weather-alerts
@@ -560,8 +749,7 @@ body
           text-decoration: none
 
 .rotate-icon
-  -webkit-animation:rotateThis .5s infinite;
-
+  -webkit-animation:rotateThis .5s infinite
 
 .loader
   position: relative

@@ -1,6 +1,15 @@
-var request = require('request');
+var request = require('request')
+  , when   	= require('when')
+  , _ 		= require('underscore')
+  , path 	= require('path');
+
+var appRoot = path.resolve(__dirname, '../../')
+  , paths 	= require(appRoot + '/core/paths');
+
+var log 	= require(paths.logger)('SABNZBD')
 
 function Sabnzbd(sabConfig) {
+
 	this.protocol 	= sabConfig.protocol;
 	this.host		= sabConfig.host;
 	this.port 		= sabConfig.port;
@@ -9,31 +18,140 @@ function Sabnzbd(sabConfig) {
 	this.apiKey 	= sabConfig.apiKey;
 }
 
-Sabnzbd.prototype.getPage = function(cmd, filters, callback) {
-	if(typeof filters == 'function') {
-		var callback = filters;
-		filters = '';
+Sabnzbd.prototype.getPage = function(cmd, filters) {
+	var defer = when.defer();
+
+	var params = '';
+	if(filters) {
+		_.each(filters, function(value, key) {
+			params += '&' + key + '=' + value;
+		});
 	}
 
-	var url = this.url + '/api?mode=' + cmd + '&output=json&apikey=' + this.apiKey;
+	var url = this.url + '/api?mode=' + cmd + params + '&output=json&apikey=' + this.apiKey;
 
 	request({
 		uri: url,
-		json: true,
-		timeout: 10000
+		json: true
 	}, function(err, res, body) {
-		if(err) return callback(err);
-
-		if(body) {
-			callback(null, body.data);
+		if(err) {
+			var errReject = new Error('REQUEST');
+			errReject.detail = err;
+			return defer.reject(errReject);
 		}
+		if(body && _.isObject(body)) {
+			if(_.isBoolean(body.status) && !body.status) {
+				if(body.error == 'API Key Incorrect') {
+					var errReject = new Error('DENIED');
+					errReject.detail = body.error;
+					errReject.reason = 'The api key for SABnzbd is required or is wrong api key.';
+				} else {
+					var errReject = new Error('API_ERROR');
+					errReject.detail = body.error;
+					errReject.body = body;
+				}
+
+				return defer.reject(errReject);
+			}
+
+			return defer.resolve(body);
+		}
+
+		var err = new Error('WRONG_SETTINGS');
+		err.reason = 'Something is wrong with the SABnzdb settings.';
+		defer.reject(err);
+	});
+
+	return defer.promise;
+};
+
+Sabnzbd.prototype.changeCategory = function(nzb_id, category) {
+	var params = {value: nzb_id, value2: category};
+
+	return this.getPage('change_cat', params);
+};
+
+Sabnzbd.prototype.changePriority = function(nzb_id, priority) {
+	var numVal = 0, priority = priority.toLowerCase();
+
+	switch(priority) {
+		case 'low':
+			numVal =  -1;
+			break;
+		case 'high':
+			numVal = 1;
+			break;
+		case 'force':
+			numVal = 2;
+			break;
+	}
+
+	var params = {value: nzb_id, value2: numVal};
+	return this.getPage('priority', params);
+};
+
+Sabnzbd.prototype.changeProcessing = function(nzb_id, value) {
+	var params = {value: nzb_id, value2: value};
+	return this.getPage('change_opts', params);
+};
+
+Sabnzbd.prototype.changeScript = function(nzb_id, value) {
+	var params = {value: nzb_id, value2: value};
+	return this.getPage('change_script', params);
+};
+
+Sabnzbd.prototype.getQueue = function() {
+	return this.getPage('queue', {
+		start: 0,
+		limit: 9999999
 	});
 };
 
-Sabnzbd.prototype.getQueueStatus = function(callback) {
-	this.getPage('qstatus', function(err, data) {
-console.log('data: ', data);
-	});
+Sabnzbd.prototype.pauseQueue = function() {
+	return this.getPage('pause');
+};
+
+Sabnzbd.prototype.queue = function(name, nzb_id, value) {
+	var params = {name: name, value: nzb_id};
+
+	if(value) {
+		if(name == 'priority') {
+			var numVal = 0, priority = value.toLowerCase();
+			switch(priority) {
+				case 'low':
+					numVal =  -1;
+					break;
+				case 'high':
+					numVal = 1;
+					break;
+				case 'force':
+					numVal = 2;
+					break;
+			}
+			params.value2 = numVal;
+		} else if(name == 'delete') {
+
+			params.del_files = value;
+		} else {
+			params.value2 = value;
+		}
+	}
+
+	return this.getPage('queue', params);
+};
+
+Sabnzbd.prototype.moveItem = function(nzb_id, position) {
+	var params = {value: nzb_id, value2: position};
+
+	return this.getPage('switch', params);
+};
+
+Sabnzbd.prototype.resumeQueue = function() {
+	return this.getPage('resume');
+};
+
+Sabnzbd.prototype.ping = function() {
+	return this.getPage('qstatus');
 };
 
 exports = module.exports = Sabnzbd;
