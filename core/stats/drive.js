@@ -11,27 +11,20 @@ var Command 	= require(paths.core + '/command')
   , log 		= require(paths.logger)('DRIVE_SPACE');
 
 var idCounter = 0;
-function Drive(label, location, options) {
+function Drive(options) {
 	idCounter += 1;
 
 	this._id = idCounter;
 
-	this.label = label;
-	this.location = location;
+	this.label = options.label;
+	this.location = options.location;
 
-	_.defaults((options) ? options : {}, Drive.defaultOptions);
+	_.defaults(options, Drive.defaultOptions);
 	this.options = options;
-
-	this.remote = (this.options.remote) ? true : false;
 	
-	this.os = (this.remote) ? this.options.remote : os.type().toLowerCase();
+	this.os = (this.os) ? this.options.os : os.type().toLowerCase();
 
-	this.service = false;
-	if(this.remote) {
-		this.service = new Service(this.options.host, this.options.port, {username: this.options.username, password: this.options.password});
-	}
-
-	this.command = Command(this.service);
+	this.command = Command(options.remote);
 }
 
 Drive.defaultOptions = {
@@ -40,11 +33,7 @@ Drive.defaultOptions = {
 	total: 0,
 	icon: '',
 
-	os: 'linux',
-	host: '',
-	port: 22,
-	username: '',
-	password: ''
+	os: 'linux'
 };
 
 Drive.prototype.getDriveSpace = function() {
@@ -53,33 +42,36 @@ Drive.prototype.getDriveSpace = function() {
 
 	log.debug('Getting drive space for', this.label.yellow, 'using', 'df'.red, 'command');
 
-	if(this.remote) {
-		this.service.isOnline().then(function(isOnline) {
-			if(isOnline) {
-				cmd();
-			} else {
-				promise.resolve({
-					_id:		self._id,
-					label:		self.label,
-					icon:		self.getIcon(),
-					offline:	true
-				});
-			}
-		}).otherwise(promise.reject);
-	} else {
-		cmd();
-	}
+	df(self).then(function(data) {
+		if(_.isNaN(data.used)) {
+			log.debug('Falling back to', 'du'.red, 'for', self.label.yellow);
+			du(self).then(finish).otherwise(promise.reject);
+		} else {
+			finish(data);
+		}
+	}).otherwise(function(reason) {
+		var json = {
+			_id:		this._id,
+			label:		this.label,
+			icon:		this.getIcon(),
+			err:		reason.message,
+			offline:	true
+		};
 
-	function cmd() {
-		df(self).then(function(data) {
-			if(_.isNaN(data.used)) {
-				log.debug('Falling back to', 'du'.red, 'for', self.label.yellow);
-				du(self).then(finish).otherwise(promise.reject);
-			} else {
-				finish(data);
-			}
-		}).otherwise(promise.reject);
-	}
+		switch(reason.message) {
+			case 'AUTHENTICATION_FAILED':
+				json.detail = 'Username and password failed. Please double check username and password for drive settings \'' + this.label + '\'';
+				break;
+			case 'CONNECTION_FAILED':
+			case 'SERVER_OFFLINE':
+				json.detail = 'Connection failed. Please double check the settings for drive settings \'' + this.label + '\'';
+				break;
+			case 'CONNECTION_TIMEOUT':
+				json.detail = 'Connection timed out to getting drive information \'' + this.label + '\'';
+				break;
+		}
+		promise.resolve(json);
+	}.bind(this));
 
 	function finish(data) {
 		var since = new Date().getTime() - start;
@@ -121,26 +113,7 @@ function df(drive) {
 	}
 
 	var size = (drive.os == 'linux') ? '--block-size=1024' : '-k';
-	drive.command('df ' + size + ' "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
-		var json = {err: reason.message, offline: true};
-
-		switch(reason.message) {
-			case 'AUTHENTICATION_FAILED':
-				json.detail = 'Username and password failed. Please double check username and password for drive settings \'' + self.label + '\'';
-				break;
-
-			case 'CONNECTION_FAILED':
-			case 'SERVER_OFFLINE':
-				json.detail = 'Connection failed. Please double check the settings for drive settings \'' + self.label + '\'';
-				break;
-
-			case 'CONNECTION_TIMEOUT':
-				json.detail = 'Connection timed out to getting drive information \'' + self.label + '\'';
-				break;
-		}
-
-		promise.resolve(json);
-	});
+	drive.command('df ' + size + ' "' + drive.location + '"').then(process).then(promise.resolve).otherwise(promise.reject);
 
 	return promise.promise;
 }
@@ -154,26 +127,7 @@ function du(drive) {
 	}
 
 	var size = (drive.os == 'linux') ? '--block-size=1024' : '-k';
-	drive.command('du ' + size + ' -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(function(reason) {
-		var json = {err: reason.message, offline: true};
-
-		switch(reason.message) {
-			case 'AUTHENTICATION_FAILED':
-				json.detail = 'Username and password failed. Please double check username and password for drive settings \'' + self.label + '\'';
-				break;
-
-			case 'CONNECTION_FAILED':
-			case 'SERVER_OFFLINE':
-				json.detail = 'Connection failed. Please double check the settings for drive settings \'' + self.label + '\'';
-				break;
-
-			case 'CONNECTION_TIMEOUT':
-				json.detail = 'Connection timed out to getting drive information \'' + self.label + '\'';
-				break;
-		}
-
-		promise.resolve(json);
-	});
+	drive.command('du ' + size + ' -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(promise.reject);
 
 	return promise.promise;
 }

@@ -8,59 +8,75 @@ var appRoot 	= path.resolve(__dirname, '../../../')
   , paths 		= require(appRoot + '/core/paths');
 
 var log 		= require(paths.logger)('CONFIG')
+  , common		= require(paths.core + '/common')
   , Bandwidth 	= require(paths.stats + '/bandwidth');
 
-module.exports 	= function validateBandwidth(data) {
-	var servers = [];
+function validate(data) {
+	var defer	= when.defer()
+	  , servers	= [];
 
-	for(var label in data.data.bandwidthServers) {
-		if(data.data.bandwidthServers.hasOwnProperty(label)) {
-			var server = data.data.bandwidthServers[label];
-			var remote = (server.remote) ? true : false;
+	_.each(data.data.bandwidthServers, function(server, label) {
+		 servers.push(create(server, label).then(common.validateRemoteHost).then(function(data) {
+			return when.resolve(new Bandwidth(data.options));
+		}));
+	});
 
-			var options = {
-				label: label,
-				'default': (server['default']) ? true : false,
+	when.all(servers).then(function(results) {
+		log.info('Validated bandwidth servers configuration.'.green);
+		data.config.bandwidth = results;
+		defer.resolve(data);
+	}).otherwise(function(reason) {
+		var error = new Error('INVALID_CONFIG');
 
-				vnstatPath: (_.isString(server.vnstatPath)) ? server.vnstatPath : 'vnstat',
-				vnstatDBDirectory: (_.isString(server.vnstatDBDirectory)) ? server.vnstatDBDirectory : false,
+		if(reason.reason) {
+			error.reason = reason.reason;
+		} else {
+			var suggestion = util.format('Please check your cofiguration for memory server labelled, %s.', (reason.options) ? reason.options.label : '');
 
-				interface: (_.isString(server.interface)) ? server.interface : 'eth0',
-				max: (server.maxSpeed) ? server.maxSpeed : [100, 100],
-				remote: remote
-			};
-
-			options.cap = (_.isString(server.cap) && server.cap != "") ? server.cap : false;
-
-			if(_.isEmpty(label)) {
-				var error = new Error('INVALID_CONFIG');
-				error.reason = 'Missing label for one of the drives.';
-
-				var printObj = '{\n' + log.printObject(server, 2) + '\n\t\t},';
-				error.suggestion = '\t\t"Home Server": ' + printObj;
-				error.currently = '\t\t"": ' + printObj;
-
-				return when.reject(error);
-
+			switch(reason.message) {
+				case 'USERNAME':
+					error.reason = 'Username is required for getting memory statistics from remote server.';
+					error.suggestion = suggestion;
+					break;
+				case 'NO_AUTHENTICATION':
+					error.reason = 'There is no authenication type present for remote server.';
+					error.suggestion = suggestion;
+					break;
 			}
-
-			if(remote) {
-				if(!_.isString(server.username) || _.isEmpty(server.username)) {
-					var error = new Error('INVALID_CONFIG');
-					error.reason = 'Username is required for getting bandwidth statistics from remote source.';
-					return when.reject(error);
-				}
-
-				options.host = (_.isString(server.host)) ? server.host : 'localhost',
-				options.port = (_.isNumber(server.port)) ? server.port : 22,
-				options.username = server.username,
-				options.password = (_.isString(server.password)) ? server.password : ''
-			};
-			servers.push(new Bandwidth(options));
 		}
+
+		defer.reject((error.reason) ? error : reason);
+	});
+
+	return defer.promise;
+}
+
+function create(server, label) {
+	if(_.isEmpty(label)) {
+		var error = new Error('INVALID_CONFIG');
+		error.reason = 'Missing label for one of the bandwidth server.';
+
+		var printObj = '{\n' + log.printObject(server, 2) + '\n\t\t},';
+		error.suggestion = '\t\t"Home Server": ' + printObj;
+		error.currently = '\t\t"": ' + printObj;
+
+		return when.reject(error);
 	}
 
-	log.info('Validated bandwidth servers configuration.'.green);
-	data.config.bandwidth = servers;
-	return when.resolve(data);
-};
+	var options = {
+		label: label,
+		'default': (server['default']) ? true : false,
+
+		vnstatPath: (_.isString(server.vnstatPath)) ? server.vnstatPath : 'vnstat',
+		vnstatDBDirectory: (_.isString(server.vnstatDBDirectory)) ? server.vnstatDBDirectory : false,
+
+		interface: (_.isString(server.interface)) ? server.interface : 'eth0',
+		max: (server.maxSpeed) ? server.maxSpeed : [100, 100],
+	};
+
+	options.cap = (_.isString(server.cap) && server.cap != "") ? server.cap : false;
+
+	return when.resolve({server: server, options: options});
+}
+
+module.exports 	= validate;

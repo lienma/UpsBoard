@@ -11,28 +11,19 @@ var Command 	= require(paths.core + '/command')
   , log 		= require(paths.logger)('MEMORY');
 
 var idCounter = 0;
-var Memory = function(label, options) {
+var Memory = function(options) {
 	idCounter += 1;
-
 	this._id = idCounter;
 
-	this.label = label;
+	this.label = options.label;
 
-	_.defaults((options) ? options : {}, Memory.defaultOptions);
+	_.defaults(options, Memory.defaultOptions);
 	this.options = options;
 
-	this.default = (this.options.default) ? this.options.default : false;
-
-	this.remote = (this.options.remote) ? true : false;
-	
+	this.default = (this.options.default) ? this.options.default : false;	
 	this.os = (this.remote) ? this.options.remote : os.type().toLowerCase();
 
-	this.service = false;
-	if(this.remote) {
-		this.service = new Service(this.options.host, this.options.port, {username: this.options.username, password: this.options.password});
-	}
-
-	this.command = Command(this.service);
+	this.command = Command(options.remote);
 };
 
 Memory.defaultOptions = {

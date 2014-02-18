@@ -14,36 +14,29 @@ var Command = require(paths.core + '/command')
 
 var globalId = 0;
 var Bandwidth = (function() {
-	return function(bwConfig) {
+	return function(options) {
 		var base = this;
 		this.id = ++globalId;
 
-		this.label = bwConfig.label;
-		this.default = (bwConfig.default) ? bwConfig.default : false;
+		this.label = options.label;
+		this.default = (options.default) ? options.default : false;
 
-		this.cap = (bwConfig.cap) ? bwConfig.cap : false;
+		this.cap = (options.cap) ? options.cap : false;
 
-		if(bwConfig.cap) {
-			var cap = bwConfig.cap.split(':');
+		if(options.cap) {
+			var cap = options.cap.split(':');
 			this.cap = [cap[0].split(','), common.getBytes(cap[1])];
 		} else {
 			this.cap = false;
 		}
 
-		this.remote = (bwConfig.remote) ? bwConfig.remote : false;
-		this.interface = (bwConfig.interface) ? bwConfig.interface : 'eth0';
-		this.vnstatPath = (bwConfig.vnstatPath) ? bwConfig.vnstatPath : 'vnstat';
-		this.vnstatDBDirectory = (bwConfig.vnstatDBDirectory) ? bwConfig.vnstatDBDirectory : false;
+		this.interface = (options.interface) ? options.interface : 'eth0';
+		this.vnstatPath = (options.vnstatPath) ? options.vnstatPath : 'vnstat';
+		this.vnstatDBDirectory = (options.vnstatDBDirectory) ? options.vnstatDBDirectory : false;
 
-		this.max = bwConfig.max;
+		this.max = options.max;
 
-		var service = false;
-		if(this.remote) {
-			var port = (bwConfig.port) ? bwConfig.port : 22;
-			service = new Service(bwConfig.host, port, {username: bwConfig.username, password: bwConfig.password});
-		}
-
-		this.command = Command(service);
+		this.command = Command(options.remote);
 	};
 })();
 

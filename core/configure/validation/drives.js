@@ -1,6 +1,7 @@
-var bcrypt 		= require('bcrypt')
+var when		= require('when')
   , fs 			= require('fs')
   , path 		= require('path')
+  , util		= require('util')
   , when 		= require('when')
   , _ 			= require('underscore');
 
@@ -11,73 +12,84 @@ var log 		= require(paths.logger)('CONFIG')
   , common 		= require(paths.core + '/common')
   , Drive 		= require(paths.stats + '/drive')
 
-module.exports 	= function validateDrives(data) {
-	var drives = [];
 
-	for(var label in data.data.drives) {
-		if(data.data.drives.hasOwnProperty(label)) {
-			var drive = data.data.drives[label];
+function validate(data) {
+	var defer	= when.defer()
+	  , drives	= [];
 
-			var remote 		= (drive.remote) ? true : false
-			  , location	= (_.isString(drive.location)) ? drive.location : '/'
-			  , options 	= {};
+	_.each(data.data.drives, function(drive, label) {
+		 drives.push(createDrive(drive, label).then(common.validateRemoteHost).then(returnDrive));
+	});
 
-			if(_.isEmpty(label)) {
-				var error = new Error('INVALID_CONFIG');
-				error.reason = 'Missing label for one of the drives.';
+	when.all(drives).then(function(results) {
+		log.info('Validated configuration for your drives.'.green);
 
-				var printObj = '{\n' + log.printObject(drive, 2) + '\n\t\t},';
-				error.suggestion = '\t\t"Main Hard Drive": ' + printObj;
-				error.currently = '\t\t"": ' + printObj;
+		data.config.drives = results;
+		defer.resolve(data);
+	}).otherwise(function(reason) {
+		var error = new Error('INVALID_CONFIG');
 
-				return when.reject(error);
-			}
+		if(reason.reason) {
+			error.reason = reason.reason;
+		} else {
+			var suggestion = util.format('Please check your cofiguration for drive labelled, %s.', (reason.options) ? reason.options.label : '');
 
-
-
-			if(remote) {
-				if(!_.isString(drive.username) || _.isEmpty(drive.username)) {
-					var error = new Error('INVALID_CONFIG');
+			switch(reason.message) {
+				case 'USERNAME':
 					error.reason = 'Username is required for getting remote drive statistics.';
-					return when.reject(error);
-				}
-
-				var os = ((drive.os) ? drive.os : 'linux').toLowerCase();
-				if(!/linux|mac/.test(os)) {
-					var error = new Error('INVALID_CONFIG');
-					error.reason = 'The operating system, ' + os + ', is not supported at this time.';
-					return when.reject(error);
-				}
-
-				options = {
-					remote: true,
-					os: os,
-					host: (_.isString(drive.host)) ? drive.host : 'localhost',
-					port: (_.isNumber(drive.port)) ? drive.port : 22,
-					username: drive.username,
-					password: (_.isString(drive.password)) ? drive.password : ''
-				};
+					error.suggestion = suggestion;
+					break;
+				case 'NO_AUTHENTICATION':
+					error.reason = 'There is no authenication type present for remote drive.';
+					error.suggestion = suggestion;
+					break;
 			}
-
-			if(drive.total) {
-				var total = String(drive.total);
-				if(!common.bytesRegEx.test(total)) {
-					var error = new Error('INVALID_CONFIG');
-					error.reason = 'Invalid total drive space for drive ' + label + ', needs to be in the proper format';
-					return when.reject(error);
-				}
-				options.total = common.getBytes(total);
-			}
-
-			if(drive.icon) {
-				options.icon = drive.icon;
-			}
-
-			drives.push(new Drive(label, location, options));
 		}
+
+		defer.reject((error.reason) ? error : reason);
+	});
+
+	return defer.promise;
+}
+
+function createDrive(drive, label) {
+	if(_.isEmpty(label)) {
+		var error = new Error('INVALID_CONFIG');
+		error.reason = 'Missing label for one of the drives.';
+
+		var printObj = '{\n' + log.printObject(drive, 2) + '\n\t\t},';
+		error.suggestion = '\t\t"Main Hard Drive": ' + printObj;
+		error.currently = '\t\t"": ' + printObj;
+
+		return when.reject(error);
 	}
 
-	log.info('Validated drives configuration'.green);
-	data.config.drives = drives;
-	return when.resolve(data);
-};
+	var options	= {
+		label:		label,
+		location:	(_.isString(drive.location)) ? drive.location : '/',
+		remote:		(drive.remote) ? true : false
+	};
+
+	if(drive.total) {
+		var total = String(drive.total);
+		if(!common.bytesRegEx.test(total)) {
+			var error = new Error('INVALID_CONFIG');
+			error.reason = 'Invalid total drive space for drive ' + label + ', needs to be in the proper format';
+			error.suggestion = util.format('Please check your cofiguration for drive labelled, %s.', reason.options.label);
+			return when.reject(error);
+		}
+		options.total = common.getBytes(total);
+	}
+
+	if(drive.icon) {
+		options.icon = drive.icon;
+	}
+
+	return when.resolve({server: drive, options: options});
+}
+
+function returnDrive(data) {
+	return when.resolve(new Drive(data.options));
+}
+
+module.exports 	= validate;
