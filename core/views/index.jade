@@ -45,7 +45,7 @@ block content
       strong Episode: 
       | <%= epCode %> 
       strong Airs 
-      | <%= epDateFromNow %>
+      span.episode-airs-moment
       br
       span.small
         | <%= showTimeAndNetwork %>
@@ -151,7 +151,7 @@ block content
       strong Episode: 
       |  <%= epSeason %>x<%= epNumber %> 
       strong  Added: 
-      |  <%= epAddedFormated %>
+      span.time-added
       br
       span.small
         strong Plot: 
@@ -513,10 +513,17 @@ block content
                   img(src=locals.webRoot + '/images/couchpotato_32.png', alt='CouchPotato', title='CouchPotato', rel='tooltip').service-icon.visible-xs
                   span.hidden-xs CouchPotato
 
+              - if(isLoggedIn) {
+              .panel-body.only-msg
+                .panel-msg.alert.alert-info
+                  strong Coming Soon
+                  |  This feature has not been implemented yet.
+              - } else {
               .panel-body.only-msg
                 .panel-msg.alert.alert-danger
                   strong Login Required
                   |  Login is required to use this feature.
+              - }
       .col-md-8
         .row
           .col-md-12
@@ -560,6 +567,7 @@ block content
                     .currentlyWactchingNothing Currently Watching Nothing
                     .carousel.slide#currentlyWatchingCarousel
                       .carousel-inner
+            - if(enabledSickBeard) {
             .row
               .col-md-12
                 .panel.panel-default.panel-service.sickbeard
@@ -570,12 +578,18 @@ block content
                     h4.panel-title
                       img(src=locals.webRoot + '/images/SickBeard_64.png', alt='Sick Beard', title='Sick Beard', rel='tooltip').service-icon.visible-xs
                       span.hidden-xs Sick Beard
-
+                  - if(isLoggedIn) {
+                  .panel-body.only-msg
+                    .panel-msg.alert.alert-info
+                      strong Coming Soon
+                      |  This feature has not been implemented yet.
+                  - } else {
                   .panel-body.only-msg
                     .panel-msg.alert.alert-danger
                       strong Login Required
                       |  Login is required to use this feature.
- 
+                  - }
+             - }
           .col-md-4
             .panel.panel-default.panel-services
               .panel-heading

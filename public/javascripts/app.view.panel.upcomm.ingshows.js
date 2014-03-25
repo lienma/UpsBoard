@@ -171,7 +171,6 @@
 			var showPoster = App.Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.get('show_id') + '&width=200';
 			var templateObj = {
 				epCode: season + 'x' + epNum,
-				epDateFromNow: epDateMoment.fromNow(),
 				epPlot: epPlot,
 				epTime: epTime[0].toLowerCase(),
 				epTitle: epName,
@@ -196,7 +195,11 @@
 				content: popoverTmpl(templateObj),
 				trigger: 'hover',
 				placement: 'bottom'
-			});
+			}).on('shown.bs.popover', function() {
+				$(this.$('.episode-airs-moment')).livestamp(epDateMoment);
+			}.bind(this)).on('hide.bs.popover', function() {
+				$(this.$('.episode-airs-moment')).livestamp('destroy');
+			}.bind(this));
 		},
 
 		remove: function() {

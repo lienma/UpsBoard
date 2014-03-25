@@ -96,7 +96,7 @@ var config = module.exports = {
 	},
 
 	"services": {
-		"PolarBear": {
+		"Service Name": {
 			"host": "",
 			"port": 80,
 
@@ -106,6 +106,17 @@ var config = module.exports = {
 			// Optional, Require the user to be logged in before they can see the link
 			"loginRequired": false
 		}
+	},
+
+	"sabnzbd": {
+		// Set to True if you want to disable sabnzbd from upsboard.
+		"disable": false,
+
+		"protocol": "http://",
+		"host": 	"",
+		"port": 	8080,
+		"webRoot": 	"",
+		"apiKey": 	""
 	},
 
 	"sickbeard": {

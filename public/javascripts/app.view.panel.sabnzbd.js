@@ -911,7 +911,6 @@ console.log('data', data);
 			this.$el.slideUp();
 			this.$('.footer').hide();
 
-console.log('Stopping');
 			this.model.resetLimit();
 			this.model.stop();
 			this.model.forceOneUpdate();
@@ -945,12 +944,13 @@ console.log('Stopping');
 		
 				var newLimit = this.model.limit + 10;
 				this.model.setLimit(newLimit);
-console.log('Loading more with limit ' + newLimit);
+
 				this.model.forceUpdate().done(function() {
 					this.isLoadingMore = false;
-console.log('Loaded More');
+
 					if(newLimit > this.model.get('noofslots')) {
-		
+// Need to hide load more...
+// move to own event.
 					}
 				}.bind(this));
 			}
@@ -986,7 +986,6 @@ console.log('Loaded More');
 
 		removeFromList: function(model) {
 			this.updateEmptyMsg();
-console.log('Remove:', model);
 			model.view.remove();
 		},
 
@@ -1038,8 +1037,6 @@ console.log('Remove:', model);
 
 			var info = this.$('.item-info-btn');
 			info.tooltip({title: 'Size: ' + this.model.get('size') + '<br />Category: ' + this.model.get('category'), html: true});
-
-			
 
 			var completed = this.model.get('completed');
 			this.$('.time').attr('title', moment(completed).format('M/D h:mm a'));

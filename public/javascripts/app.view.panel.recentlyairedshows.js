@@ -106,7 +106,6 @@
 			  , epAdded = moment.unix(this.model.get('addedAt'));
 
 			var templateObj = {
-				epAddedFormated: epAdded.fromNow(),
 				epNumber: this.model.get('epNumber'),
 				epPlot: (epPlot == '') ? 'No episode plot given' : epPlot,
 				epPoster: epPoster,
@@ -122,10 +121,9 @@
 
 			this.$el.html(this.template(templateObj));
 
-			var base = this;
 			var img = $('<img/>', {src: showPoster}).load(function() {
-				base.$('.poster').show();
-			});
+				this.$('.poster').show();
+			}.bind(this));
 
 			var pTemplate = _.template($('#tmpl-panel-recently-aired-show-popover').html());
 
@@ -134,7 +132,12 @@
 				content: pTemplate(templateObj),
 				trigger: 'hover',
 				placement: 'bottom'
-			});
+			}).on('shown.bs.popover', function() {
+				$(this.$('.time-added')).livestamp(epAdded);
+			}.bind(this)).on('hide.bs.popover', function() {
+				$(this.$('.time-added')).livestamp('destroy');
+			}.bind(this));
+
 		},
 
 		removeShow: function() {
