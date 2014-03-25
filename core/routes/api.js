@@ -116,8 +116,10 @@ console.log(reason);
 			});
 		},
 
-		getQueue: function(req, res) {
-			var sab = req.app.config.sabnzbd;
+		getHistory: function(req, res) {
+			var sab = req.app.config.sabnzbd,
+			    limit = req.query.limit,
+			    start = req.query.start;
 
 			if(!req.isAuthenticated()) {
 				return res.json({error: 'Permission Denied'});
@@ -127,7 +129,27 @@ console.log(reason);
 				return res.json({error: 'Module Disabled'});
 			}
 
-			sab.getQueue().then(function(data) {
+			sab.getHistory(start, limit).then(function(data) {
+				res.json(data.history);
+			}).otherwise(function(reason) {
+console.log(reason);
+			});
+		},
+
+		getQueue: function(req, res) {
+			var sab = req.app.config.sabnzbd,
+			    limit = req.query.limit,
+			    start = req.query.start;
+
+			if(!req.isAuthenticated()) {
+				return res.json({error: 'Permission Denied'});
+			}
+
+			if(!sab.enabled) {
+				return res.json({error: 'Module Disabled'});
+			}
+
+			sab.getQueue(start, limit).then(function(data) {
 				res.json(data.queue);
 			}).otherwise(function(reason) {
 console.log(reason);

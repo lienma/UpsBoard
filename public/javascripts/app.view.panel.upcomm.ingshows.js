@@ -145,10 +145,10 @@
 			  , airs = this.model.get('airs')
 			  , network = this.model.get('network');
 
-			epPlot = (epPlot == '') ? 'No episode plot given' : epPlot;
+			epPlot	= (epPlot == '') ? 'No episode plot given' : epPlot;
+			airs	= (airs) ? airs : '00:00';
 
 			var epTime = airs.match(/(\d+):(\d+)(\s*)(\w*)/);
-
 			var time = parseInt(epTime[1] + '' + epTime[2]);
 			time = (epTime[4] == 'PM') ? 1200 + time : time;
 

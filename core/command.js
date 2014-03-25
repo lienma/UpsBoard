@@ -81,8 +81,8 @@ console.log('Command Err:'.red, err);
 
 function Connect(options) {
 	var password	= (options.password) ? options.password : false
-	  , privateKey	= (options.privateKey) ? fs.readFileSync(options.privateKey) : false
-	  , passpharse	= (options.passpharse) ? options.passpharse : false
+	  , privateKey	= (options.privateKey) ? options.privateKey : false
+	  , passphrase	= (options.passphrase) ? options.passphrase : false
 	  , sshAgent	= (options.sshAgent) ? options.sshAgent : false;
 
 	this.host		= options.host;
@@ -115,7 +115,8 @@ function Connect(options) {
 				if(password) {
 					cred.password = password;
 				} else if(privateKey) {
-
+					cred.privateKey = privateKey;
+					cred.passphrase = passphrase;
 				} else if(sshAgent) {
 					cred.agent = sshAgent;
 				}

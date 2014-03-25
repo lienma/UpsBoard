@@ -2,7 +2,7 @@
 	var API_URL = App.Config.WebRoot + '/api/sabnzbd/';
 
 	var StatusQueueModel = Backbone.Model.extend({
-		'url': API_URL + 'getQueue',
+		'url': API_URL + 'queue?start=0&limit=10',
 
 		start: function() {
 			var defer = $.Deferred();
@@ -43,6 +43,74 @@
 		}
 	});
 
+	var HistoryModel = Backbone.Model.extend({
+		limit: 10,
+		'url': function() {
+			return API_URL + 'history?start=0&limit=' + this.limit;
+		},
+
+		resetLimit: function() {
+			this.limit = 10;
+		},
+
+		setLimit: function(limit) {
+			this.limit = limit;
+		},
+
+		start: function() {
+			var defer = $.Deferred();
+
+			this._fetch().done(defer.resolve).fail(defer.reject);
+
+			return defer.promise();
+		},
+
+		_stopUpdating: false,
+		stop: function() {
+			this._stopUpdating = true;
+		},
+
+		_failedFetches: 0,
+		_timeout: null,
+		_startTimeout: function() {
+			this._timeout = setTimeout(function() {
+				this._timeout = null;
+
+				if(this._stopUpdating) {
+					this._stopUpdating = false;
+
+					return;
+				}
+
+				this._fetch().done(function() {
+					this._failedFetches = 0;
+				}.bind(this)).fail(function() {
+					this._failedFetches += 1;
+				}.bind(this));
+			}.bind(this), (this._failedFetches > 450) ? 30000 : 2000);
+		},
+
+		_fetch: function() {
+
+			if(this._timeout != null) {
+				clearTimeout(this._timeout);
+				this._timeout = null;
+			}
+
+			this._startTimeout();
+
+			return this.fetch();
+		},
+
+		forceUpdate: function() {
+			return this._fetch();
+		},
+
+		forceOneUpdate: function() {
+			return this.fetch();
+		}
+	});
+
 	var SlotsModel = Backbone.Model.extend({
 		idAttribute: 'nzo_id',
 
@@ -73,6 +141,15 @@ console.log(url);
 		forceUpdate: function() { }
 	});
 
+	var HistorySlotModel = Backbone.Model.extend({
+		idAttribute: 'nzo_id'
+	});
+
+	var HistoryCollection = Backbone.Collection.extend({
+		model: HistorySlotModel,
+		forceUpdate: function() { }
+	});
+
 	var MainView = Backbone.View.extend({
 		el: '.panel.sabnzbd',
 
@@ -85,6 +162,8 @@ console.log(url);
 			this.status.start()
 				.then(this.buildView.bind(this))
 				.fail(this.failed.bind(this));
+
+			this.history = new HistoryModel();
 		},
 
 		failed: function() {
@@ -98,7 +177,7 @@ console.log('Failed');
 			new PauseButtonView({model: this.status, el: this.$('.puase-downloading')});
 			new SpeedView({model: this.status, el: this.$('.downloading-speed')});
 			new RemainingSpaceView({model: this.status, el: this.$('.remaining-space')});
-			new ListsView({model: this.status, el: this.$el});
+			new ListsView({model: this.status, history: this.history, el: this.$el});
 		},
 
 		addJobToQueue: function(model) {
@@ -165,8 +244,32 @@ console.log(model.id);
 
 			this.model.on('change:timeleft', this.updateTimeLeft, this);
 			this.model.on('change:paused', this.updatePause, this);
+			this.model.on('change:eta', this.updateEta, this);
 
+			var parent = this.$el.parent();
 			this.updatePause(this.model);
+			parent.on('show.bs.tooltip', function() {
+				this.tooltip = true;
+			}.bind(this)).on('hide.bs.tooltip', function() {
+				this.tooltip = false;
+			}.bind(this)).tooltip({placement: 'bottom'});
+			this.updateEta();
+		},
+
+		updateEta: function(model) {
+			var tt = this.$el.parent();
+			var wasOpened = this.tooltip;
+
+			if(wasOpened) {
+				tt.tooltip('hide');
+			}
+
+			tt.attr('data-original-title', 'ETA: ' + this.model.get('eta'));
+
+			if(wasOpened) {
+				tt.tooltip('show');
+			}
+			
 		},
 
 		updateTimeLeft: function(model) {
@@ -258,18 +361,18 @@ console.log(model.id);
 			'click .list-btn.btn-history': 'switchToHistory'
 		},
 
-		initialize: function() {
+		initialize: function(obj) {
 			this.$btnQueue = this.$('.list-btn.btn-queue');
 			this.$btnHistory = this.$('.list-btn.btn-history');
 
 			this.viewQueue = new ListQueueView({el: this.$('.list-body.list-queue'), model: this.model, body: this.$el});
-			this.viewHistory = new ListHistoryView({el: this.$('.list-body.list-history'), model: this.model});
-
+			this.viewHistory = new ListHistoryView({el: this.$('.list-body.list-history'), model: obj.history, body: this.$el});
 
 			this.updateNumOfSlots(this.model);
 			this.model.on('change:noofslots', this.updateNumOfSlots, this);
 
 			this.$('.loading').fadeOut('fast');
+
 		},
 
 		switchToHistory: function(event) {
@@ -346,6 +449,14 @@ console.log(model.id);
 			}, this);
 		},
 
+		updateEmptyMsg: function() {
+			if(this.slots.length == 0) {
+				this.$('.empty-msg').show();
+			} else {
+				this.$('.empty-msg').hide();
+			}
+		},
+
 		addToQueue: function(model) {
 			model.view = new QueueItemView({model: model}, this.model);
 			var view = model.view.$el;
@@ -362,6 +473,8 @@ console.log(model.id);
 			} else {
 				$(childern[pos]).after(view);
 			}
+
+			this.updateEmptyMsg();
 
 			this.$('table').tableDnDUpdate();
 			this.resetRowColors();
@@ -407,6 +520,7 @@ console.log(model.id);
 console.log('delete', model);
 			model.view.removeViews();
 			model.view.remove();
+			this.updateEmptyMsg();
 
 console.log('len', this.slots.length);
 		},
@@ -480,6 +594,8 @@ console.log('len', this.slots.length);
 			this.updateCategoriesSelect();
 			this.updateScriptSelect();
 
+			this.updateNzbTooltip();
+
 			this.updateCategory();
 			this.updatePriority();
 			this.updateProcessing();
@@ -546,23 +662,19 @@ console.log(data);
 		},
 
 		setOnChange: function() {
-
 			var fields = ['filename', 'status', 'cat'];
 			fields.forEach(function(field) {
-
-				this.model.on('change:' + field, function(m) {
-					var text = m.get(field);
-
-					this.$('.' + field + '-text').text(text);
+				this.listenTo(this.model, 'change:' + field, function(m) {
+					this.$('.' + field + '-text').text(m.get(field));
 				}.bind(this));
-
 			}.bind(this));
 
-			this.model.on('change:cat', this.updateCategory, this);
-			this.model.on('change:priority', this.updatePriority, this);
-			this.model.on('change:script', this.updateScript, this);
-			this.model.on('change:unpackopts', this.updateProcessing, this);
+			this.listenTo(this.model, 'change:cat', this.updateCategory);
+			this.listenTo(this.model, 'change:priority', this.updatePriority);
+			this.listenTo(this.model, 'change:script', this.updateScript);
 
+			this.listenTo(this.model, 'change:unpackopts', this.updateProcessing);
+			this.listenTo(this.model, 'change:avg_age', this.updateNzbTooltip);
 		},
 
 		eventSelects: function(event) {
@@ -579,6 +691,10 @@ console.log('data', data);
 					this.model.set('index', data.position);
 				}
 			}.bind(this));
+		},
+
+		updateNzbTooltip: function() {
+			this.$('.filename-text').attr('data-original-title', 'Age: ' + this.model.get('avg_age'));
 		},
 
 		updateCategoriesSelect: function() {
@@ -762,8 +878,17 @@ console.log('data', data);
 	});
 
 	var ListHistoryView = Backbone.View.extend({
-		initialize: function() {
+		initialize: function(obj) { 
 
+			this.body = obj.body;
+
+			this.slots = new HistoryCollection();
+			this.slots.on('add', this.addToList, this);
+			this.slots.on('remove', this.removeFromList, this);
+
+			this.model.on('change:slots', function(model) {
+				this.slots.set(model.get('slots'));
+			}, this);
 		},
 
 		_active: false,
@@ -774,11 +899,260 @@ console.log('data', data);
 		activate: function() {
 			this._active = true;
 			this.$el.slideDown();
+
+			this.startUpdating();
+
 		},
 
 		deactivate: function() {
 			this._active = false;
+			$(this.body.find('.panel-body')).unbind('scroll');
+
 			this.$el.slideUp();
+			this.$('.footer').hide();
+
+console.log('Stopping');
+			this.model.resetLimit();
+			this.model.stop();
+			this.model.forceOneUpdate();
+		},
+
+		startUpdating: function() {
+			this.showLoadingIcon();
+			this.model.start().done(function() {
+				this.$('.footer').show();
+				this.hideLoadingIcon();
+
+				$(this.body.find('.panel-body')).scroll(this.watchScroll.bind(this));
+			}.bind(this));
+
+		},
+
+		hideLoadingIcon: function() {
+			this.body.find('.loading-history-icon').hide();
+		},
+
+		showLoadingIcon: function() {
+			this.body.find('.loading-history-icon').show();
+		},
+
+		watchScroll: function() {
+			if(this.isLoadingMore) return;
+
+			var panel = $(this.body.find('.panel-body'));
+			if(panel.scrollTop() >= $(this.$el).height() - panel.height() - 10) {
+				this.isLoadingMore = true;
+		
+				var newLimit = this.model.limit + 10;
+				this.model.setLimit(newLimit);
+console.log('Loading more with limit ' + newLimit);
+				this.model.forceUpdate().done(function() {
+					this.isLoadingMore = false;
+console.log('Loaded More');
+					if(newLimit > this.model.get('noofslots')) {
+		
+					}
+				}.bind(this));
+			}
+		},
+
+		insertAt: function(index, element) {
+			var body = this.$('.table tbody');
+			var lastIndex = body.children().size();
+
+			if(index < 0) {
+				index = Math.max(0, lastIndex + 1 + index);
+			}
+			body.append(element);
+
+			if(index < lastIndex) {
+				body.children().eq(index).before(body.children().last());
+			}
+		},
+
+		addToList: function(model) {
+			this.updateEmptyMsg();	
+
+			var index = -1;
+			this.slots.each(function(m, i) {
+				if(model.id == m.id) {
+					index = i;
+				}
+			});
+
+			model.view = new HistoryItemView({model: model}, this.model);
+			this.insertAt(index, model.view.render());
+		},
+
+		removeFromList: function(model) {
+			this.updateEmptyMsg();
+console.log('Remove:', model);
+			model.view.remove();
+		},
+
+		updateEmptyMsg: function() {
+			if(this.slots.length == 0) {
+				this.$('.empty-msg').show();
+			} else {
+				this.$('.empty-msg').hide();
+			}
+		},
+	});
+
+	var HistoryItemView = Backbone.View.extend({
+		tagName: 'tr',
+
+		template: _.template($('#tmpl-panel-sabnzbd-history-item').html()),
+
+		events: {
+
+		},
+
+		initialize: function(obj, queueModel) {
+			this.buildView();
+		},
+
+		buildView: function() {
+			var templateObj = {
+				category: this.model.get('category'),
+				nzb_name: this.model.get('nzb_name'),
+				script_log_html: this.model.get('script_log').replace(/\n/g, '<br />'),
+				size: this.model.get('size')
+			};
+
+			this.$el.html(this.template(templateObj));
+
+			this.updateActionLine();
+			this.listenTo(this.model, 'change:action_line', this.updateActionLine);
+			this.listenTo(this.model, 'change:fail_message', this.updateActionLine);
+			this.listenTo(this.model, 'change:script_line', this.updateActionLine);
+
+			this.listenTo(this.model, 'change:script_log', function(model) {
+				this.$('.script-log-modal-body').html(model.get('script_log').replace(/\n/g, '<br />'));
+			}.bind(this));
+
+			this.updateStatus();
+			this.listenTo(this.model, 'change:status', this.updateStatus);
+
+			this.updateStages();
+
+			var info = this.$('.item-info-btn');
+			info.tooltip({title: 'Size: ' + this.model.get('size') + '<br />Category: ' + this.model.get('category'), html: true});
+
+			
+
+			var completed = this.model.get('completed');
+			this.$('.time').attr('title', moment(completed).format('M/D h:mm a'));
+			$(this.$('.time')).tooltip({placement:'left'});
+			$(this.$('.time')).livestamp(completed);
+
+			var menu = $(this.$('.menu'));
+			this.$el.hover(function(event) {
+				menu.slideDown('fast');
+			}, function(event) {
+				menu.slideUp('fast');
+			});
+		},
+
+		render: function() {
+			return this.$el;
+		},
+
+		updateActionLine: function() {
+			var text = this.model.get('action_line')
+			  , div = this.$('.action-line');
+
+			if(this.model.get('status') == 'Failed') {
+				div.addClass('failed');
+				text = this.model.get('fail_message');
+			} else {
+				div.removeClass('failed');
+
+				if(this.model.get('status') == 'Completed') {
+					//text = this.model.get('script_line');
+				}
+			}
+
+			div.text(text);
+		},
+
+		createStageBtn: function(className, title) {
+			var btn = $('<button type="button" class="btn btn-default btn-xs btn-stage">');
+			var icon = $('<i class="glyphicon">').addClass(className);
+
+			btn.tooltip({title: title, html: true});
+			return btn.append(icon);
+		},
+
+		updateStages: function() {
+			var stages = this.model.get('stage_log');
+
+			stages.forEach(function(stage) {
+				var className = '', title = false, enabled = true;;
+				switch(stage.name) {
+					case 'Download':
+						className = 'glyphicon-time';
+						break;
+
+					case 'Source':
+						enabled = false;
+						className = 'glyphicon-globe';
+						break;
+
+					case 'Unpack':
+						className = 'glyphicon-retweet';
+						break;
+
+					case 'Repair':
+						className = 'glyphicon-wrench';
+						break;
+
+					case 'Script':
+						className = 'glyphicon-bookmark';
+						title = 'View Script Log';
+						break;
+				}
+
+				if(enabled) {
+					title = (title) ? title : stage.actions[0];
+					var btn = this.createStageBtn(className, title)
+
+					if(stage.name == 'Script') {
+						btn.click(function() {
+							$(this.$('.script-log-modal')).modal();
+						}.bind(this));
+					}
+
+					this.$('.menu').append(btn);
+				}
+			}.bind(this));
+		},	
+
+		updateStatus: function() {
+			var icon = this.$('.status-icon'), status = this.model.get('status');
+
+			icon.removeClass('glyphicon-ok-sign glyphicon-export glyphicon-cog rotate-icon-slow');
+			this.$el.removeClass('warning success')
+
+			var iconStatus = '';
+			if(status == 'Completed') {
+				iconStatus = 'glyphicon-unchecked';
+
+			} else if(status == 'Extracting') {
+				iconStatus = 'glyphicon-export';
+				this.$el.addClass('success');
+
+			} else if(status == 'Running') {
+				iconStatus = 'glyphicon-cog rotate-icon-slow';
+				this.$el.addClass('success');
+
+			} else if(status == 'Failed') {
+				iconStatus = 'glyphicon-warning-sign failed';
+				this.$el.addClass('warning');
+
+			}
+
+			icon.addClass(iconStatus);
 		}
 	});
 

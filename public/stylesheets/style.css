@@ -3,6 +3,9 @@ body {
   line-height: 1.25;
   font-family: 'PT Sans', sans-serif;
 }
+.lighter-text {
+  color: #555;
+}
 .pointer {
   cursor: pointer;
 }
@@ -418,6 +421,12 @@ ul.action-menu li a.with-icon {
 .sabnzbd .panel-footer .list-btn {
   padding: 1px 15px;
 }
+.sabnzbd .panel-footer .loading-history {
+  padding-left: 5px;
+}
+.sabnzbd .panel-footer .loading-history i.loading-history-icon {
+  font-size: 9px;
+}
 .sabnzbd .time-left,
 .sabnzbd .downloading-speed {
   width: 80px;
@@ -441,6 +450,23 @@ ul.action-menu li a.with-icon {
 .sabnzbd .remaining-space span:last-child {
   margin-left: 5px;
 }
+.sabnzbd .list-queue .menu {
+  white-space: nowrap;
+}
+.sabnzbd .list-history .status-icon.failed {
+  color: #a94442;
+}
+.sabnzbd .list-history .menu .btn-stage {
+  font-size: 11px;
+  padding: 1px 2px 1px 1px;
+  margin-right: 2px;
+}
+.sabnzbd .list-body .empty-msg {
+  padding: 10px;
+  text-align: center;
+  font-style: italic;
+  font-size: 90%;
+}
 .sabnzbd .list-body .table {
   margin-bottom: 0;
 }
@@ -451,6 +477,12 @@ ul.action-menu li a.with-icon {
 .sabnzbd .list-body .table td {
   padding: 6px 4px;
   vertical-align: middle;
+}
+.sabnzbd .list-body .table td.middle .modal-delete-nzb,
+.sabnzbd .list-body .table td .modal-delete-nzb {
+  font-weight: bold;
+  text-align: center;
+  padding-bottom: 0;
 }
 .sabnzbd .list-body .table td.middle .drag-handle,
 .sabnzbd .list-body .table td .drag-handle {
@@ -479,20 +511,18 @@ ul.action-menu li a.with-icon {
 .sabnzbd .list-body .table td.middle .menu,
 .sabnzbd .list-body .table td .menu {
   margin-top: 2px;
-  white-space: nowrap;
 }
-.sabnzbd .list-body .table td.middle .menu select,
-.sabnzbd .list-body .table td .menu select {
+.sabnzbd .list-body .table td.middle .menu select.btn,
+.sabnzbd .list-body .table td .menu select.btn {
   width: 20px;
-}
-.sabnzbd .list-body .table td.middle .menu .btn,
-.sabnzbd .list-body .table td .menu .btn {
   font-size: 10px;
   margin-top: -2px;
   padding: 0 0 0 1px;
 }
 .sabnzbd .list-body .table td.middle .menu .delete-btn,
 .sabnzbd .list-body .table td .menu .delete-btn {
+  font-size: 10px;
+  margin-top: -2px;
   padding: 0 3px;
 }
 .sabnzbd .list-body .table td:first-child {
@@ -757,6 +787,9 @@ ul.action-menu li a.with-icon {
 }
 .rotate-icon {
   -webkit-animation: rotateThis 0.5s infinite;
+}
+.rotate-icon-slow {
+  -webkit-animation: rotateThis 1.5s infinite;
 }
 .loader {
   position: relative;

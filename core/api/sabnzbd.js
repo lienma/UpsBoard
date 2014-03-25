@@ -100,10 +100,17 @@ Sabnzbd.prototype.changeScript = function(nzb_id, value) {
 	return this.getPage('change_script', params);
 };
 
-Sabnzbd.prototype.getQueue = function() {
+Sabnzbd.prototype.getHistory = function(start, limit) {
+	return this.getPage('history', {
+		start: start,
+		limit: limit
+	});
+};
+
+Sabnzbd.prototype.getQueue = function(start, limit) {
 	return this.getPage('queue', {
-		start: 0,
-		limit: 9999999
+		start: start,
+		limit: limit
 	});
 };
 

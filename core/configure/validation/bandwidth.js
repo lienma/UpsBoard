@@ -8,7 +8,7 @@ var appRoot 	= path.resolve(__dirname, '../../../')
   , paths 		= require(appRoot + '/core/paths');
 
 var log 		= require(paths.logger)('CONFIG')
-  , common		= require(paths.core + '/common')
+  , remote		= require(paths.core + '/configure/remote')
   , Bandwidth 	= require(paths.stats + '/bandwidth');
 
 function validate(data) {
@@ -16,7 +16,7 @@ function validate(data) {
 	  , servers	= [];
 
 	_.each(data.data.bandwidthServers, function(server, label) {
-		 servers.push(create(server, label).then(common.validateRemoteHost).then(function(data) {
+		 servers.push(create(server, label).then(remote).then(function(data) {
 			return when.resolve(new Bandwidth(data.options));
 		}));
 	});

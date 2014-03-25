@@ -9,7 +9,8 @@ var appRoot 	= path.resolve(__dirname, '../../../')
   , paths 		= require(appRoot + '/core/paths');
 
 var log 		= require(paths.logger)('CONFIG')
-  , common 		= require(paths.core + '/common')
+  , common		= require(paths.core + '/common')
+  , remote		= require(paths.core + '/configure/remote')
   , Drive 		= require(paths.stats + '/drive')
 
 
@@ -18,7 +19,7 @@ function validate(data) {
 	  , drives	= [];
 
 	_.each(data.data.drives, function(drive, label) {
-		 drives.push(createDrive(drive, label).then(common.validateRemoteHost).then(returnDrive));
+		 drives.push(createDrive(drive, label).then(remote).then(returnDrive));
 	});
 
 	when.all(drives).then(function(results) {

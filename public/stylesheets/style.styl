@@ -3,6 +3,9 @@ body
   line-height: 1.25
   font-family: 'PT Sans', sans-serif
 
+.lighter-text
+  color: #555
+
 .pointer
   cursor: pointer
 
@@ -416,6 +419,12 @@ ul.action-menu
     .list-btn
       padding: 1px 15px
 
+    .loading-history
+      padding-left: 5px
+
+      i.loading-history-icon
+        font-size: 9px
+
   .time-left, .downloading-speed
     width: 80px
 
@@ -434,7 +443,27 @@ ul.action-menu
     span:last-child
       margin-left: 5px
 
+  .list-queue
+    .menu
+      white-space: nowrap
+
+  .list-history
+    .status-icon.failed
+      color: #a94442
+
+    .menu
+      .btn-stage
+        font-size: 11px
+        padding: 1px 2px 1px 1px
+        margin-right: 2px
+
   .list-body
+    .empty-msg
+      padding: 10px
+      text-align: center
+      font-style: italic
+      font-size: 90%
+
     .table
       margin-bottom: 0
 
@@ -447,6 +476,11 @@ ul.action-menu
       td
         padding: 6px 4px
         vertical-align: middle
+
+        .modal-delete-nzb
+          font-weight: bold
+          text-align: center
+          padding-bottom: 0
 
         .drag-handle
           cursor: move
@@ -470,17 +504,16 @@ ul.action-menu
 
         .menu
           margin-top: 2px
-          white-space: nowrap
  
-          select
+          select.btn
             width: 20px
-
-          .btn
             font-size: 10px
             margin-top: -2px
             padding: 0 0 0 1px
 
           .delete-btn
+            font-size: 10px
+            margin-top: -2px
             padding: 0 3px
 
       td:first-child
@@ -750,6 +783,10 @@ ul.action-menu
 
 .rotate-icon
   -webkit-animation:rotateThis .5s infinite
+
+.rotate-icon-slow
+  -webkit-animation:rotateThis 1.5s infinite
+
 
 .loader
   position: relative

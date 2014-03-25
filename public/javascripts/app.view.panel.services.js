@@ -2,6 +2,7 @@
 	var Model = Backbone.Model.extend({
 		idAttribute: '_id'
 	});
+
 	var Collection = Backbone.Collection.extend({
 		model: Model,
 		url: App.Config.WebRoot + '/stats/services'

@@ -107,7 +107,7 @@ Configure().then(function(conf) {
 			app.use(app.config.webRoot, expressUglify.middleware({ src: paths.public, logger: new blankLog() }));
 	
 			var oneYear = 31557600000;
-			app.use(app.config.webRoot, express.static(publicPath, { maxAge: oneYear }));
+			app.use(app.config.webRoot, express.static(paths.public, { maxAge: oneYear }));
 			app.use(express.errorHandler());
 		} else {
 			app.locals.pretty = true;
@@ -140,8 +140,9 @@ Configure().then(function(conf) {
 	app.get(webRoot + '/api/plex/recentlyAddedMovies', routes.api.plex.recentlyAddedMovies);
 	app.get(webRoot + '/api/plex/recentlyAired', routes.api.plex.recentlyAired);
 
-	app.get(webRoot + '/api/sabnzbd/getQueue', routes.api.sabnzbd.getQueue);
+	app.get(webRoot + '/api/sabnzbd/history', routes.api.sabnzbd.getHistory);
 	app.get(webRoot + '/api/sabnzbd/pauseQueue', routes.api.sabnzbd.pauseQueue);
+	app.get(webRoot + '/api/sabnzbd/queue', routes.api.sabnzbd.getQueue);
 	app.get(webRoot + '/api/sabnzbd/queue/:nzb/:func', routes.api.sabnzbd.itemOptions);
 	app.get(webRoot + '/api/sabnzbd/queue/:nzb/:func/:value', routes.api.sabnzbd.itemOptions);
 	app.get(webRoot + '/api/sabnzbd/resumeQueue', routes.api.sabnzbd.resumeQueue);
