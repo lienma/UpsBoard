@@ -1,77 +1,30 @@
 !(function(App, $, _, Backbone, numeral) {
 	var API_URL = App.Config.WebRoot + '/api/sabnzbd/';
 
-	var StatusQueueModel = Backbone.Model.extend({
-		'url': API_URL + 'queue?start=0&limit=10',
+	var QueueModel = Backbone.Model.extend({
+
+		initialize: function(queue) {
+			this.queueType		= queue;
+
+			this.limit			= 10;
+			this._stopUpdating	= false;
+			this._failedFetches	= 0;
+			this._timeout		= null;
+		},
+
+		forceUpdate:	function() { return this._fetch(); },
+		forceOneUpdate:	function() { return this.fetch(); },
+		url:			function() { return API_URL + this.queueType + '?start=0&limit=' + this.limit; },
+		resetLimit:		function() { this.limit = 10; },
+		setLimit:		function(limit) { this.limit = limit; },
+		stop:			function() { this._stopUpdating = true; },
 
 		start: function() {
 			var defer = $.Deferred();
-
 			this._fetch().done(defer.resolve).fail(defer.reject);
-
 			return defer.promise();
 		},
 
-		_failedFetches: 0,
-		_timeout: null,
-		_startTimeout: function() {
-			this._timeout = setTimeout(function() {
-				this._timeout = null;
-
-				this._fetch().done(function() {
-					this._failedFetches = 0;
-				}.bind(this)).fail(function() {
-					this._failedFetches += 1;
-				}.bind(this));
-			}.bind(this), (this._failedFetches > 450) ? 30000 : 2000);
-		},
-
-		_fetch: function() {
-
-			if(this._timeout != null) {
-				clearTimeout(this._timeout);
-				this._timeout = null;
-			}
-
-			this._startTimeout();
-
-			return this.fetch();
-		},
-
-		forceUpdate: function() {
-			return this._fetch();
-		}
-	});
-
-	var HistoryModel = Backbone.Model.extend({
-		limit: 10,
-		'url': function() {
-			return API_URL + 'history?start=0&limit=' + this.limit;
-		},
-
-		resetLimit: function() {
-			this.limit = 10;
-		},
-
-		setLimit: function(limit) {
-			this.limit = limit;
-		},
-
-		start: function() {
-			var defer = $.Deferred();
-
-			this._fetch().done(defer.resolve).fail(defer.reject);
-
-			return defer.promise();
-		},
-
-		_stopUpdating: false,
-		stop: function() {
-			this._stopUpdating = true;
-		},
-
-		_failedFetches: 0,
-		_timeout: null,
 		_startTimeout: function() {
 			this._timeout = setTimeout(function() {
 				this._timeout = null;
@@ -99,14 +52,6 @@
 
 			this._startTimeout();
 
-			return this.fetch();
-		},
-
-		forceUpdate: function() {
-			return this._fetch();
-		},
-
-		forceOneUpdate: function() {
 			return this.fetch();
 		}
 	});
@@ -155,15 +100,18 @@ console.log(url);
 
 		enabled: false,
 
-		initialize: function() {
-			var self = this;
+		events: {
+			'click .add-nzb': 'clickAddNzb'
+		},
 
-			this.status = new StatusQueueModel();
+		initialize: function() {
+
+			this.status = new QueueModel('queue');
 			this.status.start()
 				.then(this.buildView.bind(this))
 				.fail(this.failed.bind(this));
 
-			this.history = new HistoryModel();
+			this.history = new QueueModel('history');
 		},
 
 		failed: function() {
@@ -173,22 +121,28 @@ console.log('Failed');
 		buildView: function() {
 			this.enabled = true;
 
-			new TimeLeftView({model: this.status, el: this.$('.time-left .time')});
-			new PauseButtonView({model: this.status, el: this.$('.puase-downloading')});
-			new SpeedView({model: this.status, el: this.$('.downloading-speed')});
-			new RemainingSpaceView({model: this.status, el: this.$('.remaining-space')});
-			new ListsView({model: this.status, history: this.history, el: this.$el});
+			new TimeLeftView({ model: this.status, el: this.$('.time-left .time') });
+			new PauseButtonView({ model: this.status, el: this.$('.puase-downloading') });
+			new SpeedView({ model: this.status, el: this.$('.downloading-speed') }, this.$el);
+			new RemainingSpaceView({ model: this.status, el: this.$('.remaining-space') });
+			new ListsView({ model: this.status, history: this.history, el: this.$el });
 		},
 
-		addJobToQueue: function(model) {
-console.log(model.id);
+		clickAddNzb: function(event) {
+			this.$('.modal-add-nzb').modal();
 		}
 	});
 
 	var SpeedView = Backbone.View.extend({
 
-		initialize: function() {
-			this.model.on('change:kbpersec', this.update, this);
+		events: {
+			'click': 'click'
+		},
+
+		initialize: function(args, body) {
+			this.body = body;
+
+			this.listenTo(this.model, 'change:kbpersec', this.update);
 			this.update(this.model);
 		},
 
@@ -204,14 +158,18 @@ console.log(model.id);
 
 			this.$('.number').html(kilobytes);
 			this.$('.unit').text(' ' + unit);
+		},
+
+		click: function() {
+			$(this.body.find('.modal-speed-limit')).modal();
 		}
 	});
 
 	var RemainingSpaceView = Backbone.View.extend({
 
 		initialize: function() {
-			this.model.on('change:mb', this.updateTotal, this);
-			this.model.on('change:mbleft', this.updateLeft, this);
+			this.listenTo(this.model, 'change:mb', this.updateTotal);
+			this.listenTo(this.model, 'change:mbleft', this.updateLeft);
 
 			this.updateTotal(this.model);
 			this.updateLeft(this.model);
@@ -242,9 +200,9 @@ console.log(model.id);
 
 		initialize: function() {
 
-			this.model.on('change:timeleft', this.updateTimeLeft, this);
-			this.model.on('change:paused', this.updatePause, this);
-			this.model.on('change:eta', this.updateEta, this);
+			this.listenTo(this.model, 'change:timeleft', this.updateTimeLeft);
+			this.listenTo(this.model, 'change:paused', this.updatePause);
+			this.listenTo(this.model, 'change:eta', this.updateEta);
 
 			var parent = this.$el.parent();
 			this.updatePause(this.model);
@@ -295,7 +253,7 @@ console.log(model.id);
 		initialize: function() {
 			var self = this;
 
-			this.model.on('change:paused', this.update, this);
+			this.listenTo(this.model, 'change:paused', this.update);
 
 			if(this.model.get('paused')) {
 				this.$el.addClass('enabled');
@@ -368,8 +326,9 @@ console.log(model.id);
 			this.viewQueue = new ListQueueView({el: this.$('.list-body.list-queue'), model: this.model, body: this.$el});
 			this.viewHistory = new ListHistoryView({el: this.$('.list-body.list-history'), model: obj.history, body: this.$el});
 
-			this.updateNumOfSlots(this.model);
-			this.model.on('change:noofslots', this.updateNumOfSlots, this);
+			this.updateNumOfSlots();
+			this.listenTo(this.model, 'change:noofslots', this.updateNumOfSlots);
+			this.listenTo(this.model, 'change:slots', this.updateNumOfSlots);
 
 			this.$('.loading').fadeOut('fast');
 
@@ -395,9 +354,17 @@ console.log(model.id);
 			}
 		},
 
-		updateNumOfSlots: function(model) {
-			var num = parseInt(model.get('noofslots'));
-			this.$('.nzbs-in-queue').text(numeral(num).format('0,0'));
+		updateNumOfSlots: function() {
+			var showing = this.model.get('slots').length
+			  , total = parseInt(this.model.get('noofslots'));
+
+			var format = function(num) {
+				return numeral(num).format('0,0');
+			};
+
+			var output = (showing == total) ? format(total) : format(showing) + ' <span class="small">of</span> ' + format(total);
+
+			this.$('.nzbs-in-queue').html(output);
 		}
 	});
 
@@ -406,6 +373,7 @@ console.log(model.id);
 			this._active = true;
 
 			this.body = obj.body;
+			this.panel = $(this.body.find('.panel-body'));
 
 			this.slots = new SlotsCollection();
 			this.slots.forceUpdate = this.model.forceUpdate.bind(this.model);
@@ -419,7 +387,75 @@ console.log(model.id);
 				onDrop: this.onDrop.bind(this)	
 			});
 
-			$(window).resize(this.resize);
+			this.checkReachedMax();
+			this.listenTo(this.model, 'change:noofslots', this.checkReachedMax);
+
+			this.scroll = this.scroll.bind(this);
+			this.resize = this.resize.bind(this);
+
+			this.panel.on('scroll', this.scroll);
+			$(window).on('resize', this.resize);
+		},
+
+		_active: true,
+		isActive: function() {
+			return this._active;
+		},
+
+		activate: function() {
+			this._active = true;
+
+			this.panel.scrollTop(0);
+
+			this.$el.slideDown(function() {
+				this.panel.on('scroll', this.scroll);
+				$(window).on('resize', this.resize);
+			}.bind(this));
+
+			this.model.forceUpdate();
+			this.resize();
+		},
+
+		deactivate: function() {
+			this._active = false;
+
+			this.panel.off('scroll', this.scroll);
+			$(window).off('resize', this.resize);
+
+			this.$el.slideUp();
+		},
+
+		scroll: function() {
+console.log('queue scroll');
+			if(this.isLoadingMore) return;
+
+			if(this.panel.scrollTop() >= $(this.$el).height() - this.panel.height() - 10) {
+				this.isLoadingMore = true;
+		
+				var newLimit = this.model.limit + 10;
+				this.model.setLimit(newLimit);
+
+				this.model.forceUpdate().done(function() {
+					this.isLoadingMore = false;
+
+					this.checkReachedMax();
+				}.bind(this));
+			}
+		},
+
+		resize: function() {
+console.log('resize... Why?');
+			var width = this.$('td.middle').width();
+			width = Math.floor(width / 4) - 8;
+			this.$('.select-event').css('width', width + 'px');
+		},
+
+		checkReachedMax: function() {
+			if(this.model.limit > this.model.get('noofslots')) {
+				this.$('.load-more').hide();
+			} else {
+				this.$('.load-more').show();
+			}
 		},
 
 		onDrop: function(table, row) {
@@ -439,14 +475,14 @@ console.log(model.id);
 		},
 
 		setupSlotMonitor: function() {
-			this.slots.on('add', this.addToQueue, this);
-			this.slots.on('remove', this.removeFromQueue, this);
+			this.listenTo(this.slots, 'add', this.addToQueue);
+			this.listenTo(this.slots, 'remove', this.removeFromQueue);
 
 			this.slots.set(this.model.get('slots'));
 
-			this.model.on('change:slots', function(model) {
+			this.listenTo(this.model, 'change:slots', function(model) {
 				this.slots.set(model.get('slots'));
-			}, this);
+			}.bind(this));
 		},
 
 		updateEmptyMsg: function() {
@@ -481,7 +517,7 @@ console.log(model.id);
 
 			this.resize();
 
-			model.on('change:index', this.changeItemPosition, this);
+			this.listenTo(this.model, 'change:index', this.changeItemPosition);
 		},
 
 		getIndexById: function(id) {
@@ -517,35 +553,9 @@ console.log(model.id);
 		},
 
 		removeFromQueue: function(model) {
-console.log('delete', model);
 			model.view.removeViews();
 			model.view.remove();
 			this.updateEmptyMsg();
-
-console.log('len', this.slots.length);
-		},
-
-		resize: function() {
-			var width = this.$('td.middle').width();
-			width = Math.floor(width / 4) - 8;
-			this.$('.select-event').css('width', width + 'px');
-		},
-
-
-		_active: true,
-		isActive: function() {
-			return this._active;
-		},
-
-		activate: function() {
-			this._active = true;
-			this.$el.slideDown();
-			this.model.forceUpdate();
-		},
-
-		deactivate: function() {
-			this._active = false;
-			this.$el.slideUp();
 		}
 	});
 
@@ -568,8 +578,9 @@ console.log('len', this.slots.length);
 			this.buildView();
 			this.setOnChange();
 
-			this.queueModel.on('change:scripts', this.updateScriptSelect, this);
-			this.queueModel.on('change:categories', this.updateCategoriesSelect, this);
+
+			this.listenTo(queueModel, 'change:scripts', this.updateScriptSelect);
+			this.listenTo(queueModel, 'change:categories', this.updateCategoriesSelect);
 
 			this.viewPause = new QueueItemPauseView({el: this.$('.queue-item-pause'), model: this.model});
 			this.viewProgress = new QueueItemProgressView({el: this.$el, model: this.model});
@@ -684,8 +695,6 @@ console.log(data);
 			  , field	= element.data('field');
 
 			this.model.call(type, String(value).toLowerCase()).done(function(data) {
-console.log('data', data);
-
 				this.model.set(field, value);
 				if(type == 'priority') {
 					this.model.set('index', data.position);
@@ -750,7 +759,7 @@ console.log('data', data);
 		initialize: function() {
 			var self = this;
 
-			this.model.on('change:status', this.update, this);
+			this.listenTo(this.model, 'change:status', this.update);
 
 			if(this.isPaused()) {
 				this.$el.addClass('enabled');
@@ -812,11 +821,11 @@ console.log('data', data);
 	var QueueItemProgressView = Backbone.View.extend({
 		initialize: function() {
 
-			this.model.on('change:percentage', this.updatePercentage, this);
-			this.model.on('change:mbleft', this.updateSizeLeft, this);
-			this.model.on('change:mb', this.updateSizeTotal, this);
-			this.model.on('change:priority', this.updatePriority, this);
-			this.model.on('change:status', this.updatePaused, this);
+			this.listenTo(this.model, 'change:percentage', this.updatePercentage);
+			this.listenTo(this.model, 'change:mbleft', this.updateSizeLeft);
+			this.listenTo(this.model, 'change:mb', this.updateSizeTotal);
+			this.listenTo(this.model, 'change:priority', this.updatePriority);
+			this.listenTo(this.model, 'change:status', this.updatePaused);
 
 			this.updatePercentage();
 			this.updateSizeLeft();
@@ -881,14 +890,20 @@ console.log('data', data);
 		initialize: function(obj) { 
 
 			this.body = obj.body;
+			this.panel = $(this.body.find('.panel-body'));
 
 			this.slots = new HistoryCollection();
-			this.slots.on('add', this.addToList, this);
-			this.slots.on('remove', this.removeFromList, this);
 
-			this.model.on('change:slots', function(model) {
+			this.listenTo(this.slots, 'add', this.addToList);
+			this.listenTo(this.slots, 'remove', this.removeFromList);
+
+			this.listenTo(this.model, 'change:slots', function(model) {
 				this.slots.set(model.get('slots'));
-			}, this);
+			}.bind(this));
+
+			this.listenTo(this.model, 'change:noofslots', this.checkReachedMax);
+
+			this.scroll = this.scroll.bind(this);
 		},
 
 		_active: false,
@@ -898,15 +913,16 @@ console.log('data', data);
 
 		activate: function() {
 			this._active = true;
+
+			this.panel.scrollTop(0);
 			this.$el.slideDown();
-
 			this.startUpdating();
-
 		},
 
 		deactivate: function() {
 			this._active = false;
-			$(this.body.find('.panel-body')).unbind('scroll');
+
+			this.panel.off('scroll', this.scroll);
 
 			this.$el.slideUp();
 			this.$('.footer').hide();
@@ -922,7 +938,7 @@ console.log('data', data);
 				this.$('.footer').show();
 				this.hideLoadingIcon();
 
-				$(this.body.find('.panel-body')).scroll(this.watchScroll.bind(this));
+				this.panel.on('scroll', this.scroll);
 			}.bind(this));
 
 		},
@@ -935,11 +951,19 @@ console.log('data', data);
 			this.body.find('.loading-history-icon').show();
 		},
 
-		watchScroll: function() {
+		checkReachedMax: function() {
+			if(this.model.limit > this.model.get('noofslots')) {
+				this.$('.load-more').hide();
+			} else {
+				this.$('.load-more').show();
+			}
+		},
+
+		scroll: function() {
+console.log('history scroll');
 			if(this.isLoadingMore) return;
 
-			var panel = $(this.body.find('.panel-body'));
-			if(panel.scrollTop() >= $(this.$el).height() - panel.height() - 10) {
+			if(this.panel.scrollTop() >= $(this.$el).height() - this.panel.height() - 10) {
 				this.isLoadingMore = true;
 		
 				var newLimit = this.model.limit + 10;
@@ -948,21 +972,19 @@ console.log('data', data);
 				this.model.forceUpdate().done(function() {
 					this.isLoadingMore = false;
 
-					if(newLimit > this.model.get('noofslots')) {
-// Need to hide load more...
-// move to own event.
-					}
+					this.checkReachedMax();
 				}.bind(this));
 			}
 		},
 
 		insertAt: function(index, element) {
-			var body = this.$('.table tbody');
-			var lastIndex = body.children().size();
+			var body = this.$('.table tbody')
+			  , lastIndex = body.children().size();
 
 			if(index < 0) {
 				index = Math.max(0, lastIndex + 1 + index);
 			}
+
 			body.append(element);
 
 			if(index < lastIndex) {
@@ -1011,11 +1033,22 @@ console.log('data', data);
 			this.buildView();
 		},
 
+		formatScriptLog: function() {
+			var log = this.model.get('script_log');
+
+			log = log.replace(/</g, '&lt;');
+			log = log.replace(/>/g, '&gt;');
+			log = log.replace(/\n/g, '<br />');
+
+			return log;
+		},
+
 		buildView: function() {
 			var templateObj = {
 				category: this.model.get('category'),
+				id: this.model.id,
 				nzb_name: this.model.get('nzb_name'),
-				script_log_html: this.model.get('script_log').replace(/\n/g, '<br />'),
+				script_log_html: this.formatScriptLog(),
 				size: this.model.get('size')
 			};
 
@@ -1027,7 +1060,7 @@ console.log('data', data);
 			this.listenTo(this.model, 'change:script_line', this.updateActionLine);
 
 			this.listenTo(this.model, 'change:script_log', function(model) {
-				this.$('.script-log-modal-body').html(model.get('script_log').replace(/\n/g, '<br />'));
+				this.$('.script-log-modal-body').html(this.formatScriptLog());
 			}.bind(this));
 
 			this.updateStatus();

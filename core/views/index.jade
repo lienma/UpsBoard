@@ -119,12 +119,12 @@ block content
         button(type='button').btn.btn-default.btn-xs.btn-stage.item-info-btn
           i.glyphicon.glyphicon-info-sign
 
-      .script-log-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='<%= nzb_name %>_post_label', aria-hidden='true')
+      .script-log-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby!='<%= id %>_post_label', aria-hidden='true')
         .modal-dialog
           .modal-content
             .modal-header
               button(type='button', data-dismiss='modal', aria-hidden='true').close &times;
-              h4(id='<%= nzb_name %>_post_label').modal-title Script Log
+              h4(id!='<%= id %>_post_label').modal-title Script Log
             .modal-body.script-log-modal-body <%= script_log_html %>
 
     td(style='white-space:nowrap;text-align: right;').ends
@@ -205,7 +205,7 @@ block content
     a(href='#').pull-left
       img.media-object(src=locals.webRoot + '/images/LibDiskIcon.png')
     .media-body
-      div <%= label %>
+      .drive-label <%= label %>
       .progress
         .progress-bar
       div(style='padding-top:1px')
@@ -224,6 +224,10 @@ block content
       .progressDiv
 
   script(type='text/template')#tmpl-panel-service-item
+    a(target='_blank').btn.btn-xs
+      i.glyphicon
+
+  script(type='text/template')#tmpl-panel-service-item-full
     td.text-right <%= label %>
     td.text-left
       a(target='_blank').btn.btn-xs
@@ -456,11 +460,28 @@ block content
                       span.time 0:00:00
                       span.left  left
                    li
-                    .badge.downloading-speed.pointer
+                    .badge.downloading-speed.pointer(title='Throttle Download Rate', rel='tooltip', data-placement='bottom')
                       span.number 0
                       span.unit  KB/s
                    li
-                     i.glyphicon.glyphicon-plus.pointer
+                     i.add-nzb.glyphicon.glyphicon-plus.pointer(title='Add NZB File', rel='tooltip', data-placement='bottom')
+
+                .modal.fade.modal-speed-limit(tabindex='-1', role='dialog', aria-labelledby='', aria-hidden='true')
+                  .modal-dialog.modal-sm
+                    .modal-content
+                      form(role='form', style='padding: 15px')
+                        .form-group(style='margin-bottom: 0')
+                          label(for='txtMaxDownloadSpeed') Max Download Speed
+                          input(type='text', placeholder='Max Download Speed').form-control#txtMaxDownloadSpeed
+                      hr(style='margin: 0 0 10px;')
+                      p(style='text-align: center')
+                        button(type='button', data-dismiss='modal').btn.btn-default Close
+                        button(type='button').btn.btn-warning Reset
+                        button(type='button').btn.btn-primary Save Changes
+
+                .modal.fade.modal-add-nzb(tabindex='-1', role='dialog', aria-labelledby='', aria-hidden='true')
+                  .modal-dialog.modal-sm
+                    .modal-content Coming Soon
                 - }
 
                 h4.panel-title
@@ -473,12 +494,15 @@ block content
                   .empty-msg Queue is Empty
                   table.table.table-striped.table-hover
                     tbody
+                  .footer.load-more(style='display:none;') Loading More
+                    span.add-spacing
+                      i.glyphicon.glyphicon-refresh.rotate-icon
 
                 .list-body.list-history.small(style='display:none;')
                   .empty-msg No History
                   table.table.table-striped.table-hover
                     tbody
-                  .footer(style='display:none;padding: 10px;text-align: center;font-weight: bold;') Loading More
+                  .footer.load-more(style='display:none;') Loading More
                     span.add-spacing
                       i.glyphicon.glyphicon-refresh.rotate-icon
 
@@ -595,7 +619,8 @@ block content
               .panel-heading
                 h4.panel-title Services
               .panel-body
-                table.table-services
+                .container-services
+                  table(style='display:none').table-services
 
             .panel.panel-default.diskSpacePanel
               .panel-heading

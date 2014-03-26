@@ -12,6 +12,14 @@ body
 .add-spacing
   padding: 0 5px
 
+.panel-title
+  font-family: 'Alegreya Sans', sans-serif
+  font-weight: 500
+
+.popover-title
+  font-family: 'Alegreya Sans', sans-serif
+  font-weight: 500
+
 ul.action-menu
   padding: 3px 0
   margin: 0 -14px
@@ -111,6 +119,10 @@ ul.action-menu
           .media-heading
             margin-bottom: 0
 
+          .drive-label
+            font-family: 'Alegreya Sans', sans-serif
+            font-weight: 500
+
           .progress
             height: 12px
             margin-bottom: 0
@@ -118,6 +130,7 @@ ul.action-menu
           .server-offline
             color: #f00
             font-weight: bold
+            margin-top: -12px
             text-align: center
             width: 100%
 
@@ -373,6 +386,7 @@ ul.action-menu
 .tabs
   .tab
     border-radius: 5px 5px 0 0
+    font-family: 'Alegreya Sans', sans-serif
     margin: -6px 0 0
     padding: 11px 11px 6px
 
@@ -398,18 +412,20 @@ ul.action-menu
   .panel-body
     padding: 8px
 
-    .table-services
-      width: 100%
+    .service-item
+      padding: 2px
 
-      td
-        padding: 2px
+      a
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6)
 
-        a
-          width: 70px
-          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6)
+    .service-item.min
+      float:left;
 
-          i
-            padding-right: 5px
+    .service-item.full
+      a
+        width: 70px
+        i
+          padding-right: 5px
 
 .sabnzbd
 
@@ -458,6 +474,12 @@ ul.action-menu
         margin-right: 2px
 
   .list-body
+    .load-more
+      background-color: #f5f5f5
+      padding: 10px
+      text-align: center
+      font-weight: bold
+
     .empty-msg
       padding: 10px
       text-align: center

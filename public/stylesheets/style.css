@@ -12,6 +12,14 @@ body {
 .add-spacing {
   padding: 0 5px;
 }
+.panel-title {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-weight: 500;
+}
+.popover-title {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-weight: 500;
+}
 ul.action-menu {
   padding: 3px 0;
   margin: 0 -14px;
@@ -109,6 +117,10 @@ ul.action-menu li a.with-icon {
 .diskSpacePanel .panel-body .media-list .media .media-body .media-heading {
   margin-bottom: 0;
 }
+.diskSpacePanel .panel-body .media-list .media .media-body .drive-label {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-weight: 500;
+}
 .diskSpacePanel .panel-body .media-list .media .media-body .progress {
   height: 12px;
   margin-bottom: 0;
@@ -116,6 +128,7 @@ ul.action-menu li a.with-icon {
 .diskSpacePanel .panel-body .media-list .media .media-body .server-offline {
   color: #f00;
   font-weight: bold;
+  margin-top: -12px;
   text-align: center;
   width: 100%;
 }
@@ -378,6 +391,7 @@ ul.action-menu li a.with-icon {
 }
 .tabs .tab {
   border-radius: 5px 5px 0 0;
+  font-family: 'Alegreya Sans', sans-serif;
   margin: -6px 0 0;
   padding: 11px 11px 6px;
 }
@@ -402,17 +416,19 @@ ul.action-menu li a.with-icon {
 .panel-services .panel-body {
   padding: 8px;
 }
-.panel-services .panel-body .table-services {
-  width: 100%;
-}
-.panel-services .panel-body .table-services td {
+.panel-services .panel-body .service-item {
   padding: 2px;
 }
-.panel-services .panel-body .table-services td a {
-  width: 70px;
+.panel-services .panel-body .service-item a {
   text-shadow: 0 1px 1px rgba(0,0,0,0.6);
 }
-.panel-services .panel-body .table-services td a i {
+.panel-services .panel-body .service-item.min {
+  float: left;
+}
+.panel-services .panel-body .service-item.full a {
+  width: 70px;
+}
+.panel-services .panel-body .service-item.full a i {
   padding-right: 5px;
 }
 .sabnzbd .panel-footer {
@@ -460,6 +476,12 @@ ul.action-menu li a.with-icon {
   font-size: 11px;
   padding: 1px 2px 1px 1px;
   margin-right: 2px;
+}
+.sabnzbd .list-body .load-more {
+  background-color: #f5f5f5;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
 }
 .sabnzbd .list-body .empty-msg {
   padding: 10px;

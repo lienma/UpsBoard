@@ -27,7 +27,7 @@
 
 		addService: function(service) {
 			var view = new ServicesItemView({ model: service });
-			this.$('table').append(view.render());
+			this.$('.container-services').append(view.render());
 		},
 
 		render: function() {
@@ -36,7 +36,7 @@
 	});
 
 	var ServicesItemView = Backbone.View.extend({
-		tagName: 'tr',
+		tagName: 'div',
 		template: _.template($('#tmpl-panel-service-item').html()),
 
 		initialize: function() {
@@ -44,7 +44,7 @@
 			this.$el.html(this.template(this.model.attributes));
 
 
-			//this.$el.addClass('service').attr('title', this.model.get('label')).tooltip();
+			this.$el.addClass('service-item min').attr('title', this.model.get('label')).tooltip();
 			if(this.model.get('url')) {
 				this.$('a.btn').attr('href', this.model.get('url'));
 			} else {
