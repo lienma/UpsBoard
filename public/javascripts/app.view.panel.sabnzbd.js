@@ -50,7 +50,9 @@
 				this._timeout = null;
 			}
 
-			//this._startTimeout();
+			if(!App.Config.StopUpdating) {
+				this._startTimeout();
+			}
 
 			return this.fetch();
 		}

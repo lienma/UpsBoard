@@ -12,10 +12,8 @@ body {
 .add-spacing {
   padding: 0 5px;
 }
-.panel-title {
-  font-family: 'Alegreya Sans', sans-serif;
-  font-weight: 500;
-}
+.panel-title,
+.modal-title,
 .popover-title {
   font-family: 'Alegreya Sans', sans-serif;
   font-weight: 500;
@@ -339,7 +337,11 @@ ul.action-menu li a.with-icon {
   padding-right: 15px;
 }
 .systemModal .modal-body .nav > li > a {
+  font-family: 'Alegreya Sans', sans-serif;
   padding: 5px 10px;
+}
+.systemModal .modal-body h4 {
+  font-family: 'Alegreya Sans', sans-serif;
 }
 .systemModal .modal-body .cpuModel {
   padding-top: 10px;

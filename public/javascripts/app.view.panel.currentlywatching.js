@@ -22,33 +22,36 @@
 			this.collection.fetch();
 			App.Funcs.IntervalTimeout(function() {
 				self.collection.fetch();
-			}, App.Config.UpdateDelayLong);
+			}, App.Config.UpdateDelay);
 		},
 
 		addPoster: function(poster) {
 			var self = this;
 			this.slideCounter += 1;
 
-			var slide = new PosterView({ model: poster });
-			slide.setCarousel(this.$('.carousel'));
-			slide.resizeImg();
+			poster.view = new PosterView({ model: poster });
+			poster.view.setCarousel(this.$('.carousel'));
+			poster.view.resizeImg();
 
-			this.$('.carousel-inner').append(slide.render().addClass((this.slideCounter == 1) ? ' active' : ''));
+			var view = poster.view.render().addClass((this.slideCounter == 1) ? ' active' : '');
+			view.css('display:none;');
+
+			this.$('.carousel-inner').append(view.fadeIn());
 
 			this.startSlideshow();
 		},
 
 		startSlideshow: function() {
-			this.$('.currentlyWactchingNothing').hide();
+			this.$('.currentlyWactchingNothing').fadeOut();
 			this.resetCarousel();
 		},
 
 		removePoster: function(video) {
-			video.removePoster();
+			video.view.removePoster();
 
 			this.slideCounter -= 1;
 			if(this.slideCounter == 0) {
-				this.$('.currentlyWactchingNothing').show();
+				this.$('.currentlyWactchingNothing').fadeIn();
 			} else {
 				this.resetCarousel();
 			}
@@ -77,6 +80,7 @@
 
 		initialize: function() {
 			this.isMovie = this.model.get('type') != 'episode';
+			this._resizeImg = this._resizeImg.bind(this);
 
 			this.buildView();
 			this.buildPopover();
@@ -119,8 +123,10 @@
 		},
 
 		removePoster: function() {
-			$(window).unbind('resize', this._resizeImg.bind(this));
-			this.$el.remove();
+			$(window).off('resize', this._resizeImg);
+			this.$el.fadeOut(function() {
+				this.remove();
+			}.bind(this));
 		},
 
 		setCarousel: function(carousel) {
@@ -131,7 +137,7 @@
 			var self = this;
 
 			this._resizeImg();
-			$(window).resize(this._resizeImg.bind(this));
+			$(window).on('resize', this._resizeImg);
 		},
 
 		_resizeImg: function() {
