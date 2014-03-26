@@ -113,8 +113,11 @@ function df(drive) {
 	}
 
 	var size = (drive.os == 'linux') ? '--block-size=1024' : '-k';
-	drive.command('df ' + size + ' "' + drive.location + '"').then(process).then(promise.resolve).otherwise(promise.reject);
 
+
+	drive.command('df ' + size + ' "' + drive.location + '"').then(process).then(promise.resolve).catch(function(e) {
+		promise.reject(e);
+	});
 	return promise.promise;
 }
 
@@ -127,7 +130,9 @@ function du(drive) {
 	}
 
 	var size = (drive.os == 'linux') ? '--block-size=1024' : '-k';
-	drive.command('du ' + size + ' -s "' + drive.location + '"').then(process).then(promise.resolve).otherwise(promise.reject);
+	drive.command('du ' + size + ' -s "' + drive.location + '"').then(process).then(promise.resolve).catch(function(e) {
+		promise.reject(e);
+	});
 
 	return promise.promise;
 }

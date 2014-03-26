@@ -49,6 +49,8 @@
 			this.colors = args.colors;
 			this.yAxisFormatter = args.yAxisFormatter;
 
+			this.modal = args.modal;
+
 
 			var label = this.model.get('label'), id = this.model.id;
 			var paneId = 'paneId-' + this.modalId + '-' + id;
@@ -72,7 +74,7 @@
 
 			this.$('.chart-container').bind('plothover', this.plotHoverEvent.bind(this));
 
-			this.model.on('change', this.addHistory, this);
+			this.listenTo(this.model, 'change', this.addHistory);
 		},
 
 		addHistory: function(model) {
@@ -174,7 +176,7 @@
 			}
 			return {data: historyArray, field: item.field, label: item.label, color: this.colors[item.field].border,
 				lines: {
-					fill: true
+					fill: false
 				}
 			};
 		},
@@ -254,8 +256,18 @@
 			this.buildGraph();
 		},
 
-		updateGraph: function() {
+		isActive: function() {
+			return (this.modal.activePanel == this);
+		},
 
+		updateGraph: function() {
+			if(this.modal.modalOpened && this.isActive()) {
+				var data = this.getDataPoints();
+
+				this.graph.setData(data);
+				this.graph.setupGrid();
+				this.graph.draw();
+			}
 		}
 	});
 
@@ -263,7 +275,7 @@
 	function ModalMulti(options) {
 		this.id					= modalId++;
 
-		this.activeModel		= {};
+		this.activePanel		= {};
 		this.graphHistory		= {};
 		this.graphItems			= [];
 		this.modalOpened		= false;
@@ -287,12 +299,19 @@
 			tooltipLabel: this.options.tooltipLabel,
 			colors: this.options.colors,
 			yAxisFormatter: this.options.yAxisFormatter,
-			tmplTabBody: this.options.tmplTabBody
+			tmplTabBody: this.options.tmplTabBody,
+
+			modal: this
 		});
 
 		this.panels[model.id] = panel;
 
-		this.$('ul.nav-tabs').append(panel.renderLink());
+		var tab = panel.renderLink();
+		tab.on('show.bs.tab', function(e) {
+			this.activePanel = panel;
+		}.bind(this));
+
+		this.$('ul.nav-tabs').append(tab);
 		this.$('.tab-content').append(panel.render());
 
 		this.options.initializeBody.call(panel, model);
@@ -373,7 +392,8 @@
 
 		this.$el.on('shown.bs.modal', function () {
 			this.modalOpened = true;
-			this.panels['1'].buildGraph();
+			this.activePanel = this.panels['1'];
+			this.activePanel.buildGraph();
 		}.bind(this)).on('hide.bs.modal', function () {
 			this.modalOpened = false;
 		}.bind(this));
@@ -383,16 +403,17 @@
 		this.$el.modal();
 	};
 
-	ModalMulti.prototype.updateGraph = function() {
-		if(this.modalOpened) {
-			var data = this.getDataPoints()
-			  , graph = this.getActiveGraph();
 
-			graph.setData(data);
-			graph.setupGrid();
-			graph.draw();
-		}
-	};
+
+
+
+
+
+
+
+
+
+
 
 
 	function Modal(el, graphItems, options) {

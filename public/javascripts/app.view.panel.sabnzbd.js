@@ -50,7 +50,7 @@
 				this._timeout = null;
 			}
 
-			this._startTimeout();
+			//this._startTimeout();
 
 			return this.fetch();
 		}

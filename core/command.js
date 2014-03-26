@@ -24,18 +24,18 @@ function Command(options) {
 
 		if(remote) {
 			log.debug('Initializing command on remote server.', '(ref #' + refId + ')');
-			connect.connect().then(execute).otherwise(function(reason) {
+			connect.connect().then(execute).catch(function(e) {
 
-				switch(reason.message) {
+				switch(e.message) {
 					case 'AUTHENTICATION_FAILED':
 					case 'CONNECTION_FAILED':
 					case 'CONNECTION_TIMEOUT':
 					case 'SERVER_OFFLINE':
-						log.error('Command failed to sent.', reason.reason, '(ref #' + refId + ')');
+						log.error('Command failed to sent.', e.reason, '(ref #' + refId + ')');
 						break;
 				}
 
-				return promise.reject(reason);
+				promise.reject(e);
 			});
 		} else {
 			execute(cProcess);
@@ -99,8 +99,10 @@ function Connect(options) {
 
 		this.service.isOnline().then(function(online) {
 			if(online) {
-				var conn = new ssh(), sock = new socket();
+				var conn = new ssh(), sock = new socket(), resolved = false;
 				sock.setTimeout(10000, function() {
+					if(resolved) return;
+
 					var erro = new Error('CONNECTION_TIMEOUT');
 					erro.reason = 'Connection to ' + this.strHost + ' has timed out!';
 					promise.reject(erro);
@@ -123,6 +125,8 @@ function Connect(options) {
 
 				conn.on('error', onError.bind(this));
 				conn.on('ready', function() {
+					resolved = true;
+
 					log.debug('Connection made to server', this.strHost);
 					promise.resolve(conn);
 				}.bind(this));
@@ -134,6 +138,7 @@ function Connect(options) {
 				promise.reject(err);
 			}
 		}.bind(this)).otherwise(promise.reject);
+
 		return promise.promise;
 
 		function onError(err) {
