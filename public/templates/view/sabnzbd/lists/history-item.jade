@@ -1,0 +1,25 @@
+td(style='width:20px').ends
+  i.status-icon.glyphicon.glyphicon-ok-sign
+td.middle
+  .filename-wrap
+    .filename-text <%= nzb_name %>
+  .small.lighter-text
+    .action-line
+  .menu(style='display:none')
+    .pull-right
+      button(type='button', title='Remove Nzb', data-placement='left').btn-delete-nzb.btn.btn-danger.btn-xs.delete-btn
+        i.glyphicon.glyphicon-trash.icon-delete-nzb
+    .stages
+      button(type='button').btn.btn-default.btn-xs.btn-stage.item-info-btn
+        i.glyphicon.glyphicon-info-sign
+
+  .script-log-modal.modal.fade(tabindex='-1', role='dialog', aria-labelledby!='<%= id %>_post_label', aria-hidden='true')
+    .modal-dialog
+      .modal-content
+        .modal-header
+          button(type='button', data-dismiss='modal', aria-hidden='true').close &times;
+          h4(id!='<%= id %>_post_label').modal-title Script Log
+        .modal-body.script-log-modal-body <%= script_log_html %>
+
+td(style='white-space:nowrap;text-align: right;').ends
+  abbr(title='').time 

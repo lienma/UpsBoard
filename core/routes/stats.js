@@ -124,7 +124,7 @@ exports.weather = function(req, res) {
 	request({
 		uri: url, json: true, timeout: 10000
 	}, function(err, resp, body) {
-		if(err || !(body || body.currently)) {
+		if(err || !body || !body.currently) {
 			res.json({});
 		}
 

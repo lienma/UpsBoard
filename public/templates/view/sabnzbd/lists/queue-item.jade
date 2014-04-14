@@ -1,0 +1,53 @@
+
+td(style='width:20px').ends
+  i.glyphicon.glyphicon-pause.pointer.queue-item-pause(data-placement='right')
+
+td.middle
+  .modal.fade.bs-modal-sm.modal-delete-nzb(tabindex='-1', role='dialog', aria-labelledby='deleteNzb', aria-hidden='true')
+    .modal-dialog.modal-sm
+      .modal-content
+        .modal-body(style='font-size: 130%;padding-bottom:0')
+          div Are you sure you want
+          div to delete this nzb?
+        .modal-footer
+          button(type='button', data-files='0').btn-modal-delete-nzb.btn.btn-sm.btn-block.btn-primary Delete NZB
+          button(type='button', data-files='1').btn-modal-delete-nzb-files.btn.btn-sm.btn-block.btn-danger Delete NZB & Files
+          button(type='button', data-dismiss='modal').btn.btn-sm.btn-block.btn-default Cancel
+
+  .filename-wrap
+    .filename-text(data-placement='bottom') <%= filename %>
+  .small.lighter-text
+    .pull-right
+      strong.mb-left
+      span.add-spacing /
+      strong.mb-total
+      span.add-spacing -
+      strong.percentage-text
+    .action-line
+      strong.status-text <%= status %>
+      span.add-spacing |
+      strong.pointer.cat-text <%= cat %>
+  .progress
+    .progress-bar
+  .menu(style='display:none')
+    select(rel='tooltip', title='Category', data-placement='right', data-type='category', data-field='cat').select-event.btn.btn-default.category-select
+
+    select(rel='tooltip', title='Priority', data-placement='right', data-type='priority', data-field='priority').select-event.btn.btn-default.priority-select
+      option(value='Force') Force
+      option(value='High') High
+      option(value='Normal') Normal
+      option(value='Low') Low
+      option(value='Stop') Stop
+
+    select(rel='tooltip', title='Processing', data-placement='left', data-type='processing', data-field='unpackopts').select-event.btn.btn-default.unpackopts-select
+      option(value='0') Download
+      option(value='1') + Repair
+      option(value='2') + Unpack
+      option(value='3') + Delete
+
+    select(rel='tooltip', title='Scripts', data-placement='left' data-type='script', data-field='script').select-event.btn.btn-default.scripts-select
+
+    button(type='button', title='Remove Nzb', data-placement='left').btn-delete-nzb.btn.btn-danger.btn-xs.delete-btn
+      i.glyphicon.glyphicon-trash.icon-delete-nzb
+td(style='width:20px').ends
+  i.glyphicon.glyphicon-move.drag-handle

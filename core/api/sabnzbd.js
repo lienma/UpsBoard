@@ -157,6 +157,12 @@ Sabnzbd.prototype.resumeQueue = function() {
 	return this.getPage('resume');
 };
 
+Sabnzbd.prototype.deleteHistory = function(nzb_id, del_files) {
+	var params = {name: 'delete', value: nzb_id, del_files: del_files};
+	return this.getPage('history', params);
+};
+
+
 Sabnzbd.prototype.ping = function() {
 	return this.getPage('qstatus');
 };

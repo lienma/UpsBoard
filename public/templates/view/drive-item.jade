@@ -1,0 +1,13 @@
+a(href='#').pull-left
+  img.media-object(src=locals.webRoot + '/images/LibDiskIcon.png')
+.media-body
+  .drive-label <%= label %>
+  .progress
+    .progress-bar
+  div(style='padding-top:1px')
+    .pull-right.server-online <%= percent %>%
+    .small(style='display:none').server-offline Drive Offline
+    .small.loggedIn
+      span.usedSpace
+      span  / 
+      span.totalSpace

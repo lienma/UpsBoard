@@ -168,11 +168,19 @@ console.log(reason);
 			}
 
 			function err(reason) {
-				console.log(reason);
+console.log(reason);
 			}
 
 			function json(data) {
 				res.json(data);
+			}
+
+			if(req.params.list == 'history' && req.params.func == 'delete') {
+				return sab.deleteHistory(req.params.nzb, req.params.value).then(json).otherwise(err);
+			}
+
+			if(req.params.list != 'queue') {
+				return res.send(404);
 			}
 
 			switch(req.params.func) {

@@ -5,6 +5,6 @@ public/javascripts/.cache
 public/stylesheets/style.styl
 
 config.js
-plex.js
+./plex.js
 publickey.txt
 

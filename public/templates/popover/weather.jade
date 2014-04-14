@@ -1,0 +1,14 @@
+table
+  tr
+    td
+      canvas(width='90', height='90')#weatherIcon
+    td(style='width:100%')
+      h1.tempature
+      h4.detail
+.weather-details
+  h4(style='margin-top: 0').next-hour-title Next Hour
+  h5.next-hour
+  h4 Next 24 Hours
+  h5.next-24
+p.small.text-right.no-link-color
+  a(href='http://forecast.io/#/f/' + locals.weatherLocation, target='_blank') Forecast.io

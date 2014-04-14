@@ -25,6 +25,9 @@ var config = module.exports = {
 	"username": 			"admin",
 	"userPassword": 		"password",
 
+	// Optional, Either url, path, or email address(Gavatar) for user avatar.
+	'userAvatar":			"",
+
 	// Optional, If you want to include Google Analytics
 	"googleAnalyticsId": 	"",
 	"googleAnalyticsUrl": 	"",
@@ -44,7 +47,16 @@ var config = module.exports = {
 			"host": 		"",
 			"port": 		22,
 			"username": 	"",
-			"password": 	"",
+
+			// One of the following are required.
+			//  "password": 	"",
+			//// ssh-agent for linux
+			//	"sshAgent": true,
+			//// Public/Private Key
+			//	"privateKey": "", // Absolute location of key.
+			//	"passphrase": "", // If public key, then leave empty.
+			
+
 
 			// Optional, Allow you to specify a total drive space.
 			// Format:
@@ -58,6 +70,26 @@ var config = module.exports = {
 
 			// Optional, If you want to give the drive a different icon.
 			icon: ""
+		}
+	},
+
+	"memory": {
+		"Label": {
+			// This allows you to display on bottom bar, when you have multiple bandwidth monitors.
+			"default": 	true,
+
+			// Required, if this is a remote server.
+			"host": 	"",
+			"port": 	22,
+			"username": "",
+			// One of the following are required.
+			//  "password": 	"",
+			//// ssh-agent for linux
+			//	"sshAgent": true,
+			//// Public/Private Key
+			//	"privateKey": "", // Absolute location of key.
+			//	"passphrase": "", // If public key, then leave empty.
+
 		}
 	},
 
@@ -90,8 +122,13 @@ var config = module.exports = {
 			"host": 	"",
 			"port": 	22,
 			"username": "",
-			"password": "",
-
+			// One of the following are required.
+			//  "password": 	"",
+			//// ssh-agent for linux
+			//	"sshAgent": true,
+			//// Public/Private Key
+			//	"privateKey": "", // Absolute location of key.
+			//	"passphrase": "", // If public key, then leave empty.
 		}
 	},
 

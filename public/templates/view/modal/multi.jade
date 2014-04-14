@@ -1,0 +1,9 @@
+.modal.fade(tabindex='-1', role='dialog', aria-hidden='true')
+  .modal-dialog.systemModal
+    .modal-content
+      .modal-header
+        button(type='button', data-dismiss='modal', aria-hidden='true').close &times;
+        h4.modal-title <%= title %>
+      .modal-body
+        ul.nav.nav-tabs
+        .tab-content

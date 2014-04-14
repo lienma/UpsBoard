@@ -1,0 +1,10 @@
+.carousel-menu
+  .carousel-menu-holder
+    h3.popover-title <%= title %>
+    .carousel-menu-content.small
+      .small
+        | <% if(loggedIn) { %>
+        | Coming Soon
+        | <% } else { %>
+        | Login to see details.
+        | <% } %>

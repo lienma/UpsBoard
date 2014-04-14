@@ -1,0 +1,10 @@
+.pull-right.small.remaining-space
+.btn-group.btn-group-xs
+  button(type='button').btn.btn-default.list-btn.btn-queue.active Queue 
+    span(title='Number of nzbs in the queue', rel='tooltip')
+      |(
+      span.nzbs-in-queue 0
+      |)
+  button(type='button').btn.btn-default.list-btn.btn-history History
+    span.loading-history
+      i(style='display:none').loading-history-icon.glyphicon.glyphicon-refresh.rotate-icon

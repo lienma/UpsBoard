@@ -5,43 +5,54 @@ html(lang='en')
     meta(name='viewport', content='width=device-width')
     link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap.css')
     link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap-theme.css')
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/font-awesome.css')
     link(rel='stylesheet', href=locals.webRoot + '/stylesheets/style.css')
-    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap-select.css')
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Alegreya+Sans:400,500,700', type='text/css')
 
-    script(src=locals.webRoot + '/javascripts/jquery-2.0.3.js')
-    script(src=locals.webRoot + '/javascripts/underscore.js')
-    script(src=locals.webRoot + '/javascripts/backbone-1.1.0.js')
-    script(src=locals.webRoot + '/javascripts/bootstrap.min.js')
-    script(src=locals.webRoot + '/javascripts/numeral.min.js')
-    script(src=locals.webRoot + '/javascripts/moment-with-langs.min.js')
-    script(src=locals.webRoot + '/javascripts/jquery.flot.min.js')
-    script(src=locals.webRoot + '/javascripts/jquery.flot.time.min.js')
-    script(src=locals.webRoot + '/javascripts/jquery.flot.axislabels.js')
-    script(src=locals.webRoot + '/javascripts/jquery.flot.stack.min.js')
-    script(src=locals.webRoot + '/javascripts/jquery.color-2.1.2.min.js')
-    script(src=locals.webRoot + '/javascripts/jquery.tablednd.js')
-    script(src=locals.webRoot + '/javascripts/jquery.livestamp.js')
-    script(src=locals.webRoot + '/javascripts/skycons.js')
-    script(src=locals.webRoot + '/javascripts/bootstrap-select.js')
+    script(src=locals.webRoot + '/javascripts/libs/require/require.js', data-main=locals.webRoot + '/javascripts/main')
 
     style @-webkit-keyframes rotateThis { from { -webkit-transform: scale( 1 ) rotate( 0deg ); } to { -webkit-transform: scale( 1 ) rotate( 360deg ); } }
 
-    script(type='text/javascript')
-      include:uglify layout.js
-    script(type='text/javascript').
-      App.Config.IsLoggedIn = #{locals.isLoggedIn};
-      App.Config.IsMacOs = #{locals.isMacOs};
-      App.Config.WebRoot = '#{locals.webRoot}';
-      App.Config.StopUpdating = #{locals.debugStopUpdating};
-      App.Config.weatherEnabled = #{locals.weatherEnabled};
 
-      App.Config.Enabled = {
-        SABnzbd: #{locals.enabledSabnzbd},
-        SickBeard: #{locals.enabledSickBeard}
+    script(type='text/javascript').
+      var Config = {
+        IdCount: 0,
+        IsLoggedIn: #{locals.isLoggedIn},
+        IsMacOs: #{locals.isMacOs},
+        StopUpdating: #{locals.debugStopUpdating},
+        UpdateDelay: 5000,
+        UpdateDelayLong: 60000,
+        UpdateDelayShort: 2000,
+        WeatherEnabled: #{locals.weatherEnabled},
+        WebRoot: '#{locals.webRoot}',
+        Colors: {
+          Bandwidth: {
+            download: {bg: '#b3d6f5', border: '#3071a9'},
+            upload: {bg: '#fae2c0', border: '#ec971f'}
+          },
+          CPU: {
+            System: {bg: '#b3d6f5', border: '#3071a9'},
+            User: {bg: '#cbebf5', border: '#31b0d5'},
+            'IO Wait': {bg: '#fae2c0', border: '#ec971f'}
+          },
+          Memory: {
+            buffer: {bg: '#fae2c0', border: '#ec971f'},
+            cache: {bg: '#b3d6f5', border: '#3071a9'},
+            used: {bg: '#cbebf5', border: '#31b0d5'}
+          }
+        },
+        Enabled: {
+          SABnzbd: #{locals.enabledSabnzbd},
+          SickBeard: #{locals.enabledSickBeard}
+        }
       };
 
-    script(src=locals.webRoot + '/javascripts/app.funcs.js')
+
+      //App.Config.Enabled = {
+      //  SABnzbd: #{locals.enabledSabnzbd},
+      //  SickBeard: #{locals.enabledSickBeard}
+      //};
+
 
     - if(googleAnalytics) {
     script(type='text/javascript').
@@ -56,28 +67,4 @@ html(lang='en')
 
   body
     block content
-    script(src=locals.webRoot + '/javascripts/app.view.topbar.js')
-
-    script(src=locals.webRoot + '/javascripts/app.view.bottombar.js')
-    script(src=locals.webRoot + '/javascripts/app.view.bottombar.bandwidth.js')
-    script(src=locals.webRoot + '/javascripts/app.view.bottombar.cpu.js')
-    script(src=locals.webRoot + '/javascripts/app.view.bottombar.memory.js')
-    script(src=locals.webRoot + '/javascripts/app.view.bottombar.space.js')
-
-    script(src=locals.webRoot + '/javascripts/app.view.panel.datacap.js')
-    script(src=locals.webRoot + '/javascripts/app.view.panel.diskspace.js')
-    script(src=locals.webRoot + '/javascripts/app.view.panel.recentlyaddedmovies.js')
-    script(src=locals.webRoot + '/javascripts/app.view.panel.recentlyairedshows.js')
-    script(src=locals.webRoot + '/javascripts/app.view.panel.currentlywatching.js')
-    script(src=locals.webRoot + '/javascripts/app.view.panel.services.js')
-    - if(enabledSickBeard) {
-    script(src=locals.webRoot + '/javascripts/app.view.panel.upcomm.ingshows.js')
-    script(src=locals.webRoot + '/javascripts/app.view.panel.stat.tvcompletion.js')
-    - }
-    - if(enabledSabnzbd) {
-    script(src=locals.webRoot + '/javascripts/app.view.panel.sabnzbd.js')
-    - }
-    script(src=locals.webRoot + '/javascripts/app.modal.graph.js')
-    script(src=locals.webRoot + '/javascripts/app.collection.disks.js')
-    block javascript
 

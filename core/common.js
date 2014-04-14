@@ -53,6 +53,46 @@ var Common = module.exports = {
 		properties.forEach(function(prop) {
 			to[prop] = from[prop];
 		});
+	},
+
+
+	templateFormat: function(req, res, next) {
+		var url			= require('url');
+		var config		= req.app.config;
+		var path		= url.parse(req.url).pathname;
+
+		if(path.match(/\.tmpl$/)) {
+			var jadeFile = paths.public + '/templates' + path;
+			jadeFile = jadeFile.replace('.tmpl', '.jade');
+
+			if(fs.existsSync(jadeFile)) {
+				res.render(jadeFile, {
+
+					debugStopUpdating: (config.debugStopUpdating) ? 'true' : 'false',
+
+					enabledSabnzbd: config.sabnzbd.enabled,
+					enabledSickBeard: config.sickbeard.enabled,
+
+					googleAnalytics: config.googleAnalytics,
+					googleAnalyticsId: config.googleAnalyticsId,
+					googleAnalyticsUrl: config.googleAnalyticsUrl,
+
+					isLoggedIn: req.isAuthenticated(),
+					isMacOs: req.app.isMacOs,
+
+					token: req.csrfToken(),
+
+					weatherEnabled: (config.weather.enabled) ? 'true' : 'false',
+					weatherLat: config.weather.latitude,
+					weatherLocation: config.weather.latitude + ',' + config.weather.longitude,
+					weatherLong: config.weather.longitude,
+
+					webRoot: (config.webRoot == '/') ? '' : config.webRoot,
+				});
+			} else {
+				res.send(404);
+			}
+		}
 	}
 };
 

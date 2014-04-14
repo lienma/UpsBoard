@@ -1,0 +1,23 @@
+| <% if(loggedIn) { %> 
+.watch-status.small
+  | <% if(watched) { %>
+  span.label.label-info Watched
+  | <% } else { %>
+  span.label.label-warning Unwatched
+  | <% }%>
+| <% }%>
+
+p.small
+  strong Title: 
+  |  <%= epTitle %>
+  br
+  strong Episode: 
+  |  <%= epSeason %>x<%= epNumber %> 
+  strong  Added: 
+  span.time-added
+  br
+  span.small
+    strong Plot: 
+    |  <%= epPlot %>
+div
+  img(src!='<%= epPoster %>').epPoster.img-thumbnail

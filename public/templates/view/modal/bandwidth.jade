@@ -1,0 +1,37 @@
+h4 Bandwidth Statistics
+  .pull-right.small
+    .not-logged-in(style='color:#b94a48') Please login to see these stats
+    .logged-in Since 
+      span.bwSince <%= dateSince %>
+table.table.table-hover.table-condensed.small.logged-in
+  thead
+    tr
+      th
+      th.text-right Download
+      th.text-right Upload
+      th.text-right Total
+  tbody
+    tr.text-right
+      td
+        strong Today:
+      td.todayDownload
+      td.todayUpload
+      td.todayTotal
+    tr.text-right
+      td
+        strong This Month:
+      td.thisMonthDownload
+      td.thisMonthUpload 
+      td.thisMonthTotal
+    tr.text-right
+      td
+        strong Last Month:
+      td.lastMonthDownload
+      td.lastMonthUpload 
+      td.lastMonthTotal
+    tr.text-right
+      td
+        strong Total:
+      td.totalDownload
+      td.totalUpload
+      td.totalTotal

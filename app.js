@@ -21,6 +21,7 @@ var appRoot			= path.resolve(__dirname)
 var routes			= require(paths.core + '/routes')
   , Configure		= require(paths.core + '/configure')
   , Updater			= require(paths.core + '/updater')
+  , Common			= require(paths.core + '/common')
   , logger			= require(paths.logger)('MAIN_APP');
 
 var app				= express();
@@ -89,6 +90,8 @@ Configure().then(function(conf) {
 		return stylus(str).set('filename', path) .use(nib())
 	}}));
 
+	app.use(app.config.webRoot + '/templates', Common.templateFormat);
+
 	app.configure(function() {
 
 		if(conf.runningMode == 'normal') {
@@ -143,9 +146,9 @@ Configure().then(function(conf) {
 	app.get(webRoot + '/api/sabnzbd/history', routes.api.sabnzbd.getHistory);
 	app.get(webRoot + '/api/sabnzbd/pauseQueue', routes.api.sabnzbd.pauseQueue);
 	app.get(webRoot + '/api/sabnzbd/queue', routes.api.sabnzbd.getQueue);
-	app.get(webRoot + '/api/sabnzbd/queue/:nzb/:func', routes.api.sabnzbd.itemOptions);
-	app.get(webRoot + '/api/sabnzbd/queue/:nzb/:func/:value', routes.api.sabnzbd.itemOptions);
 	app.get(webRoot + '/api/sabnzbd/resumeQueue', routes.api.sabnzbd.resumeQueue);
+	app.get(webRoot + '/api/sabnzbd/:list/:nzb/:func', routes.api.sabnzbd.itemOptions);
+	app.get(webRoot + '/api/sabnzbd/:list/:nzb/:func/:value', routes.api.sabnzbd.itemOptions);
 
 	app.get(webRoot + '/api/sickbeard/poster', routes.api.sickbeard.poster);
 	app.get(webRoot + '/api/sickbeard/showsStats', routes.api.sickbeard.showsStats);
