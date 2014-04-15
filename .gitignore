@@ -1,12 +1,12 @@
-./config.js
-./plex.js
-./publickey.txt
 
 .cache
-cache
-logs
-node_modules
-public/javascripts/.cache
-public/stylesheets/style.styl
+/cache
+/logs
+/node_modules
+/public/javascripts/.cache
+/public/stylesheets/style.styl
 
+/config.js
+/plex.js
+/publickey.txt
 
