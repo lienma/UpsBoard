@@ -1,4 +1,8 @@
-var _ = require('underscore');
+var _ 		= require('underscore')
+  , path	= require('path');
+
+var appRoot	= path.resolve(__dirname, '../../')
+  , paths	= require(appRoot + '/core/paths');
 
 exports.index = function(req, res, next) {
 	if(!_.isUndefined(req.query.logout)) {
@@ -29,6 +33,8 @@ function routerIndex(req, res, status) {
 	var config = req.app.config;
 
 	res.render('index', {
+
+
 		debugStopUpdating: (config.debugStopUpdating) ? 'true' : 'false',
 
 		enabledSabnzbd: config.sabnzbd.enabled,

@@ -95,7 +95,6 @@ define([
 		},
 
 		_scroll: function() {
-console.log('history scroll');
 			if(this.isLoadingMore) return;
 
 			if(this.body.scrollTop() >= $(this.$el).height() - this.body.height() - 10) {
@@ -136,7 +135,7 @@ console.log('history scroll');
 					index = i;
 				}
 			});
-console.log('add view');
+
 			model.view = new ItemView({model: model, queueModel: this.model});
 			this.insertAt(index, model.view.render());
 		},

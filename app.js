@@ -90,12 +90,14 @@ Configure().then(function(conf) {
 		return stylus(str).set('filename', path) .use(nib())
 	}}));
 
+
 	app.use(app.config.webRoot + '/templates', Common.templateFormat);
 
 	app.configure(function() {
 
 		if(conf.runningMode == 'normal') {
 			app.enable('trust proxy');
+			app.set('json spaces', 0)
 
 			if(app.config.logHttpRequests) {
 				app.use(express.logger());

@@ -40,7 +40,8 @@ console.log(reason);
 		poster: function(req, res) {
 
 			if(req.get('If-None-Match')) {
-				var isCache = !(moment(req.get('If-None-Match')).isBefore(moment().subtract('days', 7)));
+				var lastWeek = moment().subtract('days', 7);
+				var isCache = !(moment(new Date(req.get('If-None-Match'))).isBefore(lastWeek));
 				log.debug('Is', 'Plex'.cyan, 'image cache in user\'s browser?', (isCache) ? 'Yes'.green : 'No'.red);
 
 				if(isCache) {

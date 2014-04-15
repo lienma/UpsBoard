@@ -1,10 +1,12 @@
+
+.cache
 cache
 logs
 node_modules
 public/javascripts/.cache
 public/stylesheets/style.styl
 
-config.js
+./config.js
 ./plex.js
-publickey.txt
+./publickey.txt
 

@@ -51,9 +51,9 @@ define([
 				this._timeout = null;
 			}
 
-			//if(!Config.StopUpdating) {
+			if(!Config.StopUpdating) {
 				this._startTimeout();
-			//}
+			}
 
 			return this.fetch();
 		}

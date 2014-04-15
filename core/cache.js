@@ -28,7 +28,6 @@ Cache.prototype.getItem = function(filename, fetchItem) {
 	if(exist) {
 		fs.stat(filePath, function(err, stats) {
 			if(err)	return fetch();
-
 			var created = moment(stats.mtime);
 			var isOld = created.isBefore(created.subtract('days', 7));
 

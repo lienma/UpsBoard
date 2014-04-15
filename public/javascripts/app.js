@@ -70,14 +70,14 @@ define([
 
 	initialize.prototype._buildPanels = function() {
 		this.Panels = {
-			//CurrentlyWatching: new PanelCurrentlyWatching(this),
-			//DataCap: new PanelDataCap(this),
-			//Drives: new PanelDrives(this.Collections.Drives),
-			//RecentlyAddedMovies: new PanelRecentlyMovies(this),
-			//RecentlyAiredShows: new PanelRecentlyShows(this),
-			//Services: new PanelServices(this),
-			//TVCompletion: new PanelTVCompletion(this),
-			//UpcomingShows: new PanelUpcomingShows(this)
+			CurrentlyWatching: new PanelCurrentlyWatching(this),
+			DataCap: new PanelDataCap(this),
+			Drives: new PanelDrives(this.Collections.Drives),
+			RecentlyAddedMovies: new PanelRecentlyMovies(this),
+			RecentlyAiredShows: new PanelRecentlyShows(this),
+			Services: new PanelServices(this),
+			TVCompletion: new PanelTVCompletion(this),
+			UpcomingShows: new PanelUpcomingShows(this)
 
 		};
 

@@ -179,13 +179,11 @@ define([
 			if(!this.sabnzbd.isLoaded()) return;
 
 			var width = this.$('td.middle').width();
-console.log('resize... Why?', width);
 			width = Math.floor(width / 4) - 8;
 			this.$('.select-event').css('width', width + 'px');
 		},
 
 		_scroll: function() {
-console.log('queue scroll');
 			if(this.isLoadingMore) return;
 
 			if(this.body.scrollTop() >= $(this.$el).height() - this.body.height() - 10) {
