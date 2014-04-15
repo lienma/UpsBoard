@@ -136,7 +136,7 @@ Configure().then(function(conf) {
 	app.get(webRoot + '/', routes.frontend.index);
 	app.post(webRoot + '/', routes.frontend.login);
 
-	app.get(webRoot + '/install', routes.frontend.install);
+	app.get(webRoot + '/avatar', routes.user.avatar);
 
 	app.get(webRoot + '/api/plex/currentlyWatching', routes.api.plex.currentlyWatching);
 	app.get(webRoot + '/api/plex/poster', routes.api.plex.poster);

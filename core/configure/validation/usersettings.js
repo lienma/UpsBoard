@@ -1,4 +1,5 @@
 var bcrypt 		= require('bcrypt')
+  , crypto		= require('crypto')
   , fs 			= require('fs')
   , path 		= require('path')
   , when 		= require('when')
@@ -10,7 +11,10 @@ var appRoot 	= path.resolve(__dirname, '../../../')
 var log 		= require(paths.logger)('CONFIG');
 
 module.exports 	= function validateUserSettings(data) {
+	return password(data).then(avatar);
+};
 
+function password(data) {
 	var password = data.data.userPassword;
 	var testCharFirst = password.substr(0, 1);
 	var testCharLast = password.substr(-1, 1);
@@ -58,4 +62,20 @@ module.exports 	= function validateUserSettings(data) {
 
 		return promise.promise;
 	}
+}
+
+function avatar(data) {
+
+	var avatar = (data.data.userAvatar) ? data.data.userAvatar : '';
+
+	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if(re.test(avatar)) {
+		var baseURL = 'https://secure.gravatar.com/avatar/';
+		data.config.user.avatar = 'url';
+		data.config.user.avatarUrl = baseURL + crypto.createHash('md5').update(avatar.toLowerCase().trim()).digest('hex');
+	} else {
+		data.config.user.avatar = avatar;
+	}
+
+	return when.resolve(data);
 };

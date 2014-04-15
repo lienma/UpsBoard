@@ -1,9 +1,5 @@
 extends layout
 
-block javascript
-  script(type='text/javascript')
-    include:uglify index.js
-
 block content
   script(type='text/template')#tmpl-panel-service-item-full
     td.text-right <%= label %>

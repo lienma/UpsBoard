@@ -25,8 +25,8 @@ var config = module.exports = {
 	"username": 			"admin",
 	"userPassword": 		"password",
 
-	// Optional, Either url, path, or email address(Gavatar) for user avatar.
-	'userAvatar":			"",
+	// Optional, Either url, path, or email address(Gravatar) for user avatar.
+	"userAvatar":			"",
 
 	// Optional, If you want to include Google Analytics
 	"googleAnalyticsId": 	"",
