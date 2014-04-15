@@ -1,3 +1,6 @@
+./config.js
+./plex.js
+./publickey.txt
 
 .cache
 cache
@@ -6,7 +9,4 @@ node_modules
 public/javascripts/.cache
 public/stylesheets/style.styl
 
-./config.js
-./plex.js
-./publickey.txt
 
