@@ -36,6 +36,7 @@ var bodyParser 		= require('body-parser')
   , responseTime	= require('response-time')
   , session			= require('cookie-session')
   , serveStatic		= require('serve-static')
+  , favicon			= require('static-favicon');
 
 
 if(process.env.NODE_ENV == 'development') {
@@ -82,7 +83,7 @@ Configure().then(function(conf) {
 		done(null, conf.user);
 	});
 
-	//app.use(app.config.webRoot, express.favicon());
+	//app.use(app.config.webRoot, favicon());
 
 	app.use(bodyParser());
 	app.use(methodOverride());

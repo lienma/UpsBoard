@@ -17,6 +17,7 @@
 	"morgan":			"*",
 	"response-time":	"*",
 	"serve-static":		"*",
+	"static-favicon":	"*",
 
 
     "jade": 			"*",
