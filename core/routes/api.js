@@ -17,7 +17,7 @@ var api = {
 
 				var json = [];
 				videos.forEach(function(video) {
-					json.push({
+					var data = {
 						_id: video.sessionKey,
 						art: video.art,
 						title: video.title,
@@ -27,9 +27,24 @@ var api = {
 						tvShowThumb: video.tvShowThumb,
 						year: video.year,
 						duration: video.duration,
+						epNumber: video.epNumber,
+						seasonNumber:video.seasonNumber,
 						summary: video.summary,
-						type: video.type,
-					});
+						type: video.type
+					};
+
+					if(req.isAuthenticated()) {
+						_.extend(data, {
+	 						username: video.username,
+							userAvatar: video.userAvatar,
+							player: video.player,
+							playerPlatform: video.playerPlatform,
+							playingState: video.playingState,
+							viewOffset: video.viewOffset
+						});
+					}	
+
+					json.push(data);
 				});
 				res.json(json);
 			}).otherwise(function(reason) {

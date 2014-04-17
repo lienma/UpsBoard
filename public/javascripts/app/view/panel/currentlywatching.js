@@ -18,7 +18,7 @@ define([
 			this.collection.on('add', this.addPoster, this);
 			this.collection.on('remove', this.removePoster, this);
 
-			this.timeout = Timeout(this.fetch.bind(this), Config.UpdateDelayLong);
+			this.timeout = Timeout(this.fetch.bind(this), Config.UpdateDelay);
 			this.timeout.start();
 
 		},

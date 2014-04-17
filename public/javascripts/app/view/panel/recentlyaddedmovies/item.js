@@ -20,7 +20,7 @@ define([
 
 		buildView: function(model) {
 			var src = Config.WebRoot + '/api/plex/poster?location=' + encodeURIComponent(this.model.get('movieThumbnail')) + '&width=300&height=500';
-			this.img = $('<img />', { 'src': src });
+			this.img = $('<img />', { 'src': src }).addClass('cover');
 			this.$el.append(this.img);
 		},
 

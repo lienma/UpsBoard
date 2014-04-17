@@ -1,13 +1,19 @@
 define([
 	'jquery', 'bootstrap'
-], function() {
+], function($) {
 
 	function Tooltip(options) {
 		if(!(this instanceof Tooltip)) {
 			return new Tooltip(options);
 		}
 
-		this.el = $(options.el);
+		if(_.isElement(options)) {
+			this.el = $(options);
+			options = {};
+		} else {
+			this.el = $(options.el);
+		}
+
 		this._showing = false;
 
 		if(options.title) {

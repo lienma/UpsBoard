@@ -93,16 +93,14 @@ Configure().then(function(conf) {
 
 
 	app.use(app.config.webRoot, stylus.middleware({src: paths.public, compile: function(str, path) { return stylus(str).set('filename', path) .use(nib()) }}));
-	app.use(app.config.webRoot + '/templates', Common.templateFormat);
 
 
 	if(app.config.logHttpRequests) {
-		app.use(morganLogger((conf.runningMode == 'normal') ? '' : 'dev'));
+		app.use(morganLogger((conf.runningMode == 'normal') ? 'default' : 'dev'));
 	}
 
 	if(conf.runningMode == 'normal') {
 		app.enable('trust proxy');
-		app.set('json spaces', 0)
 
 		function blankLog() { this.log = function() {}; }
 
@@ -111,6 +109,7 @@ Configure().then(function(conf) {
 		app.use(errorHandler());
 	} else {
 		app.locals.pretty = true;
+    	app.set('json spaces',	2);
 		app.use(responseTime());
 
 		app.use(app.config.webRoot, serveStatic(paths.public));
@@ -119,6 +118,8 @@ Configure().then(function(conf) {
 
 	app.use(passport.initialize());
 	app.use(passport.session());
+
+	app.use(app.config.webRoot + '/templates', Common.templateFormat);
 
 }).then(function() {
 

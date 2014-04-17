@@ -115,7 +115,7 @@ define([
 
 		updateStages: function() {
 			var stages = this.model.get('stage_log');
-console.log(stages);
+
 			(_.isArray(stages) ? stages : []).forEach(function(stage) {
 				var className = '', title = false, enabled = true;;
 				switch(stage.name) {

@@ -67,26 +67,8 @@ var Common = module.exports = {
 
 			if(fs.existsSync(jadeFile)) {
 				res.render(jadeFile, {
-
-					debugStopUpdating: (config.debugStopUpdating) ? 'true' : 'false',
-
-					enabledSabnzbd: config.sabnzbd.enabled,
-					enabledSickBeard: config.sickbeard.enabled,
-
-					googleAnalytics: config.googleAnalytics,
-					googleAnalyticsId: config.googleAnalyticsId,
-					googleAnalyticsUrl: config.googleAnalyticsUrl,
-
 					isLoggedIn: req.isAuthenticated(),
-					isMacOs: req.app.isMacOs,
-
 					token: req.csrfToken(),
-
-					weatherEnabled: (config.weather.enabled) ? 'true' : 'false',
-					weatherLat: config.weather.latitude,
-					weatherLocation: config.weather.latitude + ',' + config.weather.longitude,
-					weatherLong: config.weather.longitude,
-
 					webRoot: (config.webRoot == '/') ? '' : config.webRoot,
 				});
 			} else {

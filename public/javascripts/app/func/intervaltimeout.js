@@ -1,14 +1,15 @@
 define([], function() {
 
-	function IntervalTimeout(func, time) {
+	function IntervalTimeout(func, time, force) {
 		if(!(this instanceof IntervalTimeout)) {
-			return new IntervalTimeout(func, time);
+			return new IntervalTimeout(func, time, force);
 		}
 
 		this._timeout		= null;
 		this._stopUpdating	= false;
 		this.func			= func;
 		this.time			= (time) ? time : Config.UpdateDelay;
+		this.force			= (force) ? true : false;
 	}
 
 	IntervalTimeout.prototype.start = function() { this._call(); };
@@ -20,7 +21,7 @@ define([], function() {
 			this._timeout = null;
 		}
 
-		if(!Config.StopUpdating) {
+		if(this.force || !Config.StopUpdating) {
 			this._startTimeout();
 		}
 

@@ -12,6 +12,9 @@ body {
 .add-spacing {
   padding: 0 5px;
 }
+.panel-heading {
+  padding: 10px;
+}
 .panel-title,
 .modal-title,
 .popover-title {
@@ -194,27 +197,65 @@ ul.action-menu li a.with-icon {
 .panel.currently-watching .carousel .carousel-inner {
   border-radius: 5px;
 }
-.panel.recently-added-movies .carousel .carousel-inner img,
-.panel.currently-watching .carousel .carousel-inner img {
+.panel.recently-added-movies .carousel .carousel-inner img.cover,
+.panel.currently-watching .carousel .carousel-inner img.cover {
   min-height: 327px;
   width: 218px;
 }
-.panel.recently-added-movies .carousel .carousel-inner .carousel-caption,
-.panel.currently-watching .carousel .carousel-inner .carousel-caption {
-  border: 1px solid rgba(221,221,221,0.3);
+.panel.recently-added-movies .carousel .carousel-menu .popover-title,
+.panel.currently-watching .carousel .carousel-menu .popover-title {
+  line-height: 13px;
+  padding: 8px 9px;
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content {
+  font-size: 85%;
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table {
+  width: 100%;
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td.icon,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td.icon {
+  width: 40px;
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td.middle,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td.middle {
+  padding: 0 5px;
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td .cover,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td .cover {
+  width: 38px;
+  padding: 2px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td .cover img,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td .cover img {
   border-radius: 3px;
-  background-color: rgba(245,245,245,0.3);
-  padding: 0px;
+  width: 32px;
 }
-.panel.recently-added-movies .carousel .carousel-inner .carousel-caption h3,
-.panel.currently-watching .carousel .carousel-inner .carousel-caption h3 {
-  font-size: 18px;
-  margin-top: 10px;
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td .username,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td .username {
+  font-family: 'Alegreya Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
 }
-.panel.recently-added-movies .carousel .carousel-inner .carousel-caption h3 span,
-.panel.currently-watching .carousel .carousel-inner .carousel-caption h3 span {
-  font-size: 15px;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td strong,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td strong {
+  font-family: 'Alegreya Sans', sans-serif;
+  padding-right: 3px;
+}
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content table td .progress,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-content table td .progress {
+  height: 5px;
+  margin-top: -4px;
+  margin-left: -5px;
+  margin-right: -5px;
+  margin-bottom: 5px;
 }
 .panel.recently-added-movies .carousel .left.carousel-control,
 .panel.currently-watching .carousel .left.carousel-control {
@@ -224,15 +265,6 @@ ul.action-menu li a.with-icon {
 .panel.currently-watching .carousel .right.carousel-control {
   border-radius: 0 5px 5px 0;
 }
-.panel.recently-added-movies .slideContainer .slides,
-.panel.currently-watching .slideContainer .slides {
-  display: none;
-  width: 218px;
-}
-.panel.recently-added-movies .slideContainer .slides .slidesjs-navigation,
-.panel.currently-watching .slideContainer .slides .slidesjs-navigation {
-  display: none;
-}
 .panel.upcoming-shows table {
   margin-bottom: 0;
 }
@@ -241,6 +273,7 @@ ul.action-menu li a.with-icon {
 }
 .panel.upcoming-shows table tr.alt .date-label {
   background-color: #3a87ad;
+  border: 1px solid #2d6886;
 }
 .panel.upcoming-shows table td {
   height: 86px;
@@ -259,6 +292,7 @@ ul.action-menu li a.with-icon {
   border-radius: 4px;
   margin-top: 5px;
   background-color: #468847;
+  border: 1px solid #3d763e;
 }
 .panel.upcoming-shows table td .date-label span {
   -webkit-transform: rotate(-90deg);
@@ -269,6 +303,7 @@ ul.action-menu li a.with-icon {
 }
 .panel.upcoming-shows table td .date-label.missing {
   background-color: #d9534f;
+  border: 1px solid #c9312c;
 }
 .panel.upcoming-shows table td .shows {
   margin-left: 22px;
@@ -592,7 +627,8 @@ ul.action-menu li a.with-icon {
 }
 .panel-service .panel-heading ul.list-inline li {
   padding-right: 2px;
-  padding-left: 3px;
+  padding-left: 2px;
+  vertical-align: middle;
 }
 .panel-service .panel-heading ul.list-inline li:last-child {
   padding-right: 0;
@@ -628,8 +664,10 @@ ul.action-menu li a.with-icon {
   text-shadow: 0 1px 2px rgba(0,0,0,0.6);
   display: block;
   width: 100%;
+  padding: 10px;
 }
 .top-display-bar .weather-alerts {
+  margin-top: -4px;
   margin-right: 8px;
 }
 .top-display-bar .popover {

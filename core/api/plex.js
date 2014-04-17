@@ -180,8 +180,8 @@ Plex.prototype.getCurrentlyWatching = function() {
 		var json = [];
 		data.MediaContainer.Video.forEach(function(video) {
 			var User = get(video, 'User')
-			  , Player = get('video, Player');
-
+			  , Player = get(video, 'Player');
+console.log(video);
 			json.push({
 				sessionKey: 	get(video, 'sessionKey'),
 				art: 			get(video, 'art'),
@@ -193,6 +193,8 @@ Plex.prototype.getCurrentlyWatching = function() {
 				year: 			get(video, 'year'),
 				duration: 		get(video, 'duration'),
 				summary: 		get(video, 'summary'),
+				epNumber:		get(video, 'index'),
+				seasonNumber:	get(video, 'parentIndex'),
 				viewOffset: 	get(video, 'viewOffset'),
 				type: 			get(video, 'type'),
 				username: 		get(User, 'title'),

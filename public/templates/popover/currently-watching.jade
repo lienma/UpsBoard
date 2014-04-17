@@ -1,10 +1,43 @@
 .carousel-menu
   .carousel-menu-holder
     h3.popover-title <%= title %>
-    .carousel-menu-content.small
-      .small
-        | <% if(loggedIn) { %>
-        | Coming Soon
-        | <% } else { %>
-        | Login to see details.
-        | <% } %>
+    .carousel-menu-content
+
+      - if(isLoggedIn) {
+          table
+            tr
+              td(colspan='3')
+                .progress(data-placement='bottom')
+                  .progress-bar.progress-bar-warning(role='progressbar')
+            tr
+              td.icon
+                | <% if(userAvatar) { %>
+                .cover
+                  img(src!='<%= userAvatar %>')
+                | <% } %>
+              td.middle
+                .username <%= username %>
+                div
+                  strong Progress:
+                  span.offset-time(style='font-size: 75%')
+              td.icon
+                .cover
+                  img(src!=locals.webRoot + '/images/platforms/<%= imgPlatform %>' title!='<%= platform %>', data-placement='left', rel='tooltip').platform-img
+            tr
+              td(colspan='3').small
+                div
+                  strong Length:
+                  span <%= vidLength %>
+
+                | <% if(epTitle) { %>
+                div
+                  strong Episode:
+                  span <%= seasonNumber %>x<%= epNumber %> - <%= epTitle %>
+                | <% } %>
+                div
+                  strong Plot:
+                  span <%= summary %>
+
+      - } else {
+        .small Login to see details.
+      - }
