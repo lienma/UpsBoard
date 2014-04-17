@@ -12,6 +12,7 @@ var express			= require('express')
   , bcrypt			= require('bcrypt')
   , expressUglify	= require('express-uglify');
 
+
 var passport		= require('passport')
   , LocalStrategy	= require('passport-local').Strategy;
 
@@ -26,6 +27,17 @@ var routes			= require(paths.core + '/routes')
 
 var app				= express();
 
+var bodyParser 		= require('body-parser')
+  , cookieParser	= require('cookie-parser')
+  , csrf			= require('csurf')
+  , errorHandler	= require('errorhandler')
+  , methodOverride	= require('method-override')
+  , morganLogger	= require('morgan')
+  , responseTime	= require('response-time')
+  , session			= require('cookie-session')
+  , serveStatic		= require('serve-static')
+
+
 if(process.env.NODE_ENV == 'development') {
 	require('when/monitor/console');
 }
@@ -38,11 +50,9 @@ if(os.type() == 'Windows_NT') {
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 
 Configure().then(function(conf) {
-
+	app.config = conf;
 
 	app.isMacOs = (os.type() == 'Linux') ? false : true;
-
-	app.config = conf;
 
 	// all environments
 	app.set('host', 		app.config.host);
@@ -52,7 +62,6 @@ Configure().then(function(conf) {
 
 	passport.use(new LocalStrategy(function(username, password, done) {
 		if(username == conf.user.username) {
-
 			bcrypt.compare(password, conf.user.password, function(err, res) {
 				if(res) {
 					done(null, conf.user);
@@ -74,63 +83,42 @@ Configure().then(function(conf) {
 	});
 
 	//app.use(app.config.webRoot, express.favicon());
-	app.use(express.urlencoded());
-	app.use(express.json());
-	app.use(express.methodOverride());
 
-	app.use(express.cookieParser());
-	app.use(express.cookieSession({
-		secret: conf.salt,
-		cookie: { maxAge: 24 * 60 * 60 * 1000 }
-	}));
-
-	app.use(express.csrf());
-
-	app.use(app.config.webRoot, stylus.middleware({src: paths.public, compile: function(str, path) {
-		return stylus(str).set('filename', path) .use(nib())
-	}}));
+	app.use(bodyParser());
+	app.use(methodOverride());
+	app.use(cookieParser());
+	app.use(session({ secret: conf.salt, cookie: { maxAge: 24 * 60 * 60 * 1000 } }));
+	app.use(csrf());
 
 
+	app.use(app.config.webRoot, stylus.middleware({src: paths.public, compile: function(str, path) { return stylus(str).set('filename', path) .use(nib()) }}));
 	app.use(app.config.webRoot + '/templates', Common.templateFormat);
 
-	app.configure(function() {
 
-		if(conf.runningMode == 'normal') {
-			app.enable('trust proxy');
-			app.set('json spaces', 0)
+	if(app.config.logHttpRequests) {
+		app.use(morganLogger((conf.runningMode == 'normal') ? '' : 'dev'));
+	}
 
-			if(app.config.logHttpRequests) {
-				app.use(express.logger());
-			}
+	if(conf.runningMode == 'normal') {
+		app.enable('trust proxy');
+		app.set('json spaces', 0)
 
-			function blankLog() {
-				this.log = function() {
-	
-				};
-			}
+		function blankLog() { this.log = function() {}; }
 
-			app.use(app.config.webRoot, expressUglify.middleware({ src: paths.public, logger: new blankLog() }));
-	
-			var oneYear = 31557600000;
-			app.use(app.config.webRoot, express.static(paths.public, { maxAge: oneYear }));
-			app.use(express.errorHandler());
-		} else {
-			app.locals.pretty = true;
-			app.use(express.responseTime());
+		app.use(app.config.webRoot, expressUglify.middleware({ src: paths.public, logger: new blankLog() }));
+		app.use(app.config.webRoot, serveStatic(paths.public, { maxAge: 31557600000 }));
+		app.use(errorHandler());
+	} else {
+		app.locals.pretty = true;
+		app.use(responseTime());
 
-			if(app.config.logHttpRequests) {
-				app.use(express.logger('dev'));
-			}
-
-			app.use(app.config.webRoot, express.static(paths.public));
-			app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-		}
-	});
+		app.use(app.config.webRoot, serveStatic(paths.public));
+		app.use(errorHandler({ dumpExceptions: true, showStack: true }));
+	}
 
 	app.use(passport.initialize());
 	app.use(passport.session());
 
-	app.use(app.router);
 }).then(function() {
 
 	var webRoot = app.config.webRoot;

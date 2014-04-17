@@ -240,7 +240,9 @@ console.log(reason);
 			}
 
 			if(req.get('If-None-Match')) {
-				var isCache = !(moment(req.get('If-None-Match')).isBefore(moment().subtract('days', 7)));
+				var lastWeek = moment().subtract('days', 7);
+				var isCache = !(moment(new Date(req.get('If-None-Match'))).isBefore(lastWeek));
+
 				log.debug('Is', 'Sick Beard'.cyan, 'image cache in user\'s browser?', (isCache) ? 'Yes'.green : 'No'.red);
 
 				if(isCache) {

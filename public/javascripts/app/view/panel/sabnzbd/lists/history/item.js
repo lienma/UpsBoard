@@ -1,11 +1,11 @@
 define([
-	'backbone', 'moment',
+	'underscore', 'backbone', 'moment',
 	'tmpl!view/sabnzbd/lists/history-item',
 	'app/view/panel/sabnzbd/modal/deletenzb',
 
 	'app/func/tooltip',
 	'jquery.livestamp'
-], function(Backbone, moment, TmplView, ModalDeleteNzb, Tooltip) {
+], function(_, Backbone, moment, TmplView, ModalDeleteNzb, Tooltip) {
 
 	var View = Backbone.View.extend({
 		tagName: 'tr',
@@ -115,8 +115,8 @@ define([
 
 		updateStages: function() {
 			var stages = this.model.get('stage_log');
-
-			stages.forEach(function(stage) {
+console.log(stages);
+			(_.isArray(stages) ? stages : []).forEach(function(stage) {
 				var className = '', title = false, enabled = true;;
 				switch(stage.name) {
 					case 'Download':

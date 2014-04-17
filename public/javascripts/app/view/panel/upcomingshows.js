@@ -1,9 +1,9 @@
 define([
-	'jquery', 'backbone',
+	'jquery', 'backbone', 'moment',
 	'app/func/intervaltimeout',
 	'app/collection/upcomingshows',
 	'app/view/panel/upcomingshows/day'
-], function($, Backbone, Timeout, UpcomingCollection, DayView) {
+], function($, Backbone, moment, Timeout, UpcomingCollection, DayView) {
 
 	var View = Backbone.View.extend({
 		el: '.upcoming-shows',
@@ -58,12 +58,13 @@ define([
 
 		processEpisode: function(episode) {
 
-			var dateStr = episode.get('airdate');
-			if(!this.daysCollection[dateStr]) {
-				this.createDayView(dateStr);
+			var date = episode.moment().isBefore(moment()) ? 'missing' : episode.get('airdate');
+
+			if(!this.daysCollection[date]) {
+				this.createDayView(date);
 			}
 
-			this.daysCollection[dateStr].add(episode);
+			this.daysCollection[date].add(episode);
 		}
 	});
 

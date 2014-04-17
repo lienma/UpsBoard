@@ -11,19 +11,38 @@ define([
 		tagName: 'tr',
 
 		initialize: function(options) {
+			var isMissing = options.date == 'missing';
+
+			if(isMissing) {
+				this.createMissing(options);
+			} else {
+				this.createDay(options);
+			}
+
+			this.listenTo(this.collection, 'add', this.addEpisode);
+			this.listenTo(this.collection, 'remove', this.removeEpisode);
+
+		},
+
+		createDay: function(options) {
 			var date = moment(options.date, 'YYYY-MM-DD');
 
 			this.$el.html(TmplDay({
 				dateLabel: date.format('dddd')
 			}));
-
 			this.$('.date-label').attr('title', date.format('dddd MMMM D, YYYY')).tooltip({placement: 'right'});
-
-			this.listenTo(this.collection, 'add', this.addEpisode);
-			this.listenTo(this.collection, 'remove', this.removeEpisode);
 
 			date = options.date.split('-');
 			this.$el.data('date', parseInt(date[0] + date[1] + date[2]));
+		},
+
+		createMissing: function(options) {
+			this.$el.html(TmplDay({
+				dateLabel: 'Missing'
+			}));
+
+			this.$('.date-label').addClass('missing');
+			this.$el.data('date', 0);
 		},
 
 		render: function() {

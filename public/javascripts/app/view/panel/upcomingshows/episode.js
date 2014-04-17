@@ -6,6 +6,10 @@ define([
 	'jquery.livestamp'
 ], function(Backbone, moment, TmplEpisodeCover, TmplPopover) {
 
+	function episodeTime() {
+
+	}
+
 	var View = Backbone.View.extend({
 		tagName: 'li',
 
@@ -19,27 +23,16 @@ define([
 			  , airs = this.model.get('airs')
 			  , network = this.model.get('network');
 
-			epPlot	= (epPlot == '') ? 'No episode plot given' : epPlot;
-			airs	= (airs) ? airs : '00:00';
+			  epPlot = (epPlot == '') ? 'No episode plot given' : epPlot;
+			  airs = (airs) ? airs : '00:00';
 
 			var epTime = airs.match(/(\d+):(\d+)(\s*)(\w*)/);
 			var time = parseInt(epTime[1] + '' + epTime[2]);
-			time = (epTime[4] == 'PM') ? 1200 + time : time;
+			    time = (epTime[4] == 'PM') ? 1200 + time : time;
 
 			this.$el.data('time', time);
 
-			time = String((time.length == 3) ? '0' + time : time);
-
-			var hours = parseInt(time.substr(0, 2))
-			  , minutes = time.substr(2, 4);
-
-			var ampm = 'AM';
-			if(hours > 12) {
-				hours -= 12;
-				ampm = 'PM';
-			}
-
-			var epDateMoment = moment(epDate + ' ' + hours + ':' + minutes + ' ' + ampm, 'YYYY-MM-DD h:mm A');
+			var epDateMoment = this.model.moment();
 			var isEpMissed = moment().isAfter(epDateMoment);
 
 			var showPoster = Config.WebRoot + '/api/sickbeard/poster?showId=' + this.model.get('show_id') + '&width=200';

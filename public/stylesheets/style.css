@@ -264,8 +264,11 @@ ul.action-menu li a.with-icon {
   -webkit-transform: rotate(-90deg);
   display: inline-block;
   width: 60px;
-  margin-left: -24px;
+  margin-left: -25px;
   margin-top: 26px;
+}
+.panel.upcoming-shows table td .date-label.missing {
+  background-color: #d9534f;
 }
 .panel.upcoming-shows table td .shows {
   margin-left: 22px;
