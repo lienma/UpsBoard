@@ -202,10 +202,18 @@ ul.action-menu li a.with-icon {
   min-height: 327px;
   width: 218px;
 }
+.panel.recently-added-movies .carousel .carousel-menu .carousel-menu-holder,
+.panel.currently-watching .carousel .carousel-menu .carousel-menu-holder {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  -webkit-box-shadow: 0px -4px 10px rgba(50,50,50,0.75);
+  -moz-box-shadow: 0px -4px 10px rgba(50,50,50,0.75);
+  box-shadow: 0px -4px 10px rgba(50,50,50,0.75);
+}
 .panel.recently-added-movies .carousel .carousel-menu .popover-title,
 .panel.currently-watching .carousel .carousel-menu .popover-title {
-  line-height: 13px;
-  padding: 8px 9px;
+  padding: 6px 10px;
+  padding-bottom: 4px;
 }
 .panel.recently-added-movies .carousel .carousel-menu .carousel-menu-content,
 .panel.currently-watching .carousel .carousel-menu .carousel-menu-content {

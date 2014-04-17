@@ -181,7 +181,8 @@ Plex.prototype.getCurrentlyWatching = function() {
 		data.MediaContainer.Video.forEach(function(video) {
 			var User = get(video, 'User')
 			  , Player = get(video, 'Player');
-console.log(video);
+
+
 			json.push({
 				sessionKey: 	get(video, 'sessionKey'),
 				art: 			get(video, 'art'),

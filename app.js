@@ -109,7 +109,7 @@ Configure().then(function(conf) {
 		app.use(errorHandler());
 	} else {
 		app.locals.pretty = true;
-    	app.set('json spaces',	2);
+		app.set('json spaces',	2);
 		app.use(responseTime());
 
 		app.use(app.config.webRoot, serveStatic(paths.public));
