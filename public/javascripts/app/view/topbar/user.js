@@ -11,12 +11,73 @@ define([
 ], function(Backbone, TmplTopbarView, TmplUserMenu) {
 
 	var Login = Backbone.View.extend({
+
+		events: {
+			'keyup .input-checker': 'keyup'
+		},
+
 		initialize: function() {
 			this.buildView();
+
+			this.isShowing = false;
+
+			var div = this.$('.login');
+			div.hover(function() {
+				div.stop(true).animate({opacity: 1}, 500, function() {
+					this.isShowing = true;
+				}.bind(this));
+			}.bind(this), function() {
+				if(this.isEmpty()) {
+					div.stop(true).animate({opacity: 0.5}, 500, function() {
+						this.isShowing = false;
+					}.bind(this));
+				}
+			}.bind(this));
+
+			setTimeout(function() {
+				this.$('.login').css('opacity', 1);
+				this.keyup();
+			}.bind(this), 100);
 		},
 
 		buildView: function() {
 			this.$el.html(TmplTopbarView());
+		},
+
+
+		isEmpty: function() {
+			var $inputs = this.$('.input-checker');
+			var isEmpty = true;
+
+			$inputs.each(function() {
+				if($(this).val() != '') {
+					isEmpty = false;
+				}
+			});
+
+			return isEmpty;
+		},
+
+		isAnyEmpty: function() {
+			var $inputs = this.$('.input-checker');
+			var isEmpty = false;
+
+			$inputs.each(function() {
+				if($(this).val() == '') {
+					isEmpty = true;
+				}
+			});
+
+			return isEmpty;
+		},
+
+		keyup: function() {
+			var btn = this.$('.btn-login');
+			if(!this.isAnyEmpty()) {
+				btn.removeClass('btn-default disabled').addClass('btn-success');
+			} else {
+				btn.removeClass('btn-success').addClass('btn-default disabled');
+			}
 		}
 	});
 
