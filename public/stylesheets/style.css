@@ -843,6 +843,9 @@ ul.action-menu li a.with-icon {
   display: inline-block;
   margin-top: 4px;
 }
+.top-display-bar .login .form-group {
+  margin-right: 5px;
+}
 .top-display-bar .login .opacity {
   opacity: 0.5;
 }
