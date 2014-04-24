@@ -1,3 +1,4 @@
+var isLoggedIn = Config.IsLoggedIn;
 define([
 	'backbone',
 
@@ -6,7 +7,6 @@ define([
 
 
 ], function(Backbone, TmplTopbarView, TmplUserMenu) {
-	var isLoggedIn = Config.IsLoggedIn;
 
 	var Login = Backbone.View.extend({
 
