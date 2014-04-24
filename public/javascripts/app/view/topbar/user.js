@@ -35,7 +35,7 @@ define([
 			setTimeout(function() {
 				this.$('.login').css('opacity', 1);
 				this.keyup();
-			}.bind(this), 100);
+			}.bind(this), 500);
 		},
 
 		buildView: function() {

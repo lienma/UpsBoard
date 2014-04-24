@@ -37,6 +37,8 @@ Cache.prototype.getItem = function(filename, fetchItem) {
 				fetch();
 			} else {
 				var file = fs.readFileSync(filePath);
+				
+				log.debug('Sending image from cache.');
 
 				defer.resolve(file);
 			}
