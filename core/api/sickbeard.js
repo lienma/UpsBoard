@@ -43,9 +43,10 @@ SickBeard.prototype.getPage = function(cmd, filters) {
 	var promise = when.defer();
 
 	var filters = (filters) ? filters : '';
-	var url = this.url + '/api/' + this.apiKey + '/?cmd=' + cmd + '&' + filters;
+	var url = this.url + 'api/' + this.apiKey + '/?cmd=' + cmd + '&' + filters;
 
 	request({
+		rejectUnauthorized: false,
 		uri: url,
 		json: true,
 	}, function(err, res, body) {

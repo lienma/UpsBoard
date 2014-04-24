@@ -1,9 +1,9 @@
 Change Log
 
-0.1.0
+0.1.0 - 4/23/2014
 	New:
 		User Account. In a future release, you'll be able to have multiple user accounts.
-		SABnzbd! A semi-fully functional SABnzbd client. There are two things that I'm still working, setting the download speed and adding a nzb file. Those will come in a future release.
+		SABnzbd! A semi-fully functional SABnzbd client. There are two things that I'm still working on, setting the download speed and adding a nzb file to sab. These will come in a future release.
 
 	Updated:
 		TV Shows Airing Soon module has been updated with a new look.
@@ -14,7 +14,7 @@ Change Log
 	There are probably plenty other changes that I can't remember right now but it's here.
 	
 
-0.0.4
+0.0.4 - 1/22/2014
 	New:
 		New format for total drive space in config.js file. New format is (Number)(Unit). Unit being one of the following: B, KB, MB, GB, TB, PB or EB.
 		Added an extra padding to bottom. Now you can see everything on a mobile device and not have the bottom bar cut off the things at the bottom of the page.
@@ -27,7 +27,7 @@ Change Log
 		Currently watching now updates correctly.
 		Recently added movies and currently watching show properly on mobile devices.
 
-0.0.3
+0.0.3 - 1/15/2014
 	New:
 		New option in config.js, runningMode, You can select either "normal" or "debug"
 			normal - In normal mode, your http log request would be more detailed, and it will correctly give the proper IP address, when the app is placed behind a proxy.
@@ -38,7 +38,7 @@ Change Log
 		Fixed a bug when getting an image from PMS, when it is located on a different machine.
 		Fixed the drive space calculations. Now the drive spaces should be correct.
 
-0.0.2
+0.0.2 - 1/10/2014
 	New:
 		Added new options to bandwidth settings:
 			vnstatPath, allows you to specify the vnstat path if it is not the default location.

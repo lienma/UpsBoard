@@ -82,6 +82,7 @@ Plex.prototype.getPage = function(url, options) {
 	}
 
 	var resOptions = {
+		rejectUnauthorized: false,
 		uri: this.url + url,
 		headers: { 'X-Plex-Token': this.token },
 		encoding: null

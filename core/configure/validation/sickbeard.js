@@ -41,7 +41,14 @@ module.exports 	= function validateSickbeard(data) {
 	if(_.isString(sbData.url)) {
 		options.url = sbData.url;
 	} else {
-		options.url = options.protocol + options.host + ':' + options.port + '/' + options.webRoot;
+		options.url = options.protocol + options.host;
+		if(options.port) {
+			options.url += ':' + options.port;
+		}
+		options.url += options.webRoot == '/' ? options.webRoot : ('/' + options.webRoot);
+	}
+	if(options.url.slice(-1) != '/') {
+		options.url += '/';
 	}
 
 	var sickbeardCacheFolder = path.join(paths.cache, 'sickbeard');

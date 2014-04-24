@@ -10,10 +10,6 @@ var log 	= require(paths.logger)('SABNZBD')
 
 function Sabnzbd(sabConfig) {
 
-	this.protocol 	= sabConfig.protocol;
-	this.host		= sabConfig.host;
-	this.port 		= sabConfig.port;
-	this.webRoot 	= (sabConfig.webRoot) ? sabConfig.webRoot : '/';
 	this.url 		= sabConfig.url;
 	this.apiKey 	= sabConfig.apiKey;
 }
@@ -28,15 +24,18 @@ Sabnzbd.prototype.getPage = function(cmd, filters) {
 		});
 	}
 
-	var url = this.url + '/api?mode=' + cmd + params + '&output=json&apikey=' + this.apiKey;
+	var url = this.url + 'api?mode=' + cmd + params + '&output=json&apikey=' + this.apiKey;
 
 	request({
+		rejectUnauthorized: false,
 		uri: url,
 		json: true
 	}, function(err, res, body) {
 		if(err) {
-			var errReject = new Error('REQUEST');
+			var errReject = new Error('SABNZBD_REQUEST');
 			errReject.detail = err;
+			errReject.url = url;
+			errReject.body = body;
 			return defer.reject(errReject);
 		}
 		if(body && _.isObject(body)) {

@@ -1,7 +1,7 @@
 {
   "name": "UpStatsBoard",
   "description": "Usenet + plex + Stats Board, allows you to monitor your usenet services (SABnzbd+, Sick Beard, & CouchPotato), Plex, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage)",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node app.js"
