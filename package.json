@@ -26,7 +26,7 @@
 	"nib":				"1.0.2",
 	"passport":			"0.2.0",
 	"passport-local":	"1.0.0",
-	"bcrypt-nodejs":	"1.4.3",
+	"bcrypt-nodejs":	"0.0.3",
 	"gm":				"1.14.2",
 
 	"ssh2":				"0.2.21",
