@@ -82,7 +82,7 @@ ul.action-menu li a:focus {
   text-decoration: none;
 }
 ul.action-menu li a.with-icon {
-  pading: 0;
+  padding: 0;
 }
 .panel-body.stat {
   padding: 7px;
@@ -320,6 +320,8 @@ ul.action-menu li a.with-icon {
   border: 1px solid #3d763e;
 }
 .panel.upcoming-shows table td .date-label span {
+  transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
   -webkit-transform: rotate(-90deg);
   display: inline-block;
   width: 60px;
@@ -916,8 +918,10 @@ ul.action-menu li a.with-icon {
   text-decoration: none;
 }
 .rotate-icon {
+  animation: rotateThis 0.5s infinite;
   -webkit-animation: rotateThis 0.5s infinite;
 }
 .rotate-icon-slow {
+  animation: rotateThis 1.5s infinite;
   -webkit-animation: rotateThis 1.5s infinite;
 }

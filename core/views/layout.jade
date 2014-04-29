@@ -9,7 +9,8 @@ html(lang='en')
     link(rel='stylesheet', href=locals.webRoot + '/stylesheets/font-awesome.css')
     link(rel='stylesheet', href=locals.webRoot + '/stylesheets/style.css')
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Alegreya+Sans:400,500,700', type='text/css')
-    style @-webkit-keyframes rotateThis { from { -webkit-transform: scale( 1 ) rotate( 0deg ); } to { -webkit-transform: scale( 1 ) rotate( 360deg ); } }
+    style @-webkit-keyframes rotateThis { from { -webkit-transform: scale(1) rotate(0deg); } to { -webkit-transform: scale(1) rotate(360deg); } }
+    style @keyframes rotateThis { from { transform: scale(1) rotate(0deg); } to { transform: scale(1) rotate(360deg); } }
 
     script(src=locals.webRoot + '/javascripts/libs/require/require.js', data-main=locals.webRoot + '/javascripts/main')
 
