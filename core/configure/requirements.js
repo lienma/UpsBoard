@@ -17,15 +17,11 @@ module.exports	= function requirements(app) {
 
 		var promises = parallel(checks, data);
 		promises.then(function(results) {
-console.log('good', results);
 			app._GrapichsMagick = results[0];
 
 			log.info('All requirement checks have passed!'.green);
 			defer.resolve(data);
-		}).otherwise(function(reason) {
-
-console.log('bad', reason);
-		});
+		}).otherwise(defer.reject);
 
 
 		return defer.promise;
