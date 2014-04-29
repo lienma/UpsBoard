@@ -1,5 +1,13 @@
 Change Log
 
+0.1.1 - 4/29/2014
+	Added:
+		Added a warning to the startup if GraphicsMagick is not installed. If GraphicsMagick is not installed then the images do not get resized before sending to user's browsers.
+	Fixed:
+		Changed bcrypt to bcrpyt-nodejs, this does not require bcrypt to be complied and installed.
+		Fixed the css for firefox.
+
+
 0.1.0 - 4/23/2014
 	New:
 		User Account. In a future release, you'll be able to have multiple user accounts.
