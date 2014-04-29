@@ -69,6 +69,8 @@ function create(server, label) {
 		remote: (server.remote) ? true : false
 	};
 
+// is local use os type.
+
 	return when.resolve({server: server, options: options});
 }
 

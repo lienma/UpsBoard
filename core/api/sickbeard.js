@@ -93,7 +93,7 @@ SickBeard.prototype.getPoster = function(showId, options) {
 	
 	var url = this.url + '/api/' + this.apiKey + '/?cmd=show.getposter&tvdbid=' + showId;
 
-	function getImage(dontWriteImage) {
+	function getImage() {
 		var defer = when.defer();
 
 		request({uri: url, timeout: 10000, encoding: null}, function(err, res, body) {
@@ -109,6 +109,7 @@ SickBeard.prototype.getPoster = function(showId, options) {
 
 	Cache.getItem('poster-' + showId, getImage).then(function(image) {
 		if(height || width) {
+			log.debug('Resizing image with sizes:', height, width);
 			resizeImage(image);
 		} else {
 			promise.resolve(image);

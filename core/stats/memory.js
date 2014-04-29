@@ -20,8 +20,8 @@ var Memory = function(options) {
 	_.defaults(options, Memory.defaultOptions);
 	this.options = options;
 
-	this.default = (this.options.default) ? this.options.default : false;	
-	this.os = (this.remote) ? this.options.remote : os.type().toLowerCase();
+	this.default = (this.options.default) ? this.options.default : false;
+	this.os = (this.remote) ? this.options.remote : process.platform;
 
 	this.command = Command(options.remote);
 };
@@ -43,8 +43,8 @@ Memory.prototype.getMemory = function() {
 
 	log.debug('Getting memory for', this.label.yellow);
 
-	if(this.os == 'mac') {
-		log.debug('UpsBoard currently doesn\'t support getting memory on mac\'s, I\'m working on it :)');
+	if(this.os != 'linux') {
+		log.error('UpsBoard currently doesn\'t support getting memory on mac\'s or windows, I\'m working on it :)');
 
 		return when.resolve({
 			_id:		self._id,

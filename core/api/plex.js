@@ -239,6 +239,7 @@ Plex.prototype.getImage = function(options) {
 
 	Cache.getItem('img-' + hash, getImage).then(function(image) {
 		if(height || width) {
+			log.debug('Resizing image with sizes:', height, width);
 			resizeImage(image);
 		} else {
 			promise.resolve(image);

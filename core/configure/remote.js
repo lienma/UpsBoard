@@ -9,6 +9,7 @@ var appRoot 	= path.resolve(__dirname, '../../')
 var privateKeys	= {};
 
 function validate(data) {
+
 	if(!data.server.remote) {
 		data.options.remote = false;
 		return when.resolve(data);

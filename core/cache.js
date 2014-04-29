@@ -17,7 +17,7 @@ function Cache(section) {
 };
 
 Cache.prototype.getItem = function(filename, fetchItem) {
-	var defer = when.defer(), self = this;
+	var defer = when.defer();
 
 	var filePath = this.cache + '/' + filename;
 	var exist = fs.existsSync(filePath);
@@ -37,9 +37,8 @@ Cache.prototype.getItem = function(filename, fetchItem) {
 				fetch();
 			} else {
 				var file = fs.readFileSync(filePath);
-				
-				log.debug('Sending image from cache.');
 
+				log.debug('Sending image from cache.');
 				defer.resolve(file);
 			}
 		});
@@ -56,7 +55,7 @@ Cache.prototype.getItem = function(filename, fetchItem) {
 	}
 
 	function save(file) {
-		log.debug('Saving item to cache ', logFilename.cyan + '.');
+		log.debug('Saving item to cache', logFilename.cyan + '.');
 		fs.writeFileSync(filePath, file);
 		return when.resolve(file);
 	}
