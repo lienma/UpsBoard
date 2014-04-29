@@ -9,7 +9,7 @@ var express			= require('express')
   , path			= require('path')
   , os				= require('os')
   , when			= require('when')
-  , bcrypt			= require('bcrypt')
+  , bcrypt			= require('bcrypt-nodejs')
   , expressUglify	= require('express-uglify');
 
 
@@ -50,7 +50,7 @@ if(os.type() == 'Windows_NT') {
 
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 
-Configure().then(function(conf) {
+Configure(app).then(function(conf) {
 	app.config = conf;
 
 	app.isMacOs = (os.type() == 'Linux') ? false : true;

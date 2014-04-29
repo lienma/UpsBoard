@@ -1,7 +1,7 @@
 {
   "name": "UpStatsBoard",
   "description": "Usenet + plex + Stats Board, allows you to monitor your usenet services (SABnzbd+, Sick Beard, & CouchPotato), Plex, & your system (CPU Usage, Memory Usage, Bandwidth Usage, & Disk Space Usage)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "start": "node app.js"
@@ -26,7 +26,7 @@
 	"nib":				"1.0.2",
 	"passport":			"0.2.0",
 	"passport-local":	"1.0.0",
-	"bcrypt":			"0.7.7",
+	"bcrypt-nodejs":	"1.4.3",
 	"gm":				"1.14.2",
 
 	"ssh2":				"0.2.21",

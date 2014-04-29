@@ -86,44 +86,20 @@ SickBeard.prototype.getShowsStats = function(callback) {
 
 SickBeard.prototype.getPoster = function(showId, options) {
 	var promise = when.defer();
-	var self = this;
 
-	var width = (options.width) ? options.width : false
-	  , height = (options.height) ? options.height : false;
-	
-	var url = this.url + '/api/' + this.apiKey + '/?cmd=show.getposter&tvdbid=' + showId;
-
-	function getImage() {
+	Cache.getItem('poster-' + showId, function() {
 		var defer = when.defer();
 
-		request({uri: url, timeout: 10000, encoding: null}, function(err, res, body) {
+		request({uri: this.url + '/api/' + this.apiKey + '/?cmd=show.getposter&tvdbid=' + showId, timeout: 10000, encoding: null}, function(err, res, body) {
 			if (!err && res.statusCode == 200) {
 				defer.resolve(body);
 			} else {
-				promise.reject(err);
+				defer.reject(err);
 			}
 		});
 
 		return defer.promise;
-	}
-
-	Cache.getItem('poster-' + showId, getImage).then(function(image) {
-		if(height || width) {
-			log.debug('Resizing image with sizes:', height, width);
-			resizeImage(image);
-		} else {
-			promise.resolve(image);
-		}
-	});
-
-	function resizeImage(image) {
-		gm(image).resize(width, height).toBuffer(function(err, buffer) {
-			if(err) {
-				return promise.reject(err);
-			}
-			promise.resolve(buffer);
-		});
-	}
+	}.bind(this)).then(promise.resolve);
 
 	return promise.promise;
 };

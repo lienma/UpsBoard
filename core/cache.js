@@ -24,7 +24,7 @@ Cache.prototype.getItem = function(filename, fetchItem) {
 
 	var logFilename = this.section + '/' + filename;
 
-	log.debug('Is', logFilename.cyan, 'cache?', (exist) ? 'Yes'.green : 'No'.red);
+	log.debug('Is', logFilename.cyan, 'in cache?', (exist) ? 'Yes'.green : 'No'.red);
 	if(exist) {
 		fs.stat(filePath, function(err, stats) {
 			if(err)	return fetch();

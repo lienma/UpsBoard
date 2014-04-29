@@ -1,6 +1,8 @@
 var _ 			= require('underscore')
   , path 		= require('path')
-  , moment		= require('moment');
+  , moment		= require('moment')
+  , gm			= require('gm')
+  , when		= require('when');
 
 var appRoot 	= path.resolve(__dirname, '../../')
   , paths 		= require(appRoot + '/core/paths')
@@ -64,12 +66,32 @@ console.log(reason);
 				}
 			}
 
+
+			function resize(image) {
+				var height	= req.param('height') ? req.param('height') : false
+				  , width	= req.param('width') ? req.param('width') : false;
+
+				if(height || width) {
+					if(req.app._GrapichsMagick) {
+						log.debug('Resizing image with sizes:', height, 'x', width);
+
+						var promise	= when.defer();
+						gm(image).resize(width, height).toBuffer(function(err, buffer) {
+							if(err) {
+								return promise.reject(err);
+							}
+							promise.resolve(buffer);
+						});
+						return promise.promise;
+					}
+
+					log.warn('GraphicsMagick is not enabled, resizing can not be completed. Send full image to user\'s browser');
+				}
+				return when.resolve(image);
+			}
+
 			var plex = req.app.config.plex;
-			plex.getImage({
-				location: req.param('location'),
-				width: req.param('width'),
-				height: req.param('height')
-			}).then(function(image) {
+			plex.getImage(req.param('location')).then(resize).then(function(image) {
 				res.type('jpeg');
 
 				res.set('Last-Modified', (new Date()).toUTCString());
@@ -266,10 +288,7 @@ console.log(reason);
 			}
 
 			
-			sb.getPoster(req.param('showId'), {
-				width: req.param('width'),
-				height: req.param('height')
-			}).then(function(image) {
+			sb.getPoster(req.param('showId')).then(resize).then(function(image) {
 				res.type('jpeg');
 
 				res.set('Last-Modified', (new Date()).toUTCString());
@@ -279,6 +298,29 @@ console.log(reason);
 			}).otherwise(function(reason) {
 console.log(reason);
 			});
+
+			function resize(image) {
+				var height	= req.param('height') ? req.param('height') : false
+				  , width	= req.param('width') ? req.param('width') : false;
+
+				if(height || width) {
+					if(req.app._GrapichsMagick) {
+						log.debug('Resizing image to sizes:', height, 'x', width);
+
+						var promise	= when.defer();
+						gm(image).resize(width, height).toBuffer(function(err, buffer) {
+							if(err) {
+								return promise.reject(err);
+							}
+							promise.resolve(buffer);
+						});
+						return promise.promise;
+					}
+
+					log.warn('GraphicsMagick is not enabled, resizing can not be completed. Send full image to user\'s browser');
+				}
+				return when.resolve(image);
+			}
 		},
 		upcoming: function(req, res) {
 			var sb = req.app.config.sickbeard;

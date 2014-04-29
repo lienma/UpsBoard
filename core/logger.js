@@ -88,6 +88,10 @@ Logger.prototype.info = function() {
 	this.log('INFO', getMessage(arguments));
 };
 
+Logger.prototype.warn = function() {
+	this.log('WARN', getMessage(arguments));
+};
+
 Logger.prototype.log = function(type, message) {
 	if(type == 'DEBUG' && config.runningMode != 'debug') {
 		return;
@@ -102,7 +106,7 @@ Logger.prototype.log = function(type, message) {
 	}
 
 	var logMessage = [time.cyan,
-		type[(type == 'DEBUG') ? 'grey' : (type == 'ERROR' || type == 'FATAL') ? 'red' : (type == 'INFO') ? 'green' :'white'] + spaces,
+		type[(type == 'DEBUG') ? 'grey' : (type == 'ERROR' || type == 'FATAL') ? 'red' : (type == 'INFO') ? 'green' : (type == 'WARN') ? 'yellow' : 'white'] + spaces,
 		this.module.blue,
 		'::'.cyan,
 		(type == 'FATAL') ? message.red : message

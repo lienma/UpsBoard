@@ -4,8 +4,7 @@ var request	= require('request')
   , xml2js	= require('xml2js')
   , when  	= require('when')
   , os		= require('os')
-  , _		= require('underscore')
-  , gm		= require('gm');
+  , _		= require('underscore');
 
 
 var appRoot	= path.resolve(__dirname, '../../')
@@ -212,14 +211,10 @@ Plex.prototype.getCurrentlyWatching = function() {
 	return promise.promise;
 };
 
-Plex.prototype.getImage = function(options) {
-	var promise = when.defer()
-	  , imgOptions = {}
-	  , fileCacheName = '';
-
-	var url		= options.location
-	  , height	= (options.height) ? options.height : false
-	  , width	= (options.width) ? options.width : false;
+Plex.prototype.getImage = function(url) {
+	var promise			= when.defer()
+	  , imgOptions		= {}
+	  , fileCacheName	= '';
 
 	if((url.indexOf('/library/metadata/') != 0)) {
 		var err = new Error('INVALID_LOCATION');
@@ -228,32 +223,11 @@ Plex.prototype.getImage = function(options) {
 		return promise.reject('Invalid Location');
 	}
 
-	var self = this
-	  , hash = crypto.createHash('md5').update(url).digest('hex');
+	var hash = crypto.createHash('md5').update(url).digest('hex');
 
-	function getImage() {
-		var defer = when.defer();
-		self.getPage(url).then(defer.resolve).otherwise(defer.reject);
-		return defer.promise;
-	}
-
-	Cache.getItem('img-' + hash, getImage).then(function(image) {
-		if(height || width) {
-			log.debug('Resizing image with sizes:', height, width);
-			resizeImage(image);
-		} else {
-			promise.resolve(image);
-		}
-	});
-
-	function resizeImage(image) {
-		gm(image).resize(width, height).toBuffer(function(err, buffer) {
-			if(err) {
-				return promise.reject(err);
-			}
-			promise.resolve(buffer);
-		});
-	}
+	Cache.getItem('img-' + hash, function() {
+		return this.getPage(url);
+	}.bind(this)).then(promise.resolve);
 
 	return promise.promise;
 };

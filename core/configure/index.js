@@ -1,17 +1,18 @@
-var bcrypt 		= require('bcrypt')
-  , when    	= require('when')
-  , _    		= require('underscore')
-  , fs 			= require('fs')
-  , path 		= require('path');
+var bcrypt 			= require('bcrypt-nodejs')
+  , when    		= require('when')
+  , _    			= require('underscore')
+  , fs 				= require('fs')
+  , path 			= require('path');
 
-var appRoot 	= path.resolve(__dirname, '../../')
-  , paths 		= require(appRoot + '/core/paths');
+var appRoot 		= path.resolve(__dirname, '../../')
+  , paths 			= require(appRoot + '/core/paths');
 
-var validation 	= require(paths.core + '/configure/validation')
-  , log 		= require(paths.logger)('CONFIG')
-  , configData 	= require(paths.app + '/config.js');
+var requirements	= require(paths.core + '/configure/requirements')
+  , validation 		= require(paths.core + '/configure/validation')
+  , log 			= require(paths.logger)('CONFIG')
+  , configData 		= require(paths.app + '/config.js');
 
-function Config() {
+function Config(app) {
 	var promise = when.defer();
 
 	log.debug('Loading configuration data.')
@@ -32,7 +33,8 @@ function Config() {
 		'Weather',
 	];
 
-	var config = getConfigData();
+	var config = getConfigData().then(requirements(app));
+
 	validators.forEach(function(validator) {
 		config = config.then(validation[validator]);
 	});

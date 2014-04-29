@@ -31,7 +31,7 @@ function Command(options) {
 					case 'CONNECTION_FAILED':
 					case 'CONNECTION_TIMEOUT':
 					case 'SERVER_OFFLINE':
-						log.error('Command failed to sent.', e.reason, '(ref #' + refId + ')');
+						log.error('Command failed to send.', e.reason.grey, '(ref #' + refId + ')');
 						break;
 				}
 
@@ -51,7 +51,7 @@ function Command(options) {
 console.log('Command Err:'.red, err);
 					return promise.reject(err);
 				}
-				var logMsg = 'Finished executing command.'.yellow + '(ref #' + refId + ', ' + strRemote + ')';
+				var logMsg = 'Finished executing command. (ref #' + refId + ', ' + strRemote + ')';
 
 				if(typeof stream === 'string') {
 					log.debug(logMsg);
@@ -134,7 +134,7 @@ function Connect(options) {
 			} else {
 				var err = new Error('SERVER_OFFLINE');
 				err.reason = 'Could not reach ' + this.strHost;
-				log.error('Failed to connection to server', this.strHost);
+				log.warn('Failed to connection to server', this.strHost);
 				promise.reject(err);
 			}
 		}.bind(this)).otherwise(promise.reject);
