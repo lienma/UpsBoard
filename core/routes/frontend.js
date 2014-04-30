@@ -51,6 +51,8 @@ function routerIndex(req, res, status) {
 		message: message,
 		messageDegree: messageDegree,
 
+		seed: process.pid,
+
 		token: req.csrfToken(),
 
 		title: 'UpStats Board',

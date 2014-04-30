@@ -136,6 +136,30 @@ console.log(reason);
 	},
 
 	sabnzbd: {
+		limit: function(req, res) {
+			var sab = req.app.config.sabnzbd;
+
+			if(!(req.isAuthenticated() || sab.anyoneCanUse)) {
+				return res.json({error: 'Permission Denied'});
+			}
+
+			if(!sab.enabled) {
+				return res.json({error: 'Module Disabled'});
+			}
+
+			var speed = req.query.speed ? parseInt(req.query.speed) : 0;
+
+			sab.setSpeedLimit(speed).then(function(data) {
+				res.json(data);
+			}).otherwise(function(reason) {
+				if(reason.message == 'INVALID_NUMBER') {
+					return res.json({error: 'Is not a real number'});
+				}
+
+console.log(reason.message);
+			});
+		},
+
 		pauseQueue: function(req, res) {
 			var sab = req.app.config.sabnzbd;
 

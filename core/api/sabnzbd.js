@@ -162,6 +162,15 @@ Sabnzbd.prototype.deleteHistory = function(nzb_id, del_files) {
 };
 
 
+Sabnzbd.prototype.setSpeedLimit = function(speed) {
+	if(!_.isNumber(speed) && speed != 0) {
+		var err = new Error('INVALID_NUMBER');
+		return when.reject(err);
+	}
+
+	return this.getPage('config', {'name': 'speedlimit', 'value': speed});
+};
+
 Sabnzbd.prototype.ping = function() {
 	return this.getPage('qstatus');
 };
