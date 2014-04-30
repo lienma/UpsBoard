@@ -59,6 +59,7 @@ module.exports 	= function validateSabnzbd(data) {
 		log.info('Validated'.green, name.green, 'configuration'.green);
 		data.config.sabnzbd = sabnzbd;
 		data.config.sabnzbd.enabled = true;
+		data.config.sabnzbd.anyoneCanUse = (sabData.anyoneCanUse == true) ? true : false;
 		defer.resolve(data);
 
 	}).otherwise(function(reason) {

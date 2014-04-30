@@ -152,13 +152,16 @@ var config = module.exports = {
 
 	"sabnzbd": {
 		// Set to True if you want to disable sabnzbd from upsboard.
-		"disable": false,
+		"disable":			false,
 
-		"protocol": "http://",
-		"host": 	"",
-		"port": 	8080,
-		"webRoot": 	"",
-		"apiKey": 	""
+		// Optional, Allow user to logged out and use sabnzbd
+		"anyoneCanUse": 	false,
+
+		"protocol":			"http://",
+		"host":				"",
+		"port":				8080,
+		"webRoot":			"",
+		"apiKey":			""
 	},
 
 	"sickbeard": {

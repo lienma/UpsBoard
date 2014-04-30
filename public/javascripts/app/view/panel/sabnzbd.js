@@ -20,7 +20,7 @@ define([
 
 
 		initialize: function() {
-			if(!Config.IsLoggedIn) return;
+			if(!Config.CanUse.SABnzbd) return;
 
 			this.panel = new Model();
 

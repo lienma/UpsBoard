@@ -136,6 +136,7 @@ Configure(app).then(function(conf) {
 	app.get(webRoot + '/api/plex/recentlyAired', routes.api.plex.recentlyAired);
 
 	app.get(webRoot + '/api/sabnzbd/history', routes.api.sabnzbd.getHistory);
+	app.get(webRoot + '/api/sabnzbd/limit', routes.api.sabnzbd.limit);
 	app.get(webRoot + '/api/sabnzbd/pauseQueue', routes.api.sabnzbd.pauseQueue);
 	app.get(webRoot + '/api/sabnzbd/queue', routes.api.sabnzbd.getQueue);
 	app.get(webRoot + '/api/sabnzbd/resumeQueue', routes.api.sabnzbd.resumeQueue);

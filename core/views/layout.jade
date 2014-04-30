@@ -4,18 +4,19 @@ html(lang='en')
     title= title
     meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
     meta(name='viewport', content='width=device-width')
-    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap.css')
-    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap-theme.css')
-    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/font-awesome.css')
-    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/style.css')
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap.css?' + locals.seed)
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap-theme.css?' + locals.seed)
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/font-awesome.css?' + locals.seed)
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/style.css?' + locals.seed)
     link(rel='stylesheet', href='http://fonts.googleapis.com/css?family=Alegreya+Sans:400,500,700', type='text/css')
     style @-webkit-keyframes rotateThis { from { -webkit-transform: scale(1) rotate(0deg); } to { -webkit-transform: scale(1) rotate(360deg); } }
     style @keyframes rotateThis { from { transform: scale(1) rotate(0deg); } to { transform: scale(1) rotate(360deg); } }
 
-    script(src=locals.webRoot + '/javascripts/libs/require/require.js', data-main=locals.webRoot + '/javascripts/main')
+    script(src=locals.webRoot + '/javascripts/libs/require/require.js?' + locals.seed, data-main=locals.webRoot + '/javascripts/main')
 
     script(type='text/javascript').
       var Config = {
+        Seed: #{locals.seed},
         IdCount: 0,
         IsLoggedIn: #{locals.isLoggedIn},
         IsMacOs: #{locals.isMacOs},
@@ -44,6 +45,9 @@ html(lang='en')
         Enabled: {
           SABnzbd: #{locals.enabledSabnzbd},
           SickBeard: #{locals.enabledSickBeard}
+        },
+        CanUse: {
+          SABnzbd: #{locals.canUseSabnzbd},
         }
       };
 

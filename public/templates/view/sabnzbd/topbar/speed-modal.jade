@@ -1,13 +1,12 @@
 .modal.fade.modal-speed-limit(tabindex='-1', role='dialog', aria-labelledby='', aria-hidden='true')
   .modal-dialog.modal-sm
     .modal-content
-      .pull-right(style='color: #f00;font-size: 85%;') Coming Soon
       form(role='form')
         .form-group(style='margin-bottom: 0')
           label(for='txtMaxDownloadSpeed') Max Download Speed
-          input(type='text', placeholder='Max Download Speed').form-control#txtMaxDownloadSpeed
+          input(type='number', placeholder='Max Download Speed', value!='<%= speedlimit %>').form-control#txtMaxDownloadSpeed
       hr
       p.button-bar
         button(type='button', data-dismiss='modal').btn.btn-sm.btn-default Close
-        button(type='button').btn.btn-sm.btn-warning Reset
-        button(type='button').btn.btn-sm.btn-primary Save Changes
+        button(type='button').btn.btn-sm.btn-warning.btn-modal-reset Reset
+        button(type='button').btn.btn-sm.btn-primary.btn-modal-save Save Changes

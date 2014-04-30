@@ -1,6 +1,7 @@
 
 require.config({
 	baseUrl: Config.WebRoot + '/javascripts',
+	urlArgs: Config.Seed,
 
 	paths: {
 		'jquery': 'libs/jquery/jquery-2.0.3',

@@ -34,6 +34,7 @@ function routerIndex(req, res, status) {
 
 	res.render('index', {
 
+		canUseSabnzbd: (config.sabnzbd.anyoneCanUse || req.isAuthenticated()),
 
 		debugStopUpdating: (config.debugStopUpdating) ? 'true' : 'false',
 
@@ -49,6 +50,8 @@ function routerIndex(req, res, status) {
 
 		message: message,
 		messageDegree: messageDegree,
+
+		seed: process.pid,
 
 		token: req.csrfToken(),
 
