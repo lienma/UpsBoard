@@ -136,7 +136,7 @@ block content
                   img(src=locals.webRoot + '/images/sab2_32.png', alt='Sabnzbd+', title='Sabnzbd+', rel='tooltip').service-icon.visible-xs
                   span.hidden-xs Sabnzbd+
 
-              - if(isLoggedIn) {
+              - if(canUseSabnzbd) {
               .panel-body
               .panel-footer(style='display:none')
               - } else {

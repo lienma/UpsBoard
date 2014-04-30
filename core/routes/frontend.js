@@ -34,6 +34,7 @@ function routerIndex(req, res, status) {
 
 	res.render('index', {
 
+		canUseSabnzbd: (config.sabnzbd.anyoneCanUse || req.isAuthenticated()),
 
 		debugStopUpdating: (config.debugStopUpdating) ? 'true' : 'false',
 

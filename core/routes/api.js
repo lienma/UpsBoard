@@ -139,7 +139,7 @@ console.log(reason);
 		pauseQueue: function(req, res) {
 			var sab = req.app.config.sabnzbd;
 
-			if(!req.isAuthenticated()) {
+			if(!(req.isAuthenticated() || sab.anyoneCanUse)) {
 				return res.json({error: 'Permission Denied'});
 			}
 
@@ -159,7 +159,7 @@ console.log(reason);
 			    limit = req.query.limit,
 			    start = req.query.start;
 
-			if(!req.isAuthenticated()) {
+			if(!(req.isAuthenticated() || sab.anyoneCanUse)) {
 				return res.json({error: 'Permission Denied'});
 			}
 
@@ -179,7 +179,7 @@ console.log(reason);
 			    limit = req.query.limit,
 			    start = req.query.start;
 
-			if(!req.isAuthenticated()) {
+			if(!(req.isAuthenticated() || sab.anyoneCanUse)) {
 				return res.json({error: 'Permission Denied'});
 			}
 
@@ -197,7 +197,7 @@ console.log(reason);
 		itemOptions: function(req, res, next) {
 			var sab = req.app.config.sabnzbd;
 
-			if(!req.isAuthenticated()) {
+			if(!(req.isAuthenticated() || sab.anyoneCanUse)) {
 				return res.json({error: 'Permission Denied'});
 			}
 
@@ -252,7 +252,7 @@ console.log(reason);
 		resumeQueue: function(req, res) {
 			var sab = req.app.config.sabnzbd;
 
-			if(!req.isAuthenticated()) {
+			if(!(req.isAuthenticated() || sab.anyoneCanUse)) {
 				return res.json({error: 'Permission Denied'});
 			}
 
