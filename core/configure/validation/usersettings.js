@@ -35,7 +35,7 @@ function password(data) {
 
 		var promise = when.defer();
 
-		bcrypt.hash(password, data.config.salt, function(err, hash) {
+		bcrypt.hash(password, data.config.salt, false, function(err, hash) {
 			if(err) return promise.reject(err);
 
 			fs.readFile(paths.app + '/config.js', function(err, file) {
