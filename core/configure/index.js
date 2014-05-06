@@ -42,7 +42,9 @@ function Config(app) {
 	config.then(function(data) {
 		log.info('Good to launch! All configuration has been validated and tested!'.green);
 
-		promise.resolve(data.config);
+		app.config = data.config;
+
+		promise.resolve(app);
 	}).otherwise(promise.reject);
 
 	return promise.promise;
