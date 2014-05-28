@@ -1,6 +1,7 @@
 var request 		= require('request')
   , when 			= require('when')
-  , path			= require('path');
+  , path			= require('path')
+  , _				= require('underscore');
 
 var appRoot 		= path.resolve(__dirname, '../../')
   , paths 			= require(appRoot + '/core/paths');
@@ -124,11 +125,12 @@ exports.weather = function(req, res) {
 	request({
 		uri: url, json: true, timeout: 10000
 	}, function(err, resp, body) {
-		if(err || !body || !body.currently) {
-			res.json({});
+
+		if(err || !_.isObject(body) || !_.isObject(body.currently)) {
+			return res.json({});
 		}
 
-		res.json({
+		return res.json({
 			currentSummary: body.currently.summary,
 			currentIcon: body.currently.icon,
 			currentTemp: Math.round(body.currently.temperature),

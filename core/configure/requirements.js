@@ -31,22 +31,25 @@ module.exports	= function requirements(app) {
 function GraphicsMagick(data) {
 	var defer = when.defer();
 
-	log.debug('Checking to see if GrpahicsMagick is present and meets minimum requirements.');
+	log.debug('Checking to see if GraphicsMagick is present and meets minimum requirements.');
 
 	var bin = (data.data.gmPath) ? data.data.gmPath : 'gm';
+	var cmd = bin + ' -version';
 
-	exec(bin + ' -version', function(err, stdout, stderr) {
+	log.debug('Runnging this command: ', cmd);
+	exec(cmd, function(err, stdout, stderr) {
 		if(err) {
 			if(/not found/.test(err.message)) {
-				log.error('GraphicsMagick was not detected on the machine. We are not going to use GrpahicsMagick to resize images. This will cause full size images being sent to the user\'s browser.');
+				log.error('GraphicsMagick was not detected on the machine. We are not going to use GraphicsMagick to resize images. This will cause full size images being sent to the user\'s browser.');
 				return defer.resolve(false);
 			} else {
 				return defer.reject(err);
 			}
 		}
 
+		log.debug('Results from this command, ', cmd, ':', stdout);
 		var find = stdout.split('\n')[0].match(/GraphicsMagick ((\d+).(\d+).(\d+))/);
-		if(!(find[2] >= 1 && find[3] >= 3)) {
+		if(find.length == 3 && !(find[2] >= 1 && find[3] >= 3)) {
 			log.warn('The version of', find[0], 'is outdated, it may not work properly. The minimum required version is 1.3.x');
 		}
 

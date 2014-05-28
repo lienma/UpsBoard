@@ -42,14 +42,17 @@ Plex.prototype.getMyPlexToken = function() {
 	};
 
 	request.post('https://my.plexapp.com/users/sign_in.xml', { headers: headers }, function(err, res, body) {
-		if(err) return promise.reject(err);
 
-		if(body.substr(0, 5) != '<?xml') { //>
-			var err = new Error('Error gettin plex token; Response not xml format.');
-			if(typeof body === 'string') {
-				err.details = body
+		if(err || body.substr(0, 5) != '<?xml') { //>
+			var throwError = new Error('Error gettin plex token; Response not xml format.');
+			if(err) {
+				throwError.err = err;
 			}
-			promise.reject(err);
+
+			if(typeof body === 'string') {
+				throwError.details = body
+			}
+			return promise.reject(throwError);
 		}
 
 		var parser = new xml2js.Parser({ mergeAttrs: true });

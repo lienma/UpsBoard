@@ -12,9 +12,9 @@ function app() {
 	var child = new (forever.Monitor)('upsboard.js', {
 		'silent':	true,
 		'max':		1,
-		'logFile':	'logs/log.forever',
-		'outFile':	'logs/out.forever',
-		'errFile':	'logs/err.forever'
+		//'logFile':	'logs/log.forever',
+		//'outFile':	'logs/out.forever',
+		//'errFile':	'logs/err.forever'
 	});
 
 	child.on('stderr', function(data) {
