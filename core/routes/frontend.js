@@ -16,20 +16,13 @@ exports.index = function(req, res, next) {
 };
 
 function routerIndex(req, res, status) {
-	var message = false, messageDegree = -1;
 
-	switch(status) {
-		case 'LOGIN_SUCCESSFUL':
-			//message = 'Login was successful!';
-			//messageDegree = 1;
-			break;
-
-		case 'LOGIN_FAILED':
-			message = 'Login Failed! Please check the username and password and try again.';
-			messageDegree = 2;
-			break;
+	if(req.session.message) {
+		var status = req.session.message;
+		req.session.message = false;
 	}
 
+	var message = getMessage(status);
 	var config = req.app.config;
 
 	res.render('index', {
@@ -49,7 +42,6 @@ function routerIndex(req, res, status) {
 		isMacOs: req.app.isMacOs,
 
 		message: message,
-		messageDegree: messageDegree,
 
 		seed: process.pid,
 
@@ -57,12 +49,14 @@ function routerIndex(req, res, status) {
 
 		title: 'UpStats Board',
 
+		updateMsg: req.app.updater.updateMsg(),
+
 		weatherEnabled: (config.weather.enabled) ? 'true' : 'false',
 		weatherLat: config.weather.latitude,
 		weatherLocation: config.weather.latitude + ',' + config.weather.longitude,
 		weatherLong: config.weather.longitude,
 
-		webRoot: (config.webRoot == '/') ? '' : config.webRoot,
+		webRoot: (config.webRoot == '/') ? '' : config.webRoot
 	});
 };
 
@@ -78,9 +72,51 @@ exports.login = function(req, res, next) {
 	})(req, res, next);
 };
 
-exports.install = function(req, res) {
-	res.render('install', {
-		title: 'Installing UpStats Board',
-		webRoot: (req.app.config.webRoot == '/') ? '' : req.app.config.webRoot
+exports.update = function(req, res, next) {
+	if(req.isAuthenticated()) {
+		if(req.param('pid') == process.pid) {
+			req.app.updater.checkForUpdate().then(function(needUpdate) {
+				if(needUpdate) {
+
+					res.render('update', {
+						seed: process.pid,
+						title: 'Updating UpsBoard',
+						webRoot: (req.app.config.webRoot == '/') ? '' : req.app.config.webRoot
+					});
+
+					req.app.updater.doUpdate();
+				} else {
+					req.session.message = 'NO_UPDATE_NEEDED';
+					res.redirect(res.app.config.webRoot + '/');
+				}
+			});
+		} else {
+			res.redirect(res.app.config.webRoot + '/');
+		}
+	} else {
+		req.session.message = 'UPDATE_NEED_LOGIN';
+		res.redirect(res.app.config.webRoot + '/');
+	}
+};
+
+exports.alive = function(req, res, next) {
+	res.json({
+		pid: process.pid
 	});
 };
+
+function getMessage(status) {
+	switch(status) {
+		case 'LOGIN_FAILED':
+			return ['error', 'Login Failed! Please check the username and password and try again.'];
+
+		case 'NO_UPDATE_NEEDED':
+			return ['info', 'There is no update available.'];
+
+		case 'UPDATE_NEED_LOGIN':
+			return ['error', 'You must login to perfrom an update.'];
+
+	}
+	return false;
+};
+

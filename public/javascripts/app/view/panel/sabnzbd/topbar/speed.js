@@ -35,7 +35,9 @@ define([
 			this.modal.modal();
 			this.modal.on('hidden.bs.modal', function(event) {
 				$(event.target).remove();
-			});
+			}).on('shown.bs.modal',  function() {
+				$(this.modal.find('input')).focus();
+			}.bind(this));
 
 			$(this.modal.find('.btn-modal-reset')).click(this.btnReset.bind(this));
 			$(this.modal.find('.btn-modal-save')).click(this.btnSave.bind(this));

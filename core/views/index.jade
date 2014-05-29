@@ -61,13 +61,22 @@ block content
       .user
 
   .body.container
+    - if(updateMsg && isLoggedIn) {
+      .alert.alert-info
+        | !{locals.updateMsg}
+    - }
+
     - if(message) {
-      - if(messageDegree == 1) {
+      - if(message[0] == 'success') {
         .alert.alert-success
           button(type='button', data-dismiss='alert', aria-hidden='true').close &times;
           | #{locals.message}
-      - } else if(messageDegree == 2) {
+      - } else if(message[0] == 'error') {
         .alert.alert-danger
+          button(type='button', data-dismiss='alert', aria-hidden='true').close &times;
+          | #{locals.message}
+      - } else if(message[0] == 'info') {
+        .alert.alert-info
           button(type='button', data-dismiss='alert', aria-hidden='true').close &times;
           | #{locals.message}
       - }

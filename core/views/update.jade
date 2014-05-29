@@ -1,0 +1,20 @@
+doctype html
+html(lang='en')
+  head
+    title= title
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap.css?' + locals.seed)
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/bootstrap-theme.css?' + locals.seed)
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/font-awesome.css?' + locals.seed)
+    link(rel='stylesheet', href=locals.webRoot + '/stylesheets/style.css?' + locals.seed)
+    link(rel='stylesheet', href='//fonts.googleapis.com/css?family=Alegreya+Sans:400,500,700', type='text/css')
+    style @-webkit-keyframes rotateThis { from { -webkit-transform: scale(1) rotate(0deg); } to { -webkit-transform: scale(1) rotate(360deg); } }
+    style @keyframes rotateThis { from { transform: scale(1) rotate(0deg); } to { transform: scale(1) rotate(360deg); } }
+
+    script(src=locals.webRoot + '/javascripts/libs/jquery/jquery-2.0.3.js?' + locals.seed)
+    script(type='text/javascript').
+      var Config = { Seed: #{locals.seed}, WebRoot: '#{locals.webRoot}' };
+    script(src=locals.webRoot + '/javascripts/update.js?' + locals.seed)
+  body
+    .jumbotron
+      h1 Updating UpsBoard
+        i.fa.fa-refresh.fa-spin
