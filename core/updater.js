@@ -179,11 +179,9 @@ Updater.prototype.checkForUpdate = function() {
 };
 
 Updater.prototype.doUpdate = function() {
-	//return this.cmd('pull origin ' + this.branch).then(function() {
-setTimeout(function() {
+	return this.cmd('pull origin ' + this.branch).then(function() {
 		console.log('RESTART:' + process.pid);
-}, 1000);
-	//});
+	});
 };
 
 module.exports = Updater;
