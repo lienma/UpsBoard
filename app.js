@@ -9,7 +9,7 @@ var log				= require(paths.logger)('LAUNCHER');
 
 var restart			= false;
 function app() {
-	var child = new (forever.Monitor)('upsboard.js', {
+	var child = new (forever.Monitor)(appRoot + '/upsboard.js', {
 		'silent':	true,
 		'max':		1,
 		//'logFile':	'logs/log.forever',

@@ -19,6 +19,7 @@ exports.bandwidth = function(req, res) {
 	getBandwidth(req).then(function(data) {
 		res.json(data);
 	}).otherwise(function(err) {
+console.log('exports.bandwidth:');
 console.log(err);
 	});
 };
@@ -27,6 +28,7 @@ exports.cpu = function(req, res) {
 	getCpu(req).then(function(data) {
 		res.json(data);
 	}).otherwise(function(err) {
+console.log('exports.cpu:');
 console.log(err);
 	});
 };
@@ -35,6 +37,7 @@ exports.memory = function(req, res) {
 	getMemory(req).then(function(data) {
 		res.json(data);
 	}).otherwise(function(err) {
+console.log('exports.memory:');
 console.log(err);
 	});
 };
@@ -71,10 +74,12 @@ exports.disks = function(req, res) {
 			total: (loggedIn) ? total : 100
 		};
 
-		res.json(json);
+		return res.json(json);
 
 	}).otherwise(function(reason) {
-		res.json([]);
+console.log('exports.disks:');
+console.log(reason);
+		return res.json([]);
 	});
 };
 
@@ -107,9 +112,11 @@ exports.services = function(req, res) {
 			resServices.push(json);
 		}
 
-		res.json(resServices);
+		return res.json(resServices);
 	}).otherwise(function(reason) {
-		res.json([]);
+console.log('exports.services:');
+console.log(reason);
+		return res.json([]);
 	});
 };
 
@@ -193,20 +200,21 @@ function getBandwidth(req) {
 			json.push(data);
 		});
 
-		promise.resolve(json);
+		return promise.resolve(json);
 	}).otherwise(function(reason) {
+console.log('getBandwidth:');
 console.log(reason);
-		promise.resolve([]);
+		return promise.resolve([]);
 	});
 
 	return promise.promise;
 }
 
 function getCpu() {
-	var promise 	= when.defer()
+	var promise = when.defer()
 
 	CPU().then(function(data) {
-		promise.resolve(data);
+		return promise.resolve(data);
 	});
 
 	return promise.promise;
@@ -241,10 +249,11 @@ function getMemory(req) {
 			json.push(server);
 		});
 
-		promise.resolve(json);
+		return promise.resolve(json);
 	}).otherwise(function(reason) {
+console.log('getMemory:');
 console.log(reason);
-		promise.resolve([]);
+		return promise.resolve([]);
 	});
 
 	return promise.promise;

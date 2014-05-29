@@ -41,7 +41,7 @@ Plex.prototype.getMyPlexToken = function() {
 		'X-Plex-Client-Identifier': 'UpsBoard @ ' + os.hostname() 
 	};
 
-	request.post('https://my.plexapp.com/users/sign_in.xml', { headers: headers }, function(err, res, body) {
+	request.post('https://plex.tv/users/sign_in.xml', { headers: headers }, function(err, res, body) {
 
 		if(err || body.substr(0, 5) != '<?xml') { //>
 			var throwError = new Error('Error gettin plex token; Response not xml format.');
