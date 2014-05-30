@@ -47,6 +47,9 @@ define([
 
 		setupModal: function() {
 			this.modal = new MultiGraphModal({
+				useSocket: true,
+				socketName: 'memory',
+
 				collectionModel: this.model,
 
 				modelDefaults: {
@@ -75,7 +78,7 @@ define([
 				initializeBody: this.initializeBody,
 				tooltipLabel: this.tooltipLabel,
 				yAxisFormatter: this.yAxisFormatter
-			});
+			}, this.App);
 		},
 
 		updateBar: function(model) {

@@ -1,4 +1,4 @@
-var bcrypt 		= require('bcrypt-nodejs')
+var bcrypt 		= require('bcryptjs')
   , fs 			= require('fs')
   , path 		= require('path')
   , when 		= require('when')
@@ -17,7 +17,9 @@ function validate(data) {
 
 	_.each(data.data.bandwidthServers, function(server, label) {
 		 servers.push(create(server, label).then(remote).then(function(data) {
-			return when.resolve(new Bandwidth(data.options));
+			var bw = new Bandwidth(data.options);
+
+			return when.resolve(bw);
 		}));
 	});
 

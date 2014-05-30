@@ -1,4 +1,5 @@
 define([
+	'socket.io',
 	'backbone',
 
 	'app/model/serverstats',
@@ -23,6 +24,7 @@ define([
 	'app/func/intervaltimeout',
 
 ], function(
+		io,
 		Backbone,
 
 		ServerStatsModel,
@@ -56,7 +58,11 @@ define([
 			Bandwidth: new (Backbone.Collection.extend({}))
 		};
 
-		this.getServerStats();
+		this.Socket = io();
+		this.Socket.on('connect', function() {
+console.log('connected');
+		});
+
 		this.getDrives();
 
 		this._buildBars();
@@ -84,16 +90,6 @@ define([
 		if(Config.Enabled.SABnzbd) {
 			this.Panels.Sabnzbd = new PanelSabnzbd(this);
 		}
-	};
-
-	initialize.prototype.getServerStats = function() {
-		this.Models.ServerStats = new ServerStatsModel();
-
-		var fetch = function() {
-			this.Models.ServerStats.fetch();
-		};
-
-		Timeout(fetch.bind(this)).start();
 	};
 
 	initialize.prototype.getDrives = function() {

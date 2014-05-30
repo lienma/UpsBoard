@@ -9,10 +9,12 @@
   "dependencies": {
 	"body-parser":		"1.0.2",
 	"colors":			"0.6.2",
+	"connect-sqlite3":	"0.9.3",
 	"cookie-parser":	"1.0.1",
 	"cookie-session":	"1.0.1",
 	"csurf":			"1.1.0",
 	"express":			"4.0.0",
+	"express-session":	"1.2.1",
 	"express-uglify":	"0.3.1",
 	"forever-monitor":	"1.2.3",
 	"errorhandler":		"1.0.0",
@@ -21,6 +23,7 @@
 	"node-schedule":	"0.1.13",
 	"response-time":	"1.0.0",
 	"serve-static":		"1.0.4",
+	"socket.io":		"1.0.2",
 	"static-favicon":	"1.0.2",
 
 
@@ -29,7 +32,7 @@
 	"nib":				"1.0.2",
 	"passport":			"0.2.0",
 	"passport-local":	"1.0.0",
-	"bcrypt-nodejs":	"0.0.3",
+	"bcryptjs":			"0.7.12",
 	"gm":				"1.14.2",
 
 	"ssh2":				"0.2.21",

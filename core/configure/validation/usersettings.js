@@ -1,4 +1,4 @@
-var bcrypt 		= require('bcrypt-nodejs')
+var bcrypt 		= require('bcryptjs')
   , crypto		= require('crypto')
   , fs 			= require('fs')
   , path 		= require('path')

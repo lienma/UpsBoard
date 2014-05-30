@@ -8,13 +8,15 @@ define([
 
 ], function($, _, Backbone, mConfig, mDefaults, TmplGraphMulti, TmplGraphMultiItem) {
 
-	function Modal(options) {
+	function Modal(options, App) {
 		this.id					= Config.IdCount++;
 
+		this.App				= App;
 		this.activePanel		= {};
 		this.graphHistory		= {};
 		this.graphItems			= [];
 		this.modalOpened		= false;
+		this.hasBuiltTabs		= false;
 		this.previousTooltip	= null;
 		this.panels				= {};
 
@@ -33,6 +35,12 @@ define([
 	};
 
 	Modal.prototype.addTab = function(model) {
+		if(this.options.useSocket) {
+			this.App.Socket.on(this.options.socketName + ':' + model.id, function(data) {
+				model.set(data);
+			}.bind(this));
+		}
+
 		var panel = new PanelView({
 			model: model,
 			modalId: this.id,
@@ -69,6 +77,7 @@ define([
 		}.bind(this));
 
 		this.options.initialize.call(this, this.collection);
+		this.hasBuiltTabs = true;
 	};
 
 	Modal.prototype.fetch = function() {
@@ -120,6 +129,15 @@ define([
 					this.fetch();
 				}
 			}.bind(this)});
+		} else if(this.options.useSocket) {
+			this.App.Socket.on(this.options.socketName, function(data) {
+console.log('get', this.options.socketName, data);
+				this.collection.set(data);
+
+				if(!this.hasBuiltTabs) {
+					this.buildTabs();
+				}
+			}.bind(this));
 		} else {
 			this.options.collectionModel.on('change:collection', function(model) {
 				this.collection.set(model.get('collection'));

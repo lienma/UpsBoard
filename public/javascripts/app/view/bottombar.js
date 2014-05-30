@@ -36,14 +36,14 @@ define([
 					'title': 'Memory',
 					'mTitle': 'Memory History & Information',
 					'class': 'col-md-3',
-					'needServerModel': true,
+					'useSocket': true,
 					'view': MemoryView
 				}, {
 					'selector': 'Bandwidth',
 					'title': 'Bandwidth',
 					'mTitle': 'Bandwidth History & Information',
 					'class': 'col-md-3',
-					'needServerModel': true,
+					'useSocket': true,
 					'view': BandwidthView
 				}, {
 					'selector': 'Space',
@@ -65,22 +65,7 @@ define([
 		buildModules: function() {
 
 			this.Modules.forEach(function(module) {
-				var moduleName = module.selector
-				  , model = new Model(module);
-
-				this.views[moduleName] = new module.view({ model: model }, this.App);
-
-				if(module.needServerModel) {
-					this.listenTo(this.model, 'change:' + moduleName, function(m) {
-						var model = m.get(moduleName);
-
-						if(_.isArray(model)) {
-							model = {collection: model};
-						}
-
-						this.views[moduleName].model.set(model);
-					}, this);
-				}
+				this.views[module.selector] = new module.view({ model: new Model(module) }, this.App);
 			}.bind(this));
 		},
 

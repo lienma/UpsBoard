@@ -62,6 +62,8 @@ function routerIndex(req, res, status) {
 
 exports.login = function(req, res, next) {
 	req._passport.instance.authenticate('local', function(err, user, info) {
+console.log(user);
+
 		if(user) {
 			req.login(user, function(err) {
 				routerIndex(req, res, 'LOGIN_SUCCESSFUL');

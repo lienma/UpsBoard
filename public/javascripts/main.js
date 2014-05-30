@@ -4,6 +4,8 @@ require.config({
 	urlArgs: Config.Seed,
 
 	paths: {
+		'socket.io': 'libs/socket.io/socket.io',
+
 		'jquery': 'libs/jquery/jquery-2.0.3',
 		'underscore': 'libs/underscore/underscore-1.5.2',
 		'backbone': 'libs/backbone/backbone-1.1.0',

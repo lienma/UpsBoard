@@ -2,6 +2,7 @@ define({
 	url: '',
 	modelDefaults: {},
 	regularGraph: false,
+	useSocket: false,
 	colors: {},
 	tmplTabBody: null,
 	graphFields: [],

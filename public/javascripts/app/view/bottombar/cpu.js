@@ -15,6 +15,10 @@ define([
 
 			this.listenTo(this.model, 'change', this.update);
 
+			this.App.Socket.on('cpu', function(data) {
+				this.model.set(data);
+			}.bind(this));
+
 			this.$el.addClass('pointer').html(this.template(this.model.attributes));
 
 			this.setupBar();

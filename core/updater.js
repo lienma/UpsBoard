@@ -77,7 +77,7 @@ Updater.prototype.cmd = function(args, gitPath) {
 		}
 
 		output = output.trim();
-		log.debug('Git command', cmd.yellow, ' successfully returned:', output.cyan);
+		log.debug('Git command', cmd.yellow, ' successfully returned:', output.white);
 		promise.resolve(output);
 	});
 
@@ -222,7 +222,7 @@ Updater.prototype.doUpdate = function() {
 		log.debug('Found', ((diff.length == 0) ? 'no' : diff.length), 'dependencies.');
 
 		if(diff.length > 0) {
-			log.debug('Installing dependencies:', diff.join(' '));
+			log.info('Installing dependencies:', diff.join(' '));
 
 			exec('npm install', function(err, output, errMsg) {
 				if(err) {
@@ -230,6 +230,7 @@ console.log('npm install err:', err);
 
 				}
 
+				log.debug('Done installing the new dependencies.')
 				restart();
 			});
 		} else {

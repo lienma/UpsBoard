@@ -2,25 +2,21 @@
  * Module dependencies.
  */
 
-var express			= require('express')
-  , stylus			= require('stylus')
+var stylus			= require('stylus')
   , nib				= require('nib')
-  , http			= require('http')
   , path			= require('path')
   , os				= require('os')
   , when			= require('when')
-  , bcrypt			= require('bcrypt-nodejs')
   , expressUglify	= require('express-uglify');
-
-
-var passport		= require('passport')
-  , LocalStrategy	= require('passport-local').Strategy;
 
 var appRoot			= path.resolve(__dirname)
   , paths			= require(appRoot + '/core/paths');
 
 var routes			= require(paths.core + '/routes')
   , Configure		= require(paths.core + '/configure')
+  , io				= require(paths.core + '/io')
+  , Sessions		= require(paths.core + '/sessions')
+  , Socket			= require(paths.core + '/socket')
   , Updater			= require(paths.core + '/updater')
   , Common			= require(paths.core + '/common')
   , logger			= require(paths.logger)('MAIN_APP');
@@ -36,8 +32,15 @@ var bodyParser 		= require('body-parser')
   , serveStatic		= require('serve-static')
   , favicon			= require('static-favicon');
 
-var app				= express();
+var app				= require('express')();
     app.dir			= path.resolve(__dirname);
+    app.key			= 'ups.board.key';
+
+    app.sessions	= Sessions(app);
+
+var server			= require('http').Server(app);
+	app.io			= io(server, app);
+
 
 if(process.env.NODE_ENV == 'development') {
 	require('when/monitor/console');
@@ -62,34 +65,13 @@ Configure(app).then(function() {
 	app.set('views', 		path.join(paths.core, 'views'));
 	app.set('view engine', 	'jade');
 
-	passport.use(new LocalStrategy(function(username, password, done) {
-		if(username == app.config.user.username) {
-			bcrypt.compare(password, app.config.user.password, function(err, res) {
-				if(res) {
-					done(null, app.config.user);
-				} else {
-					done(null, false, { message: 'Incorrect username or password.' });
-				}
-			});
-		} else {
-			done(null, false, { message: 'Incorrect username or password.' });
-		}
-	}));
-
-	passport.serializeUser(function(username, done) {
-		done(null, 1);
-	});
-
-	passport.deserializeUser(function(userId, done) {
-		done(null, app.config.user);
-	});
 
 	//app.use(app.config.webRoot, favicon());
 
 	app.use(bodyParser());
 	app.use(methodOverride());
 	app.use(cookieParser());
-	app.use(session({ secret: app.config.salt, cookie: { maxAge: 24 * 60 * 60 * 1000 } }));
+	app.use(app.sessions.create());
 	app.use(csrf());
 
 
@@ -117,8 +99,8 @@ Configure(app).then(function() {
 		app.use(errorHandler({ dumpExceptions: true, showStack: true }));
 	}
 
-	app.use(passport.initialize());
-	app.use(passport.session());
+	app.use(app.sessions.passportInitialize());
+	app.use(app.sessions.passportSession());
 
 	app.use(app.config.webRoot + '/templates', Common.templateFormat);
 
@@ -151,17 +133,91 @@ Configure(app).then(function() {
 	app.get(webRoot + '/api/sickbeard/showsStats', routes.api.sickbeard.showsStats);
 	app.get(webRoot + '/api/sickbeard/upcoming', routes.api.sickbeard.upcoming);
 
-	app.get(webRoot + '/stats/all', routes.stats.all);
-	app.get(webRoot + '/stats/bandwidth', routes.stats.bandwidth);
-	app.get(webRoot + '/stats/cpu', routes.stats.cpu);
 	app.get(webRoot + '/stats/disks', routes.stats.disks);
-	app.get(webRoot + '/stats/memory', routes.stats.memory);
 	app.get(webRoot + '/stats/services', routes.stats.services);
 	app.get(webRoot + '/stats/weather', routes.stats.weather);
 
 }).then(function() {
-	var server = http.createServer(app);
+	var StopUpadating = app.config.debugStopUpdating
 
+	app.io.register({
+		name: 'cpu',
+		once: (StopUpadating) ? true : false,
+		timeout: (!StopUpadating) ? 2000 : false,
+		get: require(paths.stats + '/cpu'),
+		send: function(results, socket) { return when.resolve(results); }
+	});
+
+	var bw = app.config.bandwidth;
+	if(!StopUpadating) {
+		bw.forEach(function(server) {
+			app.io.register({
+				name: 'bandwidth:' + server.id,
+				timeout: 5000,
+				get: server.getBandwidth.bind(server),
+				send: Socket.Bandwidth
+			});
+		});
+	}
+
+	app.io.register({
+		name: 'bandwidth',
+		once: true,
+
+		get: function() {
+			var funcArray = [];
+			bw.forEach(function(server) {
+				funcArray.push(server.getBandwidth());
+			});
+			return when.all(funcArray);
+		},
+
+		send: function(results, socket) {
+			var funcArray = [];
+			results.forEach(function(server) {
+				funcArray.push(Socket.Bandwidth(server, socket));
+			});
+
+			return when.all(funcArray);
+		}
+	});
+
+	var memory = app.config.memory;
+	if(!StopUpadating) {
+		memory.forEach(function(server) {
+			app.io.register({
+				name: 'memory:' + server._id,
+				timeout: 5000,
+				get: server.getMemory.bind(server),
+				send: Socket.Memory
+			});
+		});
+	}
+
+	app.io.register({
+		name: 'memory',
+		once: true,
+
+		get: function() {
+			var funcArray = [];
+			memory.forEach(function(server) {
+				funcArray.push(server.getMemory());
+			});
+			return when.all(funcArray);
+		},
+
+		send: function(results, socket) {
+			var funcArray = [];
+			results.forEach(function(server) {
+				funcArray.push(Socket.Memory(server, socket));
+			});
+
+			return when.all(funcArray);
+		}
+	});
+
+
+}).then(function() {
 	server.listen(app.get('port'), app.get('host'), function() {
 		var uri = app.get('host') + ':' + app.get('port') + app.config.webRoot;
 

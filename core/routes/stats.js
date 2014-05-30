@@ -8,40 +8,6 @@ var appRoot 		= path.resolve(__dirname, '../../')
 
 var CPU				= require(paths.stats + '/cpu');
 
-exports.all = function(req, res) {
-
-	when.all([getCpu(req), getBandwidth(req), getMemory(req)]).then(function(data) {
-		res.json({ Cpu: data[0], Bandwidth: data[1], Memory: data[2] });
-	});
-};
-
-exports.bandwidth = function(req, res) {
-	getBandwidth(req).then(function(data) {
-		res.json(data);
-	}).otherwise(function(err) {
-console.log('exports.bandwidth:');
-console.log(err);
-	});
-};
-
-exports.cpu = function(req, res) {
-	getCpu(req).then(function(data) {
-		res.json(data);
-	}).otherwise(function(err) {
-console.log('exports.cpu:');
-console.log(err);
-	});
-};
-
-exports.memory = function(req, res) {
-	getMemory(req).then(function(data) {
-		res.json(data);
-	}).otherwise(function(err) {
-console.log('exports.memory:');
-console.log(err);
-	});
-};
-
 exports.disks = function(req, res) {
 	var drives = req.app.config.drives;
 
@@ -160,65 +126,7 @@ function copyProps(properties, to, from) {
 	});
 }
 
-function getBandwidth(req) {
-	var promise = when.defer()
-	  , bw = req.app.config.bandwidth
-	  , isLoggedIn = req.isAuthenticated();
 
-	var funcArray = [];
-	for(var i = 0; i < bw.length; i++) {
-		funcArray.push(bw[i].getBandwidth());
-	}
-
-	when.all(funcArray).then(function(results) {
-		var json = [];
-		results.forEach(function(server) {
-			var data = {};
-			copyProps(['_id', 'label', 'default', 'max', 'offline', 'dateSince', 'download', 'upload'], data, server);
-
-			if(server.cap) {
-				var action = server.cap[0], limit = server.cap[1];
-				var total = 0;
-				if(action.indexOf('Download') != -1) {
-					total += parseInt(server.thisMonth[0]);
-				}
-
-				if(action.indexOf('Upload') != -1) {
-					total += parseInt(server.thisMonth[1]);
-				}
-
-				data.cap = (isLoggedIn) ? total : Math.round(total / limit * 100);;
-				data.capLimit = (isLoggedIn) ? limit : 100;
-			} else {
-				data.cap = false;
-			}
-
-			if(isLoggedIn) {
-				copyProps(['total', 'lastMonth', 'thisMonth', 'today'], data, server);
-			}
-
-			json.push(data);
-		});
-
-		return promise.resolve(json);
-	}).otherwise(function(reason) {
-console.log('getBandwidth:');
-console.log(reason);
-		return promise.resolve([]);
-	});
-
-	return promise.promise;
-}
-
-function getCpu() {
-	var promise = when.defer()
-
-	CPU().then(function(data) {
-		return promise.resolve(data);
-	});
-
-	return promise.promise;
-}
 
 function getMemory(req) {
 	var promise = when.defer()
@@ -233,18 +141,7 @@ function getMemory(req) {
 	when.all(funcArray).then(function(results) {
 		var json = [];
 		results.forEach(function(server) {
-			if(!isLoggedIn) {
-				server = {
-					_id:		server._id,
-					label:		server.label,
-					default:	server.default,
-					offline:	(server.offline) ? true : false,
-					free:		Math.round(server.free / server.total * 100),
-					buffer:		Math.round(server.buffer / server.total * 100),
-					cache:		Math.round(server.cache / server.total * 100),
-					used: 		Math.round(server.used / server.total * 100)
-				};	
-			}
+
 
 			json.push(server);
 		});
