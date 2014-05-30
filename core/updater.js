@@ -1,45 +1,43 @@
 // This updater function is based off of Sick-Beard by midgetspy.
 // View their work at https://github.com/midgetspy/Sick-Beard.
 
-var exec	= require('child_process').exec
-  , when	= require('when')
-  , paths	= require('./paths')
-  , log		= require(paths.logger)('UPDATER');
+var exec		= require('child_process').exec
+  , schedule	= require('node-schedule')
+  , when		= require('when')
+  , paths		= require('./paths')
+  , log			= require(paths.logger)('UPDATER');
 
 function Updater(app) {
 	if(!(this instanceof Updater)) {
 		return new Updater(app);
 	}
 
+	this.allowChecks	= app.config.checkForUpdates;
 	this.enabled		= false;
 	this.app			= app;
 	this._currentHash	= null;
 	this._newestHash	= null;
 	this.updateObj		= false;
+	this.schedule		= false;
+
+	if(this.allowChecks) {
+		this.enable();
+	}
+};
+
+Updater.prototype.enable = function() {
+	if(this.enabled) return;
 
 	var self = this;
-	this._findWorkingGit().then(function(gitPath) {
-		self._gitPath		= gitPath;
-		self._gitRepoUser	= 'lienma';
-		self._gitRepo		= 'UpsBoard';
+	this._getDetails().then(function() {
+		self.allowChecks = true;
+		//self.checkForUpdate();
 
-		return self._getBranch().then(function(branch) {
-			self.branch		= branch;
+		if(self.schedule) self.schedule.cancel();
+
+		self.schedule = schedule.scheduleJob('0 1,13 * * *', function() {
+    		self.checkForUpdate();
 		});
-
-	}).then(function() {
-		self.checkForUpdate().then(function(needUpdate) {
-			if(needUpdate) {
-				log.debug('There is an update!');
-			} else {
-
-			}
-			self.updateObj = needUpdate;
-		});
-
-
-	}).otherwise(function(reason) {
-console.log('Bad:', reason);
 	});
 };
 
@@ -82,6 +80,23 @@ Updater.prototype.cmd = function(args, gitPath) {
 	});
 
 	return promise.promise;
+};
+
+Updater.prototype._getDetails = function() {
+	var self = this;
+	return this._findWorkingGit().then(function(gitPath) {
+		self._gitPath		= gitPath;
+		self._gitRepoUser	= 'lienma';
+		self._gitRepo		= 'UpsBoard';
+
+		return self._getBranch().then(function(branch) {
+			self.branch		= branch;
+		});
+
+	}).otherwise(function(reason) {
+
+console.log('Bad:', reason);
+	});
 };
 
 Updater.prototype._findWorkingGit = function() {
@@ -163,7 +178,9 @@ Updater.prototype._getGithubVersion = function() {
 
 Updater.prototype.checkForUpdate = function() {
 	log.info('Checking to see if UpsBoard needs an update.');
-	return when.all([this._getInstalledVersion(), this._getGithubVersion()]).then(function(results) {
+
+	var self = this;
+	when.all([this._getInstalledVersion(), this._getGithubVersion()]).then(function(results) {
 		if(results[1].behind > 0) {
 			return when.resolve({
 				current: results[0],
@@ -172,10 +189,16 @@ Updater.prototype.checkForUpdate = function() {
 				ahead: results[1].ahead
 			});
 		} else {
-			log.info('No updated need');
+			log.info('There is no new update available.');
 			return when.resolve(false);
 		}
-	})
+	}).then(function(needUpdate) {
+		if(needUpdate) {
+			log.debug('There is an update available!');
+		}
+
+		self.updateObj = needUpdate;
+	});
 };
 
 Updater.prototype.doUpdate = function() {

@@ -15,7 +15,10 @@ var config = module.exports = {
 	"port": 				8024,
 	"webRoot": 				"",
 
-	// Optional, If you want to stop the page requesting updates
+	// Allow UpsBoard check for new updates on startup and every 12 hours.
+	"checkForUpdates": 		true,
+
+	// Optional, If you want to stop the page requesting updates.
 	"debugStopUpdating": 	false,
 
 	// Optional, If you want to log the http requests.

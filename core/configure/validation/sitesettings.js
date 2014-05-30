@@ -15,6 +15,8 @@ module.exports 	= function validateSiteSettings(data) {
 	data.config.port	= (data.data.port) ? data.data.port : 8084;
 	data.config.webRoot = (data.data.webRoot || data.data.webRoot != '/') ? data.data.webRoot : '';
 
+	data.config.checkForUpdates = (data.data.checkForUpdates) ? true : false;
+
 	data.config.debugStopUpdating = (data.data.debugStopUpdating) ? true : false;
 	data.config.logHttpRequests = (data.data.logHttpRequests) ? true : false;
 

@@ -1,5 +1,18 @@
 Change Log
 
+0.2.1 - 5/29/2014
+	Updated:
+		Updater now runs every 12 hours and it can be disabled in the config.js file.
+
+
+0.2.0 - 5/29/2014
+	New:
+		Updater. This feature will check github every 12 hours to see if there has been an update. If there has been the logged in user will see a notice on their web browser to update UpsBoard.
+	Fixed:
+		Fixed the 'currently' weather bug.
+		Fixed the logged in user bug that would crashing the app.
+
+
 0.1.1 - 4/29/2014
 	Added:
 		Added a warning to the startup if GraphicsMagick is not installed. If GraphicsMagick is not installed then the images do not get resized before sending to user's browsers.
