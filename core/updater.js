@@ -1,7 +1,9 @@
 // This updater function is based off of Sick-Beard by midgetspy.
 // View their work at https://github.com/midgetspy/Sick-Beard.
 
-var exec		= require('child_process').exec
+var _			= require('underscore')
+  , exec		= require('child_process').exec
+  , fs			= require('fs')
   , schedule	= require('node-schedule')
   , when		= require('when')
   , paths		= require('./paths')
@@ -21,7 +23,7 @@ function Updater(app) {
 	this.schedule		= false;
 
 	if(this.allowChecks) {
-		this.enable();
+		this.status = this.enable();
 	}
 };
 
@@ -29,9 +31,9 @@ Updater.prototype.enable = function() {
 	if(this.enabled) return;
 
 	var self = this;
-	this._getDetails().then(function() {
+	return this._getDetails().then(function() {
 		self.allowChecks = true;
-		//self.checkForUpdate();
+return;
 
 		if(self.schedule) self.schedule.cancel();
 
@@ -179,6 +181,7 @@ Updater.prototype._getGithubVersion = function() {
 Updater.prototype.checkForUpdate = function() {
 	log.info('Checking to see if UpsBoard needs an update.');
 
+	var promise = when.defer();
 	var self = this;
 	when.all([this._getInstalledVersion(), this._getGithubVersion()]).then(function(results) {
 		if(results[1].behind > 0) {
@@ -189,22 +192,54 @@ Updater.prototype.checkForUpdate = function() {
 				ahead: results[1].ahead
 			});
 		} else {
-			log.info('There is no new update available.');
 			return when.resolve(false);
 		}
 	}).then(function(needUpdate) {
 		if(needUpdate) {
-			log.debug('There is an update available!');
+			log.info('There is an update available!');
+			promise.resolve(true);
+		} else {
+			log.info('There is no new update available.');
+			promise.resolve(false);
 		}
 
 		self.updateObj = needUpdate;
 	});
+
+	return promise.promise;
 };
 
 Updater.prototype.doUpdate = function() {
+	var package = paths.app + '/package.json';
+	var curDependencies = _.keys(require(package).dependencies);
+
 	return this.cmd('pull origin ' + this.branch).then(function() {
-		console.log('RESTART:' + process.pid);
+		log.debug('Checking for new dependences.');
+
+		var newDependencies = JSON.parse(fs.readFileSync(package, 'utf8')).dependencies;
+		var diff = _.keys(_.omit(newDependencies, curDependencies));
+
+		log.debug('Found', ((diff.length == 0) ? 'no' : diff.length), 'dependencies.');
+
+		if(diff.length > 0) {
+			log.debug('Installing dependencies:', diff.join(' '));
+
+			exec('npm install', function(err, output, errMsg) {
+				if(err) {
+console.log('npm install err:', err);
+
+				}
+
+				restart();
+			});
+		} else {
+			restart();
+		}
 	});
 };
+
+function restart() {
+	console.log('RESTART:' + process.pid);
+}
 
 module.exports = Updater;
