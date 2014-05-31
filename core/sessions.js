@@ -14,7 +14,7 @@ function Sessions(app) {
 		return new Sessions(app);
 	}
 
-	var file = app.dir + 'upsboard.db';
+	var file = app.dir + '/upsboard.db';
 	var exists = fs.existsSync(file);
 
 
