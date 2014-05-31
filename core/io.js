@@ -1,9 +1,11 @@
 var _				= require('underscore')
   , cookieParser	= require('cookie-parser')
-  , passport		= require('passport');
+  , passport		= require('passport')
+  , when			= require('when');
 
 var paths			= require('./paths')
-  , log				= require(paths.logger)('SOCKET.IO');
+  , log				= require(paths.logger)('SOCKET.IO')
+  , Socket			= require(paths.core + '/socket');
 
 function parseCookie(app, cookieHeader) {
 	var cp = cookieParser(app.config.salt);
@@ -78,6 +80,86 @@ function IOClass(server, app) {
 
 	io.register = function(opts) {
 		jobs.add(opts);
+	};
+
+	io.setup = function() {
+		var StopUpadating = app.config.debugStopUpdating
+	
+		app.io.register({
+			name: 'cpu',
+			once: (StopUpadating) ? true : false,
+			timeout: (!StopUpadating) ? 2000 : false,
+			get: require(paths.stats + '/cpu'),
+			send: function(results, socket) { return when.resolve(results); }
+		});
+	
+		var bw = app.config.bandwidth;
+		if(!StopUpadating) {
+			bw.forEach(function(server) {
+				app.io.register({
+					name: 'bandwidth:' + server.id,
+					timeout: 5000,
+					get: server.getBandwidth.bind(server),
+					send: Socket.Bandwidth
+				});
+			});
+		}
+	
+		app.io.register({
+			name: 'bandwidth',
+			once: true,
+	
+			get: function() {
+				var funcArray = [];
+				bw.forEach(function(server) {
+					funcArray.push(server.getBandwidth());
+				});
+				return when.all(funcArray);
+			},
+	
+			send: function(results, socket) {
+				var funcArray = [];
+				results.forEach(function(server) {
+					funcArray.push(Socket.Bandwidth(server, socket));
+				});
+	
+				return when.all(funcArray);
+			}
+		});
+	
+		var memory = app.config.memory;
+		if(!StopUpadating) {
+			memory.forEach(function(server) {
+				app.io.register({
+					name: 'memory:' + server._id,
+					timeout: 5000,
+					get: server.getMemory.bind(server),
+					send: Socket.Memory
+				});
+			});
+		}
+	
+		app.io.register({
+			name: 'memory',
+			once: true,
+	
+			get: function() {
+				var funcArray = [];
+				memory.forEach(function(server) {
+					funcArray.push(server.getMemory());
+				});
+				return when.all(funcArray);
+			},
+	
+			send: function(results, socket) {
+				var funcArray = [];
+				results.forEach(function(server) {
+					funcArray.push(Socket.Memory(server, socket));
+				});
+	
+				return when.all(funcArray);
+			}
+		});
 	};
 
 	return io;
