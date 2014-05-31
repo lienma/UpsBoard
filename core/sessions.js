@@ -33,6 +33,8 @@ function Sessions(app) {
 			store: this.store,
 			key: 'ups.board.key',
 			secret: app.config.salt,
+			cookie: { httpOnly: false },
+			proxy: true
 		});
 	};
 
