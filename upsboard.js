@@ -37,9 +37,7 @@ var app				= require('express')();
 
     app.sessions	= Sessions(app);
 
-var server			= require('http').Server(app);
-	app.io			= io(server, app);
-
+var server;
 
 if(process.env.NODE_ENV == 'development') {
 	require('when/monitor/console');
@@ -53,9 +51,9 @@ if(os.type() == 'Windows_NT') {
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 
 Configure(app).then(function() {
+	server		= require('http').Server(app);
+	app.io		= io(server, app);
 	app.updater = new Updater(app);
-
-
 	app.isMacOs = (os.type() == 'Linux') ? false : true;
 
 	// all environments

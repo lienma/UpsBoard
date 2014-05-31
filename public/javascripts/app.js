@@ -58,7 +58,8 @@ define([
 			Bandwidth: new (Backbone.Collection.extend({}))
 		};
 
-		this.Socket = io();
+		this.Socket = io.connect(location.protocol + '//' + location.host, {path: Config.WebRoot + '/socket.io'});
+
 		this.Socket.on('connect', function() {
 console.log('connected');
 		});

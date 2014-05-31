@@ -28,7 +28,7 @@ function IOClass(server, app) {
 		return new IOClass(server, app);
 	}
 
-	var io		= require('socket.io')(server);
+	var io		= require('socket.io')(server, {path: app.config.webRoot + '/socket.io'});
 	io.users	= [];
 	var jobs	= new Jobs(io);
 
