@@ -3,10 +3,11 @@ define([
 	'backbone',
 
 	(isLoggedIn) ? 'tmpl!view/topbar/user' : 'tmpl!view/topbar/loginform',
-	(isLoggedIn) ? 'tmpl!popover/user-menu' : ''
+	(isLoggedIn) ? 'tmpl!popover/user-menu' : '',
 
+	'app/view/topbar/accountsettings'
 
-], function(Backbone, TmplTopbarView, TmplUserMenu) {
+], function(Backbone, TmplTopbarView, TmplUserMenu, AccountSettings) {
 
 	var Login = Backbone.View.extend({
 
@@ -31,11 +32,6 @@ define([
 					}.bind(this));
 				}
 			}.bind(this));
-
-			setTimeout(function() {
-				this.$('.login').css('opacity', 1);
-				this.keyup();
-			}.bind(this), 500);
 		},
 
 		buildView: function() {
@@ -72,14 +68,18 @@ define([
 		keyup: function() {
 			var btn = this.$('.btn-login');
 			if(!this.isAnyEmpty()) {
-				btn.removeClass('btn-default disabled').addClass('btn-success');
+				btn.removeClass('btn-default').addClass('btn-success');
 			} else {
-				btn.removeClass('btn-success').addClass('btn-default disabled');
+				btn.removeClass('btn-success').addClass('btn-default');
 			}
 		}
 	});
 
 	var User = Backbone.View.extend({
+		events: {
+			'click .menu-account-settings': 'openAccountSettings'
+		},
+
 		initialize: function() {
 			this.popoverOpened = false;
 
@@ -108,6 +108,13 @@ define([
 			}.bind(this)).on('hide.bs.popover', function() {
 				this.popoverOpened = false;
 			}.bind(this));
+		},
+
+		openAccountSettings: function(event) {
+			event.preventDefault();
+
+console.log('Hello');
+			new AccountSettings();
 		}
 	});
 

@@ -33,7 +33,6 @@ Updater.prototype.enable = function() {
 	var self = this;
 	return this._getDetails().then(function() {
 		self.allowChecks = true;
-return;
 
 		if(self.schedule) self.schedule.cancel();
 

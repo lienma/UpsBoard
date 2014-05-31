@@ -1,6 +1,11 @@
 ul
   li
-    a(tabindex='-1', href=locals.webRoot + '/') Login Settings
+    a(tabindex='-1', href=locals.webRoot + '/').menu-account-settings Account Settings
+    a(tabindex='-1', href=locals.webRoot + '/') Customize Page
   li.divider
   li
-    a(tabindex='-1', href=locals.webRoot + '/?logout') Logout
+    a(tabindex='-1', href=locals.webRoot + '/') Admin Panel
+  li.divider
+  li
+    a(tabindex='-1', href=locals.webRoot + '/?logout', style='text-align: center')
+      strong Logout
