@@ -9,13 +9,10 @@ var appRoot 		= path.resolve(__dirname, '../../')
 
 var requirements	= require(paths.core + '/configure/requirements')
   , validation 		= require(paths.core + '/configure/validation')
-  , log 			= require(paths.logger)('CONFIG')
-  , configData 		= require(paths.app + '/config.js');
+  , log 			= require(paths.logger)('CONFIG');
 
-function Config(app) {
+function Config(app, configFile) {
 	var promise = when.defer();
-
-	log.debug('Loading configuration data.')
 
 	var validators = [
 		'SiteSettings',
@@ -33,7 +30,9 @@ function Config(app) {
 		'Weather',
 	];
 
-	var config = getConfigData().then(requirements(app));
+	var config = getConfigData(configFile).then(requirements(app));
+
+	log.debug('Loading configuration data.')
 
 	validators.forEach(function(validator) {
 		config = config.then(validation[validator]);
@@ -50,7 +49,10 @@ function Config(app) {
 	return promise.promise;
 }
 
-function getConfigData() {
+function getConfigData(configFile) {
+	log.debug('Loading configuration file at,', configFile.yellow);
+	var configData = require(configFile);
+
 	if(configData.version < 2) {
 		var err = new Error('INVALID_CONFIG');
 		err.reason = 'There is a new version of the config.js file.';
