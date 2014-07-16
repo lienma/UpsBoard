@@ -1,4 +1,5 @@
-var colors			= require('colors')
+var argv			= require('minimist')(process.argv.slice(2))
+  , colors			= require('colors')
   , forever			= require('forever-monitor')
   , path			= require('path');
 
@@ -8,13 +9,30 @@ var appRoot			= path.resolve(__dirname)
 var log				= require(paths.logger)('LAUNCHER');
 
 var restart			= false;
+
+var appOptions		= [];
+
+if(argv.config) {
+	appOptions.push('--config=' + argv.config);
+}
+
+if(argv.host) {
+	appOptions.push('--host=' + argv.host);
+}
+
+if(argv.port) {
+	appOptions.push('--port=' + argv.port);
+}
+
+if(argv.webroot) {
+	appOptions.push('--webroot=' + argv.webroot);
+}
+
 function app() {
 	var child = new (forever.Monitor)(appRoot + '/upsboard.js', {
-		'silent':	true,
-		'max':		1,
-		//'logFile':	'logs/log.forever',
-		//'outFile':	'logs/out.forever',
-		//'errFile':	'logs/err.forever'
+		silent:		true,
+		max:		1,
+		options:	appOptions
 	});
 
 	child.on('stderr', function(data) {
