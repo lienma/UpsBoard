@@ -84,7 +84,8 @@ console.log(reason);
 };
 
 exports.services = function(req, res) {
-	var services = req.app.config.services;
+	var services = req.app.config.services,
+	    userAuthenticated = req.isAuthenticated();
 
 	var funcArray = [];
 	services.forEach(function(service) {
@@ -99,7 +100,7 @@ exports.services = function(req, res) {
 
 			var url = service.getURL();
 			if(service.loginRequired) {
-				url = (req.isAuthenticated()) ? url : false;
+				url = (userAuthenticated) ? url : false;
 			}
 
 			var json = {
