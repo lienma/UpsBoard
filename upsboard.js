@@ -3,8 +3,10 @@
  */
 
 var stylus			= require('stylus')
+  , argv			= require('minimist')(process.argv.slice(2))
   , nib				= require('nib')
   , path			= require('path')
+  , fs 				= require('fs')
   , os				= require('os')
   , when			= require('when')
   , expressUglify	= require('express-uglify');
@@ -46,20 +48,39 @@ if(os.type() == 'Windows_NT') {
 	process.exit(0);
 }
 
+var	configFile = path.join(paths.app, '/config.js');
+
+if(argv.config) {
+	var cFile = path.resolve(paths.app, argv.config);
+	if(fs.existsSync(cFile)) {
+		configFile = cFile;
+	} else {
+		logger.error('Can not locate configration file at,', cFile.yellow);
+		process.exit(0);
+	}
+}
+
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 
+<<<<<<< HEAD
 Database(app).then(Configure).then(function() {
+=======
+Configure(app, configFile).then(function() {
+>>>>>>> e15ef0b01840e850a05b7c0a0085a96b795529e2
 	server		= require('http').Server(app);
 	app.socket	= Socket(server, app);
 	app.updater = new Updater(app);
 	app.isMacOs = (os.type() == 'Linux') ? false : true;
 
 	// all environments
-	app.set('host', app.config.host);
-	app.set('port', app.config.port);
+	app.set('host', (argv.host) ? argv.host : app.config.host);
+	app.set('port', (argv.port) ? argv.port : app.config.port);
 	app.set('views', path.join(paths.core, 'views'));
 	app.set('view engine', 	'jade');
 
+	if(argv.webroot) {
+		app.config.webRoot = argv.webroot
+	}
 
 	//app.use(app.config.webRoot, favicon());
 

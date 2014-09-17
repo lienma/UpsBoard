@@ -1,11 +1,15 @@
-var fs 		= require('fs')
+var argv	= require('minimist')(process.argv.slice(2))
+  , fs 		= require('fs')
   , moment 	= require('moment')
   , path 	= require('path')
   , _    	= require('underscore');
 
 var appRoot = path.resolve(__dirname, '../')
   , paths 	= require(appRoot + '/core/paths');
-var config 	= require(paths.app + '/config');
+
+
+var	configFile = argv.config ? path.resolve(paths.app, argv.config) : path.join(paths.app, '/config.js');
+var config = (fs.existsSync(configFile)) ? require(configFile) : {runningMode: 'debug'};
 
 function Logger(module) {
 	if(!(this instanceof Logger)) {
