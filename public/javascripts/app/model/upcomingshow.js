@@ -10,17 +10,8 @@ define([
 		},
 
 		moment: function() {
-			var airs = this.get('airs')
-			  , date = this.get('airdate');
-
-                airs = (airs) ? airs : '00:00';
-
-			var epTime = airs.match(/(\d+):(\d+)(\s*)(\w*)/);
-			var time = parseInt(epTime[1] + '' + epTime[2]);
-			    time = (epTime[4] == 'PM') ? 1200 + time : time;
-			    time = String((time.length == 3) ? '0' + time : time);
-
-
+			var date = this.get('airdate');
+			var time = this.getTime();
 			var hours = parseInt(time.substr(0, 2)), minutes = time.substr(2, 4);
 
 			var ampm = 'AM';
@@ -30,6 +21,17 @@ define([
 			}
 
 			return moment(date + ' ' + hours + ':' + minutes + ' ' + ampm, 'YYYY-MM-DD h:mm A');
+		},
+
+		getTime: function() {
+			var airs = this.get('airs');
+                airs = (airs) ? airs : '00:00';
+			var epTime = airs.match(/(\d+)([:]*(\d+))*(\s*)(\w*)/);
+			var time = parseInt(epTime[1] + '' + (epTime[3] ? epTime[3] : '00'));
+			    time = (epTime[5] == 'PM') ? 1200 + time : time;
+			    time = String((time.length == 3) ? '0' + time : time);
+
+			return time;
 		}
 	});
 

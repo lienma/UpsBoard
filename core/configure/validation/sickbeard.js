@@ -53,7 +53,7 @@ module.exports 	= function validateSickbeard(data) {
 
 	var sickbeardCacheFolder = path.join(paths.cache, 'sickbeard');
 	var cacheFolderExists = fs.existsSync(sickbeardCacheFolder);
-	log.debug('Does Sick Beard cache folder exist? ' + cacheFolderExists);
+	log.debug('Does Sick Beard cache folder exist?', String(cacheFolderExists).cyan);
 
 	if(!cacheFolderExists) {
 		log.debug('Creating cache folder for Sick Beard.');

@@ -27,7 +27,7 @@ function app() {
 
 		if(msg == 'RESTART:' + child.child.pid) {
 			restart = true;
-			log.info('Restarting UpsBoard');
+			log.info('Restarting UpsBoard.');
 			child.stop();
 		} else {
 			console.log(msg);
@@ -38,7 +38,7 @@ function app() {
 		if(restart) {
 			restart = false;
 			setTimeout(function() {
-				log.info('Starting UpsBoard Back Up.');
+				log.info('Attempting to start UpsBoard.');
 				app();
 			}, 5000);
 		}

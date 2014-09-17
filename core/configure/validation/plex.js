@@ -61,14 +61,14 @@ module.exports 	= function validatePlex(data) {
 		.then(function() { log.debug('Sending a ping to the plex media server.'); })
 		.then(plex.ping.bind(plex))
 
-		.then(function() { log.debug('Checking to see if th tv section id is proper - ' + options.recentTVSection); })
+		.then(function() { log.debug('Checking to see if the tv section id is proper, id:', String(options.recentTVSection).cyan); })
 		.then(function() {
 			var err = new Error('WRONG_TV_SECTION_ID');
 			err.reason = 'The TV section ID is not a tv section.';
 			return vaidateSection(options.recentTVSection, 'show', err);
 		})
 
-		.then(function() { log.debug('Checking to see if th movie section id is proper - ' + options.recentMovieSection); })
+		.then(function() { log.debug('Checking to see if the movie section id is proper, id:', String(options.recentMovieSection).cyan); })
 		.then(function() {
 			var err = new Error('WRONG_MOVIE_SECTION_ID');
 			err.reason = 'The Movie section ID is not a movie section.';
@@ -84,7 +84,7 @@ module.exports 	= function validatePlex(data) {
 
 	var plexCacheFolder = path.join(paths.cache, 'plex');
 	var cacheFolderExists = fs.existsSync(plexCacheFolder);
-	log.debug('Does Plex cache folder exist? ' + cacheFolderExists);
+	log.debug('Does Plex cache folder exist?', String(cacheFolderExists).cyan);
 
 	if(!cacheFolderExists) {
 		log.debug('Creating cache folder for Plex.');

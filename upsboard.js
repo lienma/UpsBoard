@@ -13,11 +13,11 @@ var appRoot			= path.resolve(__dirname)
   , paths			= require(appRoot + '/core/paths');
 
 var routes			= require(paths.core + '/routes')
-  , Configure		= require(paths.core + '/configure')
-  , io				= require(paths.core + '/io')
-  , Sessions		= require(paths.core + '/sessions')
-  , Updater			= require(paths.core + '/updater')
   , Common			= require(paths.core + '/common')
+  , Configure		= require(paths.core + '/configure')
+  , Database		= require(paths.core + '/database')
+  , Socket			= require(paths.core + '/socket')
+  , Updater			= require(paths.core + '/updater')
   , logger			= require(paths.logger)('MAIN_APP');
 
 var bodyParser 		= require('body-parser')
@@ -35,8 +35,6 @@ var app				= require('express')();
     app.dir			= path.resolve(__dirname);
     app.key			= 'ups.board.key';
 
-    app.sessions	= Sessions(app);
-
 var server;
 
 if(process.env.NODE_ENV == 'development') {
@@ -50,9 +48,9 @@ if(os.type() == 'Windows_NT') {
 
 logger.info('Starting up app in', (process.env.NODE_ENV) ? process.env.NODE_ENV : 'unknown', 'environment.');
 
-Configure(app).then(function() {
+Database(app).then(Configure).then(function() {
 	server		= require('http').Server(app);
-	app.io		= io(server, app);
+	app.socket	= Socket(server, app);
 	app.updater = new Updater(app);
 	app.isMacOs = (os.type() == 'Linux') ? false : true;
 
@@ -136,9 +134,8 @@ Configure(app).then(function() {
 
 }).then(function() {
 
-	app.io.setup();
+	app.socket.setup();
 
-}).then(function() {
 	server.listen(app.get('port'), app.get('host'), function() {
 		var uri = app.get('host') + ':' + app.get('port') + app.config.webRoot;
 
