@@ -20,7 +20,8 @@ function Service(host, port, options) {
 	this.label = (options.label) ? options.label : '';
 	this.host = host;
 	this.port = port;
-	this.url = (options && options.url) ? options.url : false;
+	this.url = (options.url) ? options.url : false;
+	this.loginRequired = (options.loginRequired) ? options.loginRequired : false;
 }
 
 Service.prototype.getHost = function() {
